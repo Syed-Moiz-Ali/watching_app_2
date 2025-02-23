@@ -1,0 +1,20 @@
+[
+  {
+    "url": "https://manhwa18.cc/",
+    "searchUrl": "https://manhwa18.cc/search?q=${search}&page=${page}",
+    "type": "4",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "manhwa18",
+    "icon": "https://manhwa18.cc/images/manhwa18.png",
+    "pageType": "page",
+    "query": {
+      "latest": "webtoons/{page}?orderby=latest",
+      "popular": "webtoons/{page}?orderby=trending",
+      "yuri": "webtoons/{page}?orderby=trending"
+    }
+  }
+]

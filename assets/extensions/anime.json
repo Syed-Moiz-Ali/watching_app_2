@@ -1,0 +1,38 @@
+[
+  {
+    "url": "https://hentaifox.tv/",
+    "searchUrl": "https://hentaifox.tv/search/?q={search}&page={page}",
+    "type": "5",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "hentaifox",
+    "icon": "https://hentaifox.com/images/logo.png",
+    "pageType": "page",
+    "query": {
+      "latest": "?page={page}",
+      "popular": "sort/most-views/?page={page}",
+      "yuri": "sort/most-likes/?page={page}"
+    }
+  },
+  {
+    "url": "https://watchhentai.net/",
+    "searchUrl": "https://watchhentai.net/page/{page}/?s={search}",
+    "type": "5",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "hentaifox",
+    "icon": "https://hentaifox.com/images/logo.png",
+    "pageType": "page",
+    "query": {
+      "latest": "trending/page/{page}/",
+      "popular": "sort/most-views/?page={page}",
+      "yuri": "sort/most-likes/?page={page}"
+    }
+  }
+]

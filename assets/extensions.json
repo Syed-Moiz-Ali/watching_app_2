@@ -1,0 +1,806 @@
+[
+  {
+    "url": "https://spankbang.party/",
+    "type": "1",
+    "searchUrl": "https://spankbang.party/s/{search}/{page}?{filter}/",
+    "getType": "1",
+    "decodeType": "1",
+    "isEmbed": "1",
+    "categUrl":"https://spankbang.party/tags",
+    "query": {
+      "trending": "trending_videos/{page}/?{filter}",
+      "popular": "most_popular/{page}/?{filter}",
+      "upcoming": "upcoming/{page}/?{filter}",
+      "new": "new_videos/{page}/?{filter}"
+    },
+    "name": "spankbang",
+    "icon": "https://assets.sb-cd.com/static/mobile/Images/logo_v5@2x.png",
+    "NSFW": "1",
+    "isPreview": "1"
+  },
+  {
+    "url": "https://goodporn.to/",
+    "searchUrl": "https://goodporn.to/search/{search}/",
+    "categUrl":"https://goodporn.to/categories/",
+    "type": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isEmbed": "0",
+    "name": "goodporn",
+    "icon": "https://statics.goodporn.to/static/images/logo.png",
+    "NSFW": "1",
+    "isPreview": "0",
+    "query": {
+      "latest updates": "latest-updates/{page}/",
+      "top rated": "top-rated/{page}/",
+      "most popular": "most-popular/{page}/"
+    }
+  },
+  {
+    "url": "https://noodlemagazine.com/now",
+    "searchUrl": "https://noodlemagazine.com/video/{search}?p={page}",
+    "type": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isEmbed": "0",
+    "name": "noodlemagazine",
+    "icon": "https://noodlemagazine.com/static/extend/dark/android-icon-192x192.png",
+    "NSFW": "1",
+    "isPreview": "1",
+    "pageStart" : "0",
+    
+    "query": {
+      "latest updates": "?p={page}"
+     
+    }
+  },
+  {
+    "url": "https://www.tabooporn.tv/",
+    "searchUrl": "https://www.tabooporn.tv/search/{search}/",
+    "categUrl": "https://www.tabooporn.tv/categories/",
+    "type": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isEmbed": "0",
+    "name": "tabooporn",
+    "icon": "https://www.tabooporn.tv/images/logo.png",
+    "NSFW": "1",
+    "isPreview": "1",
+    "query": {
+      "latest updates": "latest-updates/{page}/",
+      "top rated": "top-rated/{page}/",
+      "most popular": "most-popular/{page}/"
+    }
+  },
+  {
+    "url": "https://hqporner.com/",
+    "searchUrl": "https://hqporner.com/?q={search}&p={page}",
+    "categUrl": "https://hqporner.com/categories",
+    "type": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isEmbed": "1",
+    "name": "hqporner",
+    "icon": "https://fastporndelivery.hqporner.com/favicon.ico",
+    "NSFW": "1",
+    "isPreview": "0",
+    "query": {
+      "latest updates": "hdporn/{page}",
+      "top rated": "top/{page}"
+      
+    }
+  },
+  {
+    "url": "https://www.tabooporn.to/",
+    "searchUrl": "https://tabooporn.to/page/{page}/?s={search}",
+    "type": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isEmbed": "0",
+    "name": "tabooporn2",
+    "icon": "https://tabooporn.to/wp-content/uploads/2023/07/cropped-T-32x32.png",
+    "NSFW": "1",
+    "isPreview": "0",
+    "query": {
+      "latest updates": "page/{page}/",
+      "hot": "hot/page/{page}/",
+      "trending": "trending/page/{page}/",
+      "most popular": "popular/page/{page}/"
+    }
+  },
+  {
+    "url": "https://www.youjizz.com/",
+    "searchUrl": "https://www.youjizz.com/search/{search}-{page}.html?",
+    "type": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isEmbed": "0",
+    "name": "youjizz",
+    "icon": "https://cdne-static.cdn1122.com/app/1/images/youjizz-logo-1.png",
+    "NSFW": "1",
+    "isPreview": "1",
+    "query": {
+      "latest updates": "",
+      "top rated": "top-rated/{page}.html",
+      "trending": "trending/{page}.html",
+      "most popular": "most-popular/{page}.html",
+      "random": "random"
+    }
+  },
+  {
+    "url": "https://pimpbunny.com/",
+    "searchUrl": "https://pimpbunny.com/search/{search}/{page}/",
+    "type": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isEmbed": "1",
+    "name": "pimpbunny",
+    "icon": "https://pimpbunny.com/static/images/pb/logo/header/default.png",
+    "NSFW": "1",
+    "isPreview": "0",
+    "query": {
+      "featured": "{page}/?videos_per_page=30",
+      "latest updates": "videos/{page}/?videos_per_page=30&sort_by=post_date&duration=0;0",
+      "top rated": "videos/{page}/?videos_per_page=30&sort_by=rating&duration=0;0",
+      "most viewed": "videos/{page}/?videos_per_page=30&sort_by=video_viewed&duration=0;0"
+     
+    }
+  },
+  {
+    "url": "https://baddies.xxx/",
+    "searchUrl": "https://baddies.xxx/search/{search}/{page}/",
+    "type": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isEmbed": "1",
+    "name": "baddies",
+    "icon": "https://baddies.xxx/static/images/bx/logo/header/default.png",
+    "NSFW": "1",
+    "isPreview": "0",
+    "query": {
+      "featured": "{page}/?videos_per_page=30",
+      "latest updates": "videos/{page}/?videos_per_page=30&sort_by=post_date&duration=0;0",
+      "top rated": "videos/{page}/?videos_per_page=30&sort_by=rating&duration=0;0",
+      "most viewed": "videos/{page}/?videos_per_page=30&sort_by=video_viewed&duration=0;0"
+     
+    }
+  },
+  {
+    "url": "https://en.luxuretv.com/",
+    "searchUrl": "https://en.luxuretv.com/searchgate/videos/{search}/page{page}.html",
+    "type": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isEmbed": "0",
+    "name": "luxuretv",
+    "icon": "https://en.luxuretv.com/images/logo.png",
+    "NSFW": "1",
+    "isPreview": "0",
+    "query": {
+      "latest updates": "",
+      "top rated": "top-rated/page{page}.html",
+      "most viewed": "most-viewed/page{page}.html",
+      "longest": "longest/page{page}.html"
+    }
+  },
+ 
+  {
+    "url": "https://www.freeomovie.to/",
+    "searchUrl": "https://www.freeomovie.to/page/{page}?s={search}",
+    "type": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "name": "freeomovie",
+    "icon": "https://www.freeomovie.to/wp-content/uploads/2023/05/freeomovie.to_.png",
+    "NSFW": "1",
+    "isPreview": "0",
+    "isEmbed": "1",
+    "pageType": "page/",
+    "query": {
+      "fullmovie": "category/full-movie/page/{page}/",
+      "clips": "category/clips/page/{page}/",
+      "all sex": "category/all-sex/page/{page}/",
+      "all girl": "category/all-girl/page/{page}/",
+      "big tits": "category/big-tits/page/{page}/"
+    }
+  },
+  
+
+  {
+    "url": "https://crazyshit.com/",
+    "searchUrl": "https://crazyshit.com/search/{search}/{page}/",
+
+    "type": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "name": "crazyshit",
+    "icon": "https://crazyshit.com/favicon.ico",
+    "NSFW": "1",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "query": {
+      "videos": "videos/{page}/",
+      "extreme content": "category/extreme-content/{page}/",
+      "fight": "category/fight/{page}/",
+      "pictures": "pictures/{page}/"
+    }
+  },
+
+  {
+    "url": "https://kompoz2.com/",
+    "searchUrl": "https://kompoz2.com/find/{search}/?page={page}",
+    "type": "1",
+    "NSFW": "1",
+    "decodeType": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "kompoz2",
+    "icon": "https://kompoz2.com/favicon.png",
+    "pageType": "page=",
+    "query": {
+      "latest": "latest/?page={page}",
+      "top rated videos": "top-rated-videos/?page={page}",
+      "most-viewed-videos": "most-viewed-videos/?page={page}",
+      "longest-videos": "longest-videos/?page={page}"
+    }
+  },
+  {
+    "url": "https://collectionofbestporn.com/",
+    "searchUrl": "https://collectionofbestporn.com/search/{search}/page/{page}",
+    "type": "1",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "collectionofbestporn",
+    "icon": "https://collectionofbestporn.com/templates/cobp/images/logo.png",
+    "pageType": "page/",
+    "query": {
+      "latest": "most-recent/page/{page}",
+      "top rated videos": "top-rated/page/{page}",
+      "most-viewed-videos": "most-viewed/page/{page}",
+      "longest-videos": "longest/page/{page}"
+    }
+  },
+  {
+    "url": "https://eroticmv.com/",
+    "searchUrl": "https://eroticmv.com/page/{page}/?s={search}",
+    "type": "1",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "1",
+    "name": "eroticmv",
+    "icon": "https://eroticmv.com/wp-content/uploads/2019/10/logo-2.png",
+    "pageType": "page/",
+    "query": {
+      "latest": "category/decades/page/{page}/?archive_query=latest&alphabet_filter",
+      "top rated videos": "category/decades/page/{page}/?archive_query=highest_rated&alphabet_filter",
+      "most-viewed-videos": "category/decades/page/{page}/?archive_query=view&alphabet_filter"
+     
+    }
+  },
+  {
+    "url": "https://www.brazz.org/",
+    "searchUrl": "https://brazz.org/page/{page}/?s={search}",
+    "type": "1",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "1",
+    "isEmbed": "1",
+    "name": "brazz",
+    "isCloudflare": "1",
+    "icon": "https://eroticmv.com/wp-content/uploads/2019/10/logo-2.png",
+    "pageType": "page/",
+    "query": {
+      "latest": "page/{page}/?filter=latest",
+      "most viewed videos": "page/{page}/?filter=most-viewed",
+      "most popular videos": "page/{page}/?filter=popular",
+      "longest videos": "page/{page}/?filter=longest"
+     
+    }
+  },
+  {
+    "url": "https://bigfuck.tv/",
+    "searchUrl": "https://bigfuck.tv/s/{search}/{page}/",
+    "type": "1",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "1",
+    "isEmbed": "0",
+    "name": "bigfuck",
+    "icon": "https://bigfuck.tv/static/images/favicon/android-icon-192x192-29712ba36c.png",
+
+    "query": {
+      "latest": "recent/{page}/",
+      "trending": "trends/{page}/",
+      "best videos": "best/{page}/",
+      "most popular": "most-popular/{page}/"
+    }
+  },
+  {
+    "url": "https://xtapes.to/",
+    "searchUrl": "https://xtapes.to/page/{page}/?s={search}",
+    "type": "1",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "1",
+    "name": "xtapes",
+    "icon": "https://xtapes.to/wp-content/uploads/xtapes2.png",
+
+    "query": {
+      "latest": "page/{page}/?filtre=date",
+      "most viewed": "page/{page}/?filtre=views",
+      "random videos": "page/{page}/?filtre=random",
+      "longest": "page/{page}/?filtre=duree",
+      "top rated": "page/{page}/?filtre=rate"
+    }
+  },
+
+  {
+    "url": "https://netfapx.net/",
+    "searchUrl": "https://netfapx.net/page/{page}/?s={search}",
+    "type": "1",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "1",
+    "name": "netfapx",
+    "icon": "https://netfapx.net/wp-content/uploads/2023/06/logo.png",
+    "pageType": "page/",
+    "query": {
+      "latest": "1b/latest-porn-videos/page/{page}/?filter=latest",
+      "popular": "1b/latest-porn-videos/page/{page}/?filter=popular",
+      "longest": "1b/latest-porn-videos/page/{page}/?filter=longest",
+      "random": "1b/latest-porn-videos/page/{page}/?filter=random"
+    }
+  },
+  {
+    "url": "https://slutvids.net/",
+    "searchUrl": "https://slutvids.net/page/{page}/?s={search}",
+    "type": "1",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "1",
+    "name": "slutvids",
+    "icon": "https://slutvids.net/wp-content/uploads/2024/01/cropped-favicon-192x192.png",
+    "pageType": "page/",
+    "query": {
+      "treniding": "category/trending/",
+      "manyVids leaks": "category/manyvids/",
+      "onlyfans leaks": "category/onlyfans/",
+      "latest": "?filter=latest",
+      "longest": "?filter=longest",
+      "random": "?filter=random"
+    }
+  },
+  {
+    "url": "https://milfnut.com/",
+    "searchUrl": "https://milfnut.com//page/{page}/?s={search}",
+    "type": "1",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "1",
+    "name": "milfnut",
+    "icon": "https://milfnut.com/wp-content/uploads/2021/12/cropped-pause-solid-1-192x192.png",
+    "pageType": "page/",
+    "query": {
+      "treniding": "category/trending/",
+      "latest": "?filter=latest",
+      "longest": "?filter=longest",
+      "random": "?filter=random"
+    }
+  },
+  {
+    "url": "https://trannyvideosxxx.net/",
+    "searchUrl": "https://trannyvideosxxx.net/page/{page}?s={search}",
+    "type": "1",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "1",
+    "name": "tranny",
+    "icon": "https://trannyvideosxxx.net/wp-content/uploads/2022/10/logo.png",
+    "pageType": "page/",
+    "query": {
+      "latest": "tranny-videos/page/{page}/?filter=latest",
+      "most viewed": "tranny-videos/page/{page}/?filter=most-viewed",
+      "longest": "tranny-videos/page/{page}/?filter=longest",
+      "popular": "tranny-videos/page/{page}/?filter=popular",
+      "random": "tranny-videos/page/{page}/?filter=random",
+      "latest dvd": "tag/dvd/page/{page}/?filter=latest",
+      "most viewed dvd": "tag/dvd/page/{page}/?filter=most-viewed",
+      "longest dvd": "tag/dvd/page/{page}/?filter=longest",
+      "popular dvd": "tag/dvd/page/{page}/?filter=popular",
+      "random dvd": "tag/dvd/page/{page}/?filter=random"
+    }
+  },
+  {
+    "url": "https://www.whoreshub.com/",
+    "searchUrl": "https://www.whoreshub.com/search/{search}/",
+    "type": "1",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "1",
+    "isEmbed": "1",
+    "name": "whoreshub",
+    "icon": "https://ik.imagekit.io/ienxzh4c2/image2.png?updatedAt=1715758617400",
+
+    "query": {
+      "latest": "latest-updates/{page}/",
+      "most popular": "most-popular/{page}/",
+      "top rated": "top-rated/{page}/"
+    }
+  },
+  {
+    "url": "https://porntop.com/",
+    "searchUrl": "https://porntop.com/search/{search}/?p={page}",
+    "type": "1",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "1",
+    "isEmbed": "1",
+    "name": "porntop",
+    "icon": "https://porntop.com/upd/20240507.140813.1103/static/images/favicons/apple-touch-icon.png",
+    "pageType": "p=",
+    "query": {
+      "latest": "l/?p={page}",
+      "most popular": "pm/?p={page}",
+      "top rated": "bm/?p={page}",
+      "longest": "d/?p={page}"
+    }
+  },
+  {
+    "url": "https://pandamovies.org/",
+    "searchUrl": "https://pandamovies.org/page/{page}?s={search}",
+    "type": "1",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "1",
+    "name": "pandamovies",
+    "icon": "https://pandamovies.org/wp-content/uploads/2023/04/download-1-1.png",
+    "pageType": "page/",
+    "query": {
+      "latest": "movies/page/{page}"
+    }
+  },
+  {
+    "url": "https://www.3movs.com/",
+    "searchUrl": "https://www.3movs.com/search_videos/?q={search}",
+    "type": "1",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "1",
+    "isEmbed": "1",
+    "name": "3movs",
+    "icon": "https://pandamovies.org/wp-content/uploads/2023/04/download-1-1.png",
+    "pageType": "page/",
+    "query": {
+      "recently featured": "videos/{page}/",
+      "Latest": "latest-updates/{page}/",
+      "most visited": "most-viewed/all-time/{page}/",
+      "top rated": "top-rated/all-time/{page}/",
+      "Longest": "longest/{page}/"
+     
+    }
+  },
+  {
+    "url": "https://internetchicks.com/",
+    "searchUrl": "https://internetchicks.com/",
+    "type": "1",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "1",
+    "name": "internetchicks",
+    "icon": "https://internetchicks.com/wp-content/uploads/2021/01/cropped-vibes__9_-removebg-preview-180x180.png?x93186",
+    "pageType": "page/",
+    "query": {
+      "onlyfans": "category/onlyfans/page/{page}/",
+      "asmr": "category/asmr/page/{page}/",
+      "femdom": "category/femdom/page/{page}/",
+      "manyvids": "category/manyvids/page/{page}/",
+      "patreon": "category/patreon/page/{page}/",
+      "photos": "category/photos/page/{page}/",
+      "snapchat": "category/snapchat/page/{page}/",
+      "tiktok": "category/tiktok/page/{page}/",
+      "webcam": "category/webcam/page/{page}/"
+    }
+  },
+//photos
+  {
+    "url": "https://x-pictures.io/aiporn/gallery",
+    "searchUrl": "https://x-pictures.io/aiporn/gallery?query={search}&page={page}",
+    "type": "3",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "1",
+    "name": "xpictures",
+    "icon": "https://ik.imagekit.io/ienxzh4c2/image.png?updatedAt=1715758617289",
+    "pageType": "page=",
+    "query": {
+      "all": "?page={page}"
+    }
+  },
+  {
+    "url": "https://www.peakpx.com/",
+    "searchUrl": "https://www.peakpx.com/en/search?q={search}&page={page}",
+    "type": "3",
+    "decodeType": "1",
+    "NSFW": "0",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "peakpx",
+    "icon": "https://www.peakpx.com/public/favicons/apple-touch-icon.png",
+    "pageType": "page=",
+    "query": {
+      "all": "?page={page}"
+    }
+  },
+  {
+    "url": "https://www.pxfuel.com/",
+    "searchUrl": "https://www.pxfuel.com/en/query?q={search}&page={page}",
+    "type": "3",
+    "decodeType": "1",
+    "NSFW": "0",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "pxfuel",
+    "icon": "https://www.pxfuel.com/public/icons/apple-touch-icon.png",
+    "pageType": "page=",
+    "query": {
+      "all": "?page={page}"
+    }
+  },
+  {
+    "url": "https://www.wallpaperbetter.com/",
+    "searchUrl": "https://www.wallpaperbetter.com/es/search?q={search}&page={page}",
+    "type": "3",
+    "decodeType": "1",
+    "NSFW": "0",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "wallpaperbetter",
+    "icon": "https://www.wallpaperbetter.com/public/css/favicon.ico?2021",
+    "pageType": "page=",
+    "query": {
+      "all": "?page={page}"
+    }
+  },
+  {
+    "url": "https://wallpaper.mob.org/",
+    "searchUrl": "https://wallpaper.mob.org/gallery/tag={search}/{page}/",
+    "type": "3",
+    "decodeType": "1",
+    "NSFW": "0",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "wallpaper.mob",
+    "icon": "https://mobjs.b-cdn.net/_/img/mob-favicon.ico",
+    "pageType": "page=",
+    "query": {
+      "all": "best/{page}/"
+    }
+  },
+  
+  {
+    "url": "https://taboohome.com/",
+    "searchUrl": "https://taboohome.com/page/{page}/?s={search}",
+    "type": "1",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "1",
+    "name": "taboohome",
+    "icon": "https://taboohome.com/wp-content/uploads/2021/09/cropped-TabooHome-favicon-300x300.png",
+    "pageType": "page/",
+    "query": {
+      "incest": "thvideocat/incest/page/{page}",
+      "mom son": "thvideocat/mom-son-porn/page/{page}",
+      "brother sister": "thvideocat/brother-sister-porn/page/{page}",
+      "father daughter": "thvideocat/father-daughter-porn/page/{page}"
+    }
+  },
+
+  {
+    "url": "https://watchporninpublic.net/",
+    "searchUrl": "https://watchporninpublic.net/page/{page}/?s={search}",
+    "type": "1",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "1",
+    "icon": "https://watchporninpublic.net/wp-content/uploads/2024/03/logo2.png",
+    "name": "watchporninpublic",
+    "pageType": "page/",
+    "query": {
+      "latest": "category/watchporninpublic-videos/page/{page}/?filter=latest",
+      "popular": "category/watchporninpublic-videos/page/{page}/?filter=popular",
+      "longest": "category/watchporninpublic-videos/page/{page}/?filter=longest",
+      "random": "category/watchporninpublic-videos/page/{page}/?filter=random",
+      "public latest": "category/public-porn-videos/page/{page}/?filter=latest",
+      "public popular": "category/public-porn-videos/page/{page}/?filter=popular",
+      "public longest": "category/public-porn-videos/page/{page}/?filter=longest",
+      "public random": "category/public-porn-videos/page/{page}/?filter=random",
+
+      "outdoor latest": "category/public-sex-porn/page/{page}/?filter=latest",
+      "outdoor popular": "category/public-sex-porn/page/{page}/?filter=popular",
+      "outdoor longest": "category/public-sex-porn/page/{page}/?filter=longest",
+      "outdoor random": "category/public-sex-porn/page/{page}/?filter=random",
+
+      "onlyfans latest": "category/onlyfans/page/{page}/?filter=latest",
+      "onlyfans popular": "category/onlyfans/page/{page}/?filter=popular",
+      "onlyfans longest": "category/onlyfans/page/{page}/?filter=longest",
+      "onlyfans random": "category/onlyfans/page/{page}/?filter=random"
+    }
+  },
+//tiktok
+  {
+    "url": "https://api.fikfap.com/cached-high-quality/posts?amount=10&sort=random",
+
+    "type": "2",
+    "decodeType": "2",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "fikfap",
+    "icon": "https://fikfap.com/apple-touch-icon.png?v=2",
+    "headers":{ "Authorization-Anonymous":"35e0a0b1-a7db-44fa-812c-ba23c91cab9d"},
+
+    "query": {
+      "recent": ""
+    }
+  },
+  {
+    "url": "https://apiv2.tik.porn/getnextvideos",
+    "type": "2",
+    "NSFW": "1",
+    "decodeType": "2",
+    "getType": "2",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "tikporn",
+    "icon": "https://tik.porn/apple-touch-icon.png",
+    "body": { "amount": "10" },
+
+    "query": {
+      "recent": ""
+    }
+  },
+
+ 
+
+  {
+    "url": "https://pmatehunter.com/",
+    "type": "3",
+    "NSFW": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isPreview": "0",
+    "name": "pmatehunter",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://cdn.pmatehunter.com/wp-content/themes/masonry/images/favicons/apple-touch-icon.png",
+    "query": {
+      "pics": "updates/sort/filter/ord/0/content/pix/quality/0/tags/0/",
+      "archive": "archive/page/{page}",
+      "trending": "updates/",
+      "newest": "updates/sort/newest/mpage/{page}",
+      "popular": "updates/sort/popular/mpage/{page}"
+    }
+  },
+  {
+    "url": "https://www.pornpics.com/",
+    "type": "3",
+    "NSFW": "1",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "name": "pornpics",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://static.pornpics.com/favicon/apple-touch-icon.png?v=1",
+    "query": {
+      "recent": "recent/?limit=20&offset={offset}",
+      
+    
+      "popular": "popular/?limit=20&offset={offset}"
+    }
+  },
+  {
+    "url": "https://www.sex.com/",
+    "type": "3",
+    "NSFW": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isPreview": "0",
+    "name": "sex",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://sximagex1.sxccdn.com/sex/Logo.webp",
+    "query": {
+      "all":"pins",
+      "pics recent": "pics/?sort=latest&sub=all&page={page}",
+      
+      
+      "pics popular": "pics/?sort=popular&sub=all&page={page}",
+      "gifs recent": "videos/?sort=latest&sub=all&page={page}",
+      "gifs popular": "videos/?sort=popular&sub=all&page={page}"
+    }
+  },
+
+
+  
+  {
+    "url": "https://www.xxxfollow.com/api/v1/user/public?",
+    "type": "2",
+    "NSFW": "1",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "xxxfollow",
+    "icon": "https://media.xxxfollow.com/media/fans/assets/manifest/xfollow/xfollow-apple-touch-icon-512x512.png",
+    "pageType": "page=",
+    "query": {
+      "recent": ""
+    }
+  },
+  {
+    "url": "https://api.avrebo.net/api/v1/video/listRandom?limit=20",
+    "type": "2",
+    "NSFW": "1",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "avrebo",
+    "icon": "https://www.avrebo.com/pwa-icons/android-chrome-192x192.png",
+    "headers":{},
+    "query": {
+      "recent": ""
+    }
+  },
+  {
+    "url": "https://api.redgifs.com/v2/feeds/home?page=1&count=20",
+    "type": "2",
+    "NSFW": "1",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "redgifs",
+    "icon": "https://www.redgifs.com/apple-touch-icon.png",
+    "query": {
+      "recent": ""
+    }
+  }
+]

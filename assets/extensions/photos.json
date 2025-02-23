@@ -1,0 +1,250 @@
+[
+  {
+    "url": "https://x-pictures.io/aiporn/gallery",
+    "searchUrl": "https://x-pictures.io/aiporn/gallery?query={search}&page={page}",
+    "type": "3",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "1",
+    "name": "xpictures",
+    "icon": "https://ik.imagekit.io/ienxzh4c2/image.png?updatedAt=1715758617289",
+    "pageType": "page=",
+    "query": {
+      "all": "?page={page}"
+    }
+  },
+  {
+    "url": "https://www.peakpx.com/",
+    "searchUrl": "https://www.peakpx.com/en/search?q={search}&page={page}",
+    "type": "3",
+    "decodeType": "1",
+    "NSFW": "0",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "peakpx",
+    "icon": "https://www.peakpx.com/public/favicons/apple-touch-icon.png",
+    "pageType": "page=",
+    "query": {
+      "all": "?page={page}"
+    }
+  },
+  {
+    "url": "https://www.pxfuel.com/",
+    "searchUrl": "https://www.pxfuel.com/en/query?q={search}&page={page}",
+    "type": "3",
+    "decodeType": "1",
+    "NSFW": "0",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "pxfuel",
+    "icon": "https://www.pxfuel.com/public/icons/apple-touch-icon.png",
+    "pageType": "page=",
+    "query": {
+      "all": "?page={page}"
+    }
+  },
+  {
+    "url": "https://www.wallpaperbetter.com/",
+    "searchUrl": "https://www.wallpaperbetter.com/es/search?q={search}&page={page}",
+    "type": "3",
+    "decodeType": "1",
+    "NSFW": "0",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "wallpaperbetter",
+    "icon": "https://www.wallpaperbetter.com/public/css/logo.svg",
+    "pageType": "page=",
+    "query": {
+      "all": "?page={page}"
+    }
+  },
+  {
+    "url": "https://wallpaper.mob.org/",
+    "searchUrl": "https://wallpaper.mob.org/gallery/tag={search}/{page}/",
+    "type": "3",
+    "decodeType": "1",
+    "NSFW": "0",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "wallpaper.mob",
+    "icon": "https://mobimg.b-cdn.net/statics/static/images/logo.svg",
+    "pageType": "page=",
+    "query": {
+      "all": "best/{page}/"
+    }
+  },
+  {
+    "url": "https://www.worldsex.com/",
+    "searchUrl": "https://www.worldsex.com/search/pics/?q={search}&page={page}",
+    "type": "3",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "worldsex",
+    "icon": "https://www.worldsex.com/apple-touch-icon.png",
+    "pageType": "page=",
+    "query": {
+      "all": "porn-pics/galleries/?page={page}",
+      "latest": "porn-pics/?page={page}"
+    }
+  },
+  {
+    "url": "https://pmatehunter.com/",
+    "type": "3",
+    "NSFW": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isPreview": "0",
+    "name": "pmatehunter",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://cdn.pmatehunter.com/wp-content/themes/masonry/images/favicons/apple-touch-icon.png",
+    "query": {
+      "pics": "updates/sort/filter/ord/popular/content/pix/quality/0/tags/0/mpage/{page}/",
+      "archive": "archive/page/{page}/",
+      "trending": "updates/",
+      "newest": "updates/sort/newest/mpage/{page}/",
+      "popular": "updates/sort/popular/mpage/{page}/"
+    }
+  },
+  {
+    "url": "https://www.elitebabes.com/",
+    "type": "3",
+    "NSFW": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isPreview": "0",
+    "name": "pmatehunter",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://cdn.elitebabes.com/wp-content/themes/masonry/images/favicons/apple-touch-icon.png",
+    "query": {
+      "pics": "updates/sort/filter/ord/popular/content/pix/quality/0/tags/0/mpage/{page}/",
+      "archive": "archive/page/{page}/",
+      "trending": "updates/",
+      "newest": "updates/sort/newest/mpage/{page}/",
+      "popular": "updates/sort/popular/mpage/{page}/"
+    }
+  },
+  {
+    "url": "https://erowall.com/",
+    "type": "3",
+    "NSFW": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isPreview": "0",
+    "name": "erowall",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://erowall.com/favicon.ico",
+    "query": {
+      
+     
+      "newest": "dat/page/{page}",
+      "popular": "views/page/{page}",
+      "downloads": "down/page/{page}"
+    }
+  },
+  
+  {
+    "url": "https://wallpaperporn.com/",
+    "type": "3",
+    "NSFW": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isPreview": "0",
+    "name": "wallpaperporn",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://wallpaperporn.com/Free%20Porn%20Wallpaper.png",
+    "query": {
+      
+     
+      "newest": "wallpapers/browse/{page}?order=publish-date-newest&resolution=all",
+      "popular": "wallpapers/browse/{page}?order=liked&resolution=all",
+      "views": "wallpapers/browse/${page}?order=top-hits&resolution=all",
+      "downloads": "wallpapers/browse/{page}?order=top-downloads&resolution=all"
+    }
+  },
+  {
+    "url": "https://www.pornpics.com/",
+    "type": "3",
+    "NSFW": "1",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "name": "pornpics",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://static.pornpics.com/favicon/apple-touch-icon.png?v=1",
+    "query": {
+      "recent": "recent/?limit=20&offset={offset}",
+
+      "popular": "popular/?limit=20&offset={offset}"
+    }
+  },
+  {
+    "url": "https://www.sex.com/",
+    "type": "3",
+    "NSFW": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isPreview": "0",
+    "name": "sex",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://sximagex1.sxccdn.com/sex/Logo.webp",
+    "query": {
+      "all": "pins",
+      "pics recent": "pics/?sort=latest&sub=all&page={page}",
+
+      "pics popular": "pics/?sort=popular&sub=all&page={page}",
+      "gifs recent": "videos/?sort=latest&sub=all&page={page}",
+      "gifs popular": "videos/?sort=popular&sub=all&page={page}"
+    }
+  },
+  {
+    "url": "https://www.definebabe.com/",
+    "type": "3",
+    "NSFW": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isPreview": "0",
+    "name": "definebabe",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://a.definebabe.com/apple-touch-icon.png",
+    "query": {
+      "latest": "galleries/page{page}/",
+
+      "popular": "galleries/by-rate/page{page}/"
+    }
+  },
+  {
+    "url": "https://sxypix.com/php/",
+    "type": "3",
+    "NSFW": "1",
+    "getType": "2",
+    "decodeType": "2",
+    "isPreview": "0",
+    "name": "sxypix",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://sximagex1.sxccdn.com/sex/Logo.webp",
+    "endPoints": {
+      "getList": "apg.php"
+    },
+    "query": {
+      "all": "0",
+      "popular": "1"
+    }
+  }
+]

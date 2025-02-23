@@ -1,0 +1,49 @@
+[
+  {
+    "url": "https://apiv2.tik.porn/getnextvideos",
+    "type": "2",
+    "NSFW": "1",
+    "decodeType": "2",
+    "getType": "2",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "tikporn",
+    "icon": "https://tik.porn/apple-touch-icon.png",
+    "body": { "amount": "10" },
+
+    "query": {
+      "recent": ""
+    }
+  },
+
+  {
+    "url": "https://www.xxxfollow.com/api/v1/user/public?genders=cf&limit=10&page={page}",
+    "type": "2",
+    "NSFW": "1",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "xxxfollow",
+    "icon": "https://media.xxxfollow.com/media/fans/assets/manifest/xfollow/xfollow-apple-touch-icon-512x512.png",
+    "pageType": "page=",
+    "query": {
+      "recent": ""
+    }
+  },
+  {
+    "url": "https://api.avrebo.net/api/v1/video/listRandom?limit=20",
+    "type": "2",
+    "NSFW": "1",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "avrebo",
+    "icon": "https://www.avrebo.com/pwa-icons/android-chrome-192x192.png",
+    "headers": {},
+    "query": {
+      "recent": ""
+    }
+  }
+]
