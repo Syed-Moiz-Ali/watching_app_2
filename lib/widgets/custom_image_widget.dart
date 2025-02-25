@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:watching_app_2/core/constants/color_constants.dart';
 
 import 'loading_indicator.dart';
@@ -93,10 +94,10 @@ class _CustomImageWidgetState extends State<CustomImageWidget> {
                   ? SizedBox(
                       height: MediaQuery.of(context).size.height * .8,
                       child: const Center(child: CustomLoadingIndicator()))
-                  : Container(
-                      color: AppColors.greyColor.withOpacity(.6),
-                      height: widget.height,
-                      width: widget.width,
+                  : Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(color: Colors.white),
                     ),
           errorWidget: (context, url, error) => Stack(
             children: [

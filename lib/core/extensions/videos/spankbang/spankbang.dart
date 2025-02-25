@@ -29,19 +29,16 @@ class Spankbang extends BaseScraper {
             ),
             qualitySelector: ElementSelector(
               selector: '.thumb >  .h',
-              // attribute: 'text', // Extract quality from text content
             ),
             timeSelector: ElementSelector(
               selector: '.thumb >  .l',
-              // attribute: 'text', // Extract time from text content
             ),
             durationSelector: ElementSelector(
               selector: '.thumb >  .l',
-              // attribute: 'text', // Extract duration from text content
             ),
             previewSelector: ElementSelector(
               selector: '.thumb > picture > img',
-              attribute: 'data-preview', // Extract duration from text content
+              attribute: 'data-preview',
             ),
             watchingLinkSelector: ElementSelector(
               customExtraction: (element) {
@@ -52,7 +49,6 @@ class Spankbang extends BaseScraper {
                 );
 
                 var jsonString1 = scriptContainingEmbedUrl.text;
-
                 var jsonData = json.decode(jsonString1);
 
                 Map watchingLink = {};
@@ -63,7 +59,10 @@ class Spankbang extends BaseScraper {
             ),
             keywordsSelector: ElementSelector(
               selector: 'meta[name="keywords"]',
-              attribute: 'content', // Extract duration from text content
+              attribute: 'content',
+            ),
+            similarContentSelector: ElementSelector(
+              selector: '.user_uploads > .video-list > .video-item',
             ),
           ),
         );

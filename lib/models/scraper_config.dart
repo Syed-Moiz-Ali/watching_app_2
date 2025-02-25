@@ -10,6 +10,7 @@ class ScraperConfig {
   final ElementSelector durationSelector; // Added this line
   final ElementSelector watchingLinkSelector; // Added this line
   final ElementSelector keywordsSelector; // Added this line
+  final ElementSelector? similarContentSelector; // Added this line
 
   ScraperConfig({
     required this.titleSelector,
@@ -21,6 +22,7 @@ class ScraperConfig {
     required this.durationSelector, // Added this line
     required this.watchingLinkSelector, // Added this line
     required this.keywordsSelector, // Added this line
+    this.similarContentSelector, // New parameter
   });
 }
 

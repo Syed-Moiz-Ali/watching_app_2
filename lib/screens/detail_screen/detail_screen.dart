@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/color_constants.dart';
 import 'package:watching_app_2/core/enums/app_enums.dart';
+import 'package:watching_app_2/provider/source_provider.dart';
 import 'package:watching_app_2/provider/webview_controller_provider.dart';
 import 'package:watching_app_2/models/content_item.dart';
 import 'package:watching_app_2/widgets/custom_gap.dart';
@@ -113,6 +114,7 @@ class _DetailScreenState extends State<DetailScreen>
     _fadeController.dispose();
     _slideController.dispose();
     _scaleController.dispose();
+
     super.dispose();
   }
 
@@ -374,7 +376,7 @@ class _DetailScreenState extends State<DetailScreen>
         _buildInfoCard(
           icon: Icons.update,
           title: 'Updated',
-          value: 'Recently',
+          value: context.read<SourceProvider>().selectedQuery ?? 'N/A',
           color: Colors.blue,
         ),
       ],

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:watching_app_2/core/constants/color_constants.dart';
 import 'package:watching_app_2/models/video_source.dart';
 import 'package:watching_app_2/services/scrapers/scraper_service.dart';
@@ -19,6 +20,7 @@ class WebviewControllerProvider with ChangeNotifier {
   // WebviewControllerProvider(this.item);
 
   Future<void> loadVideos(ContentItem item) async {
+    ScraperService scraperService = ScraperService(item.source);
     try {
       isLoading = true;
       error = null;
@@ -26,7 +28,7 @@ class WebviewControllerProvider with ChangeNotifier {
         notifyListeners();
       });
 
-      final newVideos = await ScraperService(item.source).getVideo(
+      final newVideos = await scraperService.getVideo(
         SMA.formatImage(baseUrl: item.source.url, image: item.contentUrl),
       );
 
@@ -59,23 +61,98 @@ class WebviewControllerProvider with ChangeNotifier {
     webViewController = WebViewController()
       ..setBackgroundColor(AppColors.backgroundColorLight)
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..enableZoom(false)
       ..addJavaScriptChannel(
         'VideoHandler',
         onMessageReceived: (JavaScriptMessage message) {
           log("message: ${message.message}");
-          if (message.message == 'video') {
-            // Pause all video elements
-            webViewController.runJavaScript(
-                'document.querySelectorAll("video").forEach(video => video.pause());');
-          }
+          // if (message.message == 'video') {
+          //   // Pause all video elements
+          //   webViewController.runJavaScript(
+          //       'document.querySelectorAll("video").forEach(video => video.pause());');
+          // }
+          // else if (message.message == 'fullscreenEnter') {
+          //   _setLandscapeOrientation();
+          // } else if (message.message == 'fullscreenExit') {
+          //   _setPortraitOrientation();
+          // }
         },
       )
       ..setNavigationDelegate(
         NavigationDelegate(
+          onPageStarted: (String url) {
+            // Show loading animation
+
+            isLoading = true;
+          },
           onPageFinished: (String url) {
-            // Inject JavaScript to pause all video elements after the page is fully loaded
-            webViewController.runJavaScript(
-                'document.querySelectorAll("video").forEach(video => video.pause());');
+            // Hide loading animation
+
+            isLoading = false;
+
+            // Inject JavaScript to handle video elements and fullscreen events
+            webViewController.runJavaScript('''
+            // Pause all videos initially
+            document.querySelectorAll("video").forEach(video => {
+              video.pause();
+              
+              // Add click event listeners for play/pause
+              video.addEventListener('play', function() {
+                VideoHandler.postMessage('video');
+              });
+              
+              // Track fullscreen changes for videos
+              video.addEventListener('fullscreenchange', function() {
+                if (document.fullscreenElement) {
+                  VideoHandler.postMessage('fullscreenEnter');
+                } else {
+                  VideoHandler.postMessage('fullscreenExit');
+                }
+              });
+              
+              // For webkit browsers (iOS)
+              video.addEventListener('webkitfullscreenchange', function() {
+                if (document.webkitFullscreenElement) {
+                  VideoHandler.postMessage('fullscreenEnter');
+                } else {
+                  VideoHandler.postMessage('fullscreenExit');
+                }
+              });
+            });
+            
+            // Handle iframes (like YouTube) fullscreen events
+            document.querySelectorAll("iframe").forEach(iframe => {
+              iframe.addEventListener('fullscreenchange', function() {
+                if (document.fullscreenElement) {
+                  VideoHandler.postMessage('fullscreenEnter');
+                } else {
+                  VideoHandler.postMessage('fullscreenExit');
+                }
+              });
+              
+              // For webkit browsers
+              iframe.addEventListener('webkitfullscreenchange', function() {
+                if (document.webkitFullscreenElement) {
+                  VideoHandler.postMessage('fullscreenEnter');
+                } else {
+                  VideoHandler.postMessage('fullscreenExit');
+                }
+              });
+            });
+            
+            // Add fullscreen API interception
+            const originalRequestFullscreen = Element.prototype.requestFullscreen;
+            Element.prototype.requestFullscreen = function() {
+              VideoHandler.postMessage('fullscreenEnter');
+              return originalRequestFullscreen.apply(this, arguments);
+            };
+            
+            document.addEventListener('fullscreenchange', function() {
+              if (!document.fullscreenElement) {
+                VideoHandler.postMessage('fullscreenExit');
+              }
+            });
+          ''');
           },
           onNavigationRequest: (NavigationRequest request) {
             if (request.url.startsWith('https://www.youtube.com/')) {
@@ -83,8 +160,32 @@ class WebviewControllerProvider with ChangeNotifier {
             }
             return NavigationDecision.navigate;
           },
+          onWebResourceError: (WebResourceError error) {
+            log("WebView error: ${error.description}");
+          },
         ),
       )
       ..loadRequest(Uri.parse(videoUrl));
+  }
+
+// Helper method to set landscape orientation
+  void _setLandscapeOrientation() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+
+    // Animate to fullscreen
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  }
+
+// Helper method to set portrait orientation
+  void _setPortraitOrientation() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+
+    // Animate back from fullscreen
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   }
 }

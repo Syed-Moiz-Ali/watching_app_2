@@ -92,6 +92,9 @@ class NoodleMagazine extends BaseScraper {
               selector: 'meta[name="keywords"]',
               attribute: 'content', // Extract duration from text content
             ),
+            similarContentSelector: ElementSelector(
+              selector: '.related_videos > .item',
+            ),
           ),
         );
 

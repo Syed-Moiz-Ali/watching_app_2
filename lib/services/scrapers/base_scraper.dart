@@ -1,13 +1,16 @@
 import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 import 'package:html/dom.dart';
+import 'package:html/parser.dart';
+import 'package:provider/provider.dart';
 import 'package:watching_app_2/models/video_source.dart';
 
 import '../../core/api/api_fetch_module.dart';
+import '../../core/global/app_global.dart';
 import '../../models/content_item.dart';
 import '../../models/content_source.dart';
 import '../../models/scraper_config.dart';
+import '../../provider/similar_content_provider.dart';
 
 abstract class BaseScraper {
   final ContentSource source;
@@ -16,7 +19,6 @@ abstract class BaseScraper {
   BaseScraper(this.source, this.config);
 
   Future<List<ContentItem>> scrapeContent(String html);
-
   Future<List<VideoSource>> scrapeVideos(String html);
   Future<List<ContentItem>> search(String query, int page);
   Future<List<ContentItem>> getContentByType(String queryType, int page);
@@ -35,11 +37,29 @@ abstract class BaseScraper {
   Future<List<VideoSource>> fetchVideoAndScrape(String url) async {
     try {
       final response = await ApiFetchModule.request(url: url);
+      scrapeSimilarContent(response); // We call it here in base class.
       return scrapeVideos(response);
     } catch (e) {
       log('Error fetching data from $url: $e');
       return [];
     }
+  }
+
+  Future<List<ContentItem>> scrapeSimilarContent(String html) async {
+    final document = parse(html);
+    final similarContentElements =
+        document.querySelectorAll(config.similarContentSelector!.selector!);
+
+    // Assuming we handle similar content scraping here
+    var similarContent = await parseElements(similarContentElements);
+
+    // Optionally, you could also update your `SimilarContentProvider` here,
+    // which could be done in one place across all scrapers
+    await SMA.navigationKey.currentContext!
+        .read<SimilarContentProvider>()
+        .setSimilarContents(similarContent);
+
+    return similarContent;
   }
 
   Future<List<ContentItem>> parseElements(List<Element> elements) async {
@@ -120,7 +140,6 @@ abstract class BaseScraper {
       preview:
           await getAttributeValue(element: element, config.previewSelector) ??
               '',
-      // preview: '',
       quality:
           await getAttributeValue(element: element, config.qualitySelector) ??
               'HD',
