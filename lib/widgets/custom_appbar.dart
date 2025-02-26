@@ -137,10 +137,6 @@ class _CustomAppBarState extends State<CustomAppBar>
     return Selector<ThemeProvider, bool>(
       selector: (context, provider) => provider.isDarkTheme,
       builder: (context, isDarkTheme, _) {
-        final textColor = !isDarkTheme
-            ? AppColors.backgroundColorDark
-            : AppColors.backgroundColorLight;
-
         return Container(
           decoration: BoxDecoration(
             color: widget.backgroundColor ??
@@ -159,7 +155,7 @@ class _CustomAppBarState extends State<CustomAppBar>
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: AppBar(
-                backgroundColor: Colors.transparent,
+                // backgroundColor: Colors.transparent,
                 automaticallyImplyLeading: false,
                 toolbarHeight: widget.appBarHeight,
                 title: Stack(
@@ -178,7 +174,7 @@ class _CustomAppBarState extends State<CustomAppBar>
                             if (widget.automaticallyImplyLeading == true)
                               _buildBackButton(),
                             Expanded(
-                              child: _buildTitle(textColor),
+                              child: _buildTitle(),
                             ),
                           ],
                         ),
@@ -232,7 +228,7 @@ class _CustomAppBarState extends State<CustomAppBar>
     );
   }
 
-  Widget _buildTitle(Color textColor) {
+  Widget _buildTitle() {
     return Hero(
       tag: 'app_bar_title_${widget.title}',
       child: Material(
@@ -242,7 +238,6 @@ class _CustomAppBarState extends State<CustomAppBar>
           text: widget.title,
           styleType: widget.styleType ?? TextStyleType.heading2,
           textAlign: widget.centerTitle ? TextAlign.center : TextAlign.start,
-          color: textColor,
         ),
       ),
     );

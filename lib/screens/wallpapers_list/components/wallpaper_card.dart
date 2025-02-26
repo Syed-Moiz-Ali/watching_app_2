@@ -5,7 +5,6 @@ import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:watching_app_2/core/global/app_global.dart';
 import 'package:watching_app_2/widgets/custom_image_widget.dart';
-import '../../../core/zoom/zoom_widget.dart';
 import '../../../models/content_item.dart';
 
 class WallpaperCard extends StatefulWidget {

@@ -256,22 +256,22 @@ class _VideoScreenState extends State<VideoScreen>
         ),
       ),
       // if (isFullscreen) ...[
-      Expanded(
-        // height: 50.h,
-        child: SimilarContentSection(
-            similarContents: similarProvider.similarContents),
-        // Column(
-        //   children: List.generate(
-        //     similarProvider.similarContents.length,
-        //     (index) {
-        //       var content = similarProvider.similarContents[index];
-        //       return Container(
-        //         child: TextWidget(text: content.title),
-        //       );
-        //     },
-        //   ),
-        // ),
-      ),
+      // Expanded(
+      //   // height: 50.h,
+      //   child: SimilarContentSection(
+      //       similarContents: similarProvider.similarContents),
+      //   // Column(
+      //   //   children: List.generate(
+      //   //     similarProvider.similarContents.length,
+      //   //     (index) {
+      //   //       var content = similarProvider.similarContents[index];
+      //   //       return Container(
+      //   //         child: TextWidget(text: content.title),
+      //   //       );
+      //   //     },
+      //   //   ),
+      //   // ),
+      // ),
       const CustomGap(heightFactor: .08),
     ]);
   }

@@ -1,12 +1,15 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/color_constants.dart';
 import 'package:watching_app_2/widgets/text_widget.dart';
+
+import '../../provider/theme_provider.dart';
 
 class PremiumSettingsScreen extends StatefulWidget {
   const PremiumSettingsScreen({super.key});
@@ -239,15 +242,15 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
 
               // Main content
               Scaffold(
-                backgroundColor: Colors.transparent,
+                // backgroundColor: Colors.transparent,
                 // extendBodyBehindAppBar: true,
                 appBar: _buildAppBar(),
                 body: _buildBody(),
-                floatingActionButton: _buildFloatingActionButton(),
+                // floatingActionButton: _buildFloatingActionButton(),
               ),
 
               // Floating menu
-              _buildFloatingMenu(),
+              // _buildFloatingMenu(),
 
               // Premium floating badge
             ],
@@ -314,7 +317,7 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
 
     return AppBar(
       elevation: 0,
-      backgroundColor: Colors.transparent,
+      // backgroundColor: Colors.transparent,
       flexibleSpace: ClipRRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -412,7 +415,10 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
                   onChanged: (value) {
                     setState(() {
                       _isDarkMode = value;
-                      _updateThemeColors();
+                      context
+                          .read<ThemeProvider>()
+                          .setTheme(value ? ThemeMode.dark : ThemeMode.light);
+                      // _updateThemeColors();
                     });
                   },
                   type: _SettingType.toggle,
@@ -655,7 +661,7 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
                       TextButton(
                         onPressed: () {},
                         style: TextButton.styleFrom(
-                          backgroundColor: Colors.white.withOpacity(0.25),
+                          // backgroundColor: Colors.white.withOpacity(0.25),
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 8),
                           shape: RoundedRectangleBorder(
@@ -739,8 +745,8 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
                           ),
                           child: Icon(
                             icon,
-                            color: _primaryColor,
-                            size: 24,
+                            // color: _primaryColor,
+                            size: 22.sp,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -800,13 +806,13 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
             duration: const Duration(milliseconds: 300),
             margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: isHovered
-                    ? [_cardColor, _cardColor.withOpacity(0.8)]
-                    : _cardGradient,
-              ),
+              // gradient: LinearGradient(
+              //   begin: Alignment.topLeft,
+              //   end: Alignment.bottomRight,
+              //   colors: isHovered
+              //       ? [_cardColor, _cardColor.withOpacity(0.8)]
+              //       : _cardGradient,
+              // ),
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
@@ -873,6 +879,7 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
   }
 
   Widget _buildAnimatedItemIcon(IconData icon, bool isHovered) {
+    var isDarkMode = context.watch<ThemeProvider>();
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0, end: isHovered ? 1 : 0),
       duration: const Duration(milliseconds: 300),
@@ -881,11 +888,17 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
           height: 48,
           width: 48,
           decoration: BoxDecoration(
-            color: Color.lerp(
-              _primaryColor.withOpacity(0.1),
-              _primaryColor.withOpacity(0.2),
-              value,
-            ),
+            color: isDarkMode.isDarkTheme
+                ? Color.lerp(
+                    AppColors.backgroundColorLight.withOpacity(0.1),
+                    AppColors.backgroundColorLight.withOpacity(0.2),
+                    value,
+                  )
+                : Color.lerp(
+                    _primaryColor.withOpacity(0.1),
+                    _primaryColor.withOpacity(0.2),
+                    value,
+                  ),
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
@@ -899,8 +912,10 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
             scale: 1.0 + (0.1 * value),
             child: Icon(
               icon,
-              color: _primaryColor,
-              size: 24,
+              // color: !isDarkMode.isDarkTheme
+              //     ? AppColors.backgroundColorLight
+              //     : _primaryColor,
+              size: 20.sp,
             ),
           ),
         );
@@ -927,11 +942,7 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
             height: 28,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              color: Color.lerp(
-                _dividerColor,
-                _primaryColor,
-                safeAnimationValue,
-              ),
+              color: AppColors.disabledColor,
               boxShadow: [
                 BoxShadow(
                   color: value
@@ -969,7 +980,7 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
                             height: 4,
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white,
+                              // color: Colors.white,
                             ),
                           ),
                         ),
@@ -986,7 +997,7 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
                     height: 24,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white,
+                      color: AppColors.greyColor,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
@@ -999,6 +1010,7 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
                       child: Icon(
                         value ? Icons.check : Icons.close,
                         size: 14,
+                        color: AppColors.backgroundColorLight,
                         // color:
                         //     value ? _primaryColor : _textColor.withOpacity(0.4),
                       ),
@@ -1066,7 +1078,7 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
         turns: rotation,
         child: FloatingActionButton(
           onPressed: _toggleFloatingMenu,
-          backgroundColor: _primaryColor,
+          // backgroundColor: _primaryColor,
           elevation: 8,
           highlightElevation: 12,
           child: AnimatedSwitcher(
@@ -1139,7 +1151,7 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
                               borderRadius: BorderRadius.circular(12.w),
                             ),
                             heroTag: 'floatingMenu$index',
-                            backgroundColor: _cardColor,
+                            // backgroundColor: _cardColor,
                             foregroundColor: _primaryColor,
                             elevation: 4,
                             onPressed: () => _scrollToSection(index),

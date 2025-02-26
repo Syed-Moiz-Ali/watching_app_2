@@ -386,7 +386,7 @@ class _AnimatedWallpaperScreenState extends State<AnimatedWallpaperScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      // backgroundColor: Colors.transparent,
       extendBody: true,
       body: Stack(
         children: [

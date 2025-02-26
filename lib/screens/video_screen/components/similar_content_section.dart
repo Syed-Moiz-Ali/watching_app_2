@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:provider/provider.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
+import 'package:watching_app_2/core/constants/color_constants.dart';
+import 'package:watching_app_2/core/navigation/navigator.dart';
 import 'package:watching_app_2/models/content_item.dart';
-import 'package:watching_app_2/widgets/custom_gap.dart';
+import 'package:watching_app_2/screens/detail_screen/detail_screen.dart';
 import 'package:watching_app_2/widgets/custom_image_widget.dart';
 import 'package:watching_app_2/widgets/text_widget.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-
-import '../../../provider/webview_controller_provider.dart';
 
 class SimilarContentSection extends StatefulWidget {
   final List<ContentItem> similarContents;
@@ -73,7 +69,8 @@ class _SimilarContentSectionState extends State<SimilarContentSection>
         ),
 
         // Content Grid
-        Expanded(
+        SizedBox(
+          height: 32.h,
           // height: 35.h, // Fixed height for the horizontal list
           child: AnimationLimiter(
             child: ListView.builder(
@@ -94,11 +91,12 @@ class _SimilarContentSectionState extends State<SimilarContentSection>
                             horizontal: 1.5.w, vertical: 1.h),
                         child: GestureDetector(
                             onTap: () {
-                              var provider =
-                                  Provider.of<WebviewControllerProvider>(
-                                      context,
-                                      listen: false);
-                              provider.loadVideos(content);
+                              // var provider =
+                              //     Provider.of<WebviewControllerProvider>(
+                              //         context,
+                              //         listen: false);
+                              // provider.loadVideos(content);
+                              NH.navigateTo(DetailScreen(item: content));
                             },
                             child: SimilarContentCard(
                                 content: content, index: index)),
@@ -171,7 +169,7 @@ class _SimilarContentCardState extends State<SimilarContentCard>
         margin: contentMargin,
         width: 55.w,
         decoration: BoxDecoration(
-          color: Colors.white,
+          border: Border.all(color: AppColors.greyColor),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -198,6 +196,8 @@ class _SimilarContentCardState extends State<SimilarContentCard>
                     child: Hero(
                       tag: 'content-${widget.content.contentUrl}',
                       child: CustomImageWidget(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(12)),
                         imagePath: widget.content.thumbnailUrl,
                         fit: BoxFit.cover,
                         // placeholder: (context, url) => Shimmer.fromColors(
@@ -221,14 +221,14 @@ class _SimilarContentCardState extends State<SimilarContentCard>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Title
-                        AutoSizeText(
-                          widget.content.title,
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                          maxLines: 2,
+                        TextWidget(
+                          text: widget.content.title,
+                          // style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+
+                          // ),
+                          maxLine: 4,
                           overflow: TextOverflow.ellipsis,
                         ),
 

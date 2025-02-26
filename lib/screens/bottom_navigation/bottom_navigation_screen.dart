@@ -567,7 +567,8 @@ class _NavigationExampleContent extends StatelessWidget {
         ],
       ),
       bottomNavigationBar: const UltraPremiumNavBar(
-        accentColor: AppColors.primaryColor, // Change to match your brand color
+        accentColor:
+            AppColors.secondaryColor, // Change to match your brand color
         enableBlur: true,
       ),
     );

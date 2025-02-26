@@ -1,99 +1,320 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:watching_app_2/core/global/app_global.dart';
 import 'package:watching_app_2/models/content_source.dart';
 import 'dart:ui';
 import 'dart:math' as math;
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:dio/dio.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 
 import '../../models/content_item.dart';
 import '../../widgets/custom_image_widget.dart';
 
-class UltraPremiumWallpaperDetail extends StatefulWidget {
+class MinimalistWallpaperDetail extends StatefulWidget {
   final ContentItem item;
 
-  const UltraPremiumWallpaperDetail({
+  const MinimalistWallpaperDetail({
     Key? key,
     required this.item,
   }) : super(key: key);
 
   @override
-  _UltraPremiumWallpaperDetailState createState() =>
-      _UltraPremiumWallpaperDetailState();
+  _MinimalistWallpaperDetailState createState() =>
+      _MinimalistWallpaperDetailState();
 }
 
-class _UltraPremiumWallpaperDetailState
-    extends State<UltraPremiumWallpaperDetail> with TickerProviderStateMixin {
-  // Controllers for various animations
-  late AnimationController _backgroundController;
+class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
+    with TickerProviderStateMixin {
+  // Core animation controllers
+  late AnimationController _imageAnimationController;
   late AnimationController _interfaceController;
-  late AnimationController _pulseController;
-  late AnimationController _rippleController;
+  late AnimationController _actionButtonController;
 
-  // Animations
-  late Animation<double> _pulseAnimation;
-  late Animation<double> _backgroundScaleAnimation;
-  late Animation<double> _backgroundOpacityAnimation;
-  late Animation<double> _blurAnimation;
-  late Animation<double> _rippleAnimation;
+  // Animation sequences
+  late Animation<double> _imageScaleAnimation;
+  late Animation<double> _imageOpacityAnimation;
+  late Animation<double> _interfaceOpacityAnimation;
+  late Animation<double> _actionsSlideAnimation;
 
   // State variables
-  bool _isDownloading = false;
-  bool _isSettingWallpaper = false;
   bool _interfaceVisible = true;
-  double _dragPosition = 0.0;
+  bool _isDownloading = false;
+  bool isWallpaperSetting = false;
 
-  // Gesture values for 3D tilt effect
-  double _tiltX = 0.0;
-  double _tiltY = 0.0;
+  // Gesture values for parallax effect
+  double _offsetX = 0.0;
+  double _offsetY = 0.0;
+  final Dio dio = Dio();
+
+  // Future<void> requestPermissions() async {
+  //   if (Platform.isAndroid) {
+  //     if (int.parse(Platform.version.split('.')[0]) >= 13) {
+  //       // Android 13+ uses more granular media permissions
+  //       if (await Permission.photos.request().isGranted) {
+  //         return;
+  //       }
+  //     } else if (int.parse(Platform.version.split('.')[0]) >= 11) {
+  //       // Android 11+ uses scoped storage
+  //       if (await Permission.storage.request().isGranted) {
+  //         return;
+  //       }
+  //     } else {
+  //       // Android 10 and below use traditional storage permissions
+  //       if (await Permission.storage.request().isGranted) {
+  //         return;
+  //       }
+  //     }
+
+  //     throw PlatformException(
+  //       code: 'PERMISSION_DENIED',
+  //       message: 'Storage permission is required to download wallpapers',
+  //     );
+  //   }
+  // }
+
+  Future<void> downloadWallpaper() async {
+    setState(() {
+      _isDownloading = true;
+    });
+
+    try {
+      // Request permissions first
+      await requestPermissions();
+
+      // Get the downloads directory using proper methods
+      late String downloadPath;
+
+      if (Platform.isAndroid) {
+        // For Android 10+ (API 29+), we need to use MediaStore API approach
+        if (await _isAndroid10OrAbove()) {
+          // Use the Downloads folder with ContentResolver on Android 10+
+          downloadPath = (await getExternalStorageDirectory())!.path;
+
+          // Download the file to getExternalStorageDirectory first
+          String tempFileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+          String tempFilePath = '$downloadPath/$tempFileName';
+
+          await dio.download(
+            widget.item.thumbnailUrl,
+            tempFilePath,
+            onReceiveProgress: (received, total) {
+              if (total != -1) {
+                print('${(received / total * 100).toStringAsFixed(0)}%');
+              }
+            },
+          );
+
+          // Save to MediaStore/Gallery which user can access in Downloads
+          final result = await ImageGallerySaver.saveFile(
+            tempFilePath,
+            name:
+                '${widget.item.source.name}_${DateTime.now().millisecondsSinceEpoch}',
+          );
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Wallpaper saved to Downloads folder')),
+          );
+          return;
+        } else {
+          // For Android 9 and below, we can use the direct path
+          // downloadPath = '/storage/emulated/0/Download';
+          downloadPath = (await getExternalStorageDirectory())!.path;
+        }
+      } else {
+        // For iOS or other platforms
+        final directory = await getApplicationDocumentsDirectory();
+        downloadPath = directory.path;
+      }
+
+      // Create the custom directory structure
+      String customDirPath =
+          '$downloadPath/${_getAppName()}/${widget.item.source.name}';
+      Directory customDir = Directory(customDirPath);
+      if (!await customDir.exists()) {
+        await customDir.create(recursive: true);
+      }
+
+      // Download the file to our custom path
+      String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+      String filePath = '$customDirPath/$fileName';
+
+      await dio.download(
+        widget.item.thumbnailUrl,
+        filePath,
+        onReceiveProgress: (received, total) {
+          if (total != -1) {
+            print('${(received / total * 100).toStringAsFixed(0)}%');
+          }
+        },
+      );
+
+      log('message: $filePath');
+
+      // Also save to gallery so user can find it easily
+      final result = await ImageGallerySaver.saveFile(filePath);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Wallpaper saved to $filePath')),
+      );
+    } catch (e) {
+      print('Error downloading wallpaper: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Failed to download wallpaper: ${e.toString()}')),
+      );
+    } finally {
+      setState(() {
+        _isDownloading = false;
+      });
+    }
+  }
+
+// Helper function to check Android version
+  Future<bool> _isAndroid10OrAbove() async {
+    if (Platform.isAndroid) {
+      String release = await _getAndroidVersion();
+      int version = int.tryParse(release) ?? 0;
+      return version >= 10;
+    }
+    return false;
+  }
+
+  Future<String> _getAndroidVersion() async {
+    try {
+      return Platform.operatingSystemVersion.split(' ').last;
+    } catch (e) {
+      return '0';
+    }
+  }
+
+// Add this function for proper permission handling
+  Future<void> requestPermissions() async {
+    if (Platform.isAndroid) {
+      // Check Android version
+      bool isAndroid10Plus = await _isAndroid10OrAbove();
+      bool isAndroid13Plus = await _isAndroid13OrAbove();
+
+      if (isAndroid13Plus) {
+        // For Android 13+, request media permissions
+        Map<Permission, PermissionStatus> statuses = await [
+          Permission.photos,
+          Permission.storage,
+        ].request();
+
+        if (statuses[Permission.photos] != PermissionStatus.granted ||
+            statuses[Permission.storage] != PermissionStatus.granted) {
+          throw PlatformException(
+            code: 'PERMISSION_DENIED',
+            message: 'Storage permission is required to download wallpapers',
+          );
+        }
+      } else if (isAndroid10Plus) {
+        // For Android 10-12, request storage permission
+        if (await Permission.storage.request() != PermissionStatus.granted) {
+          throw PlatformException(
+            code: 'PERMISSION_DENIED',
+            message: 'Storage permission is required to download wallpapers',
+          );
+        }
+      } else {
+        // For Android 9 and below
+        if (await Permission.storage.request() != PermissionStatus.granted) {
+          throw PlatformException(
+            code: 'PERMISSION_DENIED',
+            message: 'Storage permission is required to download wallpapers',
+          );
+        }
+      }
+    }
+  }
+
+  Future<bool> _isAndroid13OrAbove() async {
+    if (Platform.isAndroid) {
+      String release = await _getAndroidVersion();
+      int version = int.tryParse(release) ?? 0;
+      return version >= 13;
+    }
+    return false;
+  }
+
+  String _getAppName() {
+    return 'PornQueen'; // Use your app's name here
+  }
+
+  Future<void> _applyWallpaper(int location) async {
+    setState(() {
+      isWallpaperSetting = true;
+    });
+
+    try {
+      // Request permissions first
+      await requestPermissions();
+
+      // Get the app's directory
+      Directory? appDocDir = await getTemporaryDirectory();
+      String appPath = appDocDir.path;
+
+      // Use the same directory structure for consistency
+      String customDirPath =
+          '$appPath/downloads/${_getAppName()}/${widget.item.source.name}';
+      Directory customDir = Directory(customDirPath);
+      if (!await customDir.exists()) {
+        await customDir.create(recursive: true);
+      }
+
+      String fileName = '${DateTime.now().toIso8601String()}.jpg';
+      String filePath = '$customDirPath/$fileName';
+
+      // Download if not already downloaded
+      File file = File(filePath);
+      if (!await file.exists()) {
+        await dio.download(
+          widget.item.thumbnailUrl,
+          filePath,
+        );
+      }
+      // Set the wallpaper
+      final result =
+          await WallpaperManager.setWallpaperFromFile(filePath, location);
+
+      if (result) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Wallpaper set successfully')),
+        );
+      } else {
+        throw Exception('Failed to set wallpaper');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error setting wallpaper: ${e.toString()}')),
+      );
+      setState(() {
+        isWallpaperSetting = true;
+      });
+    } finally {
+      setState(() {
+        isWallpaperSetting = false;
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
 
-    // Background animation controller
-    _backgroundController = AnimationController(
-      duration: const Duration(seconds: 30),
+    // Subtle, elegant image animation
+    _imageAnimationController = AnimationController(
+      duration: const Duration(seconds: 60),
       vsync: this,
     )..repeat(reverse: true);
 
-    _backgroundScaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 1.05, end: 1.1),
-        weight: 1,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 1.1, end: 1.05),
-        weight: 1,
-      ),
-    ]).animate(_backgroundController);
-
-    _backgroundOpacityAnimation = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 0.93, end: 1.0),
-        weight: 1,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 1.0, end: 0.93),
-        weight: 1,
-      ),
-    ]).animate(_backgroundController);
-
-    // UI Interface animation
-    _interfaceController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-
-    // Initialize fully visible UI
-    _interfaceController.value = 1.0;
-
-    // Pulse animation for buttons
-    _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
-      vsync: this,
-    )..repeat(reverse: true);
-
-    _pulseAnimation = TweenSequence<double>([
+    _imageScaleAnimation = TweenSequence<double>([
       TweenSequenceItem(
         tween: Tween<double>(begin: 1.0, end: 1.05)
             .chain(CurveTween(curve: Curves.easeInOutSine)),
@@ -104,43 +325,53 @@ class _UltraPremiumWallpaperDetailState
             .chain(CurveTween(curve: Curves.easeInOutSine)),
         weight: 1,
       ),
-    ]).animate(_pulseController);
+    ]).animate(_imageAnimationController);
 
-    // Blur animation for backdrop filter
-    _blurAnimation = Tween<double>(begin: 0.0, end: 10.0).animate(
-      CurvedAnimation(
-        parent: _interfaceController,
-        curve: Curves.easeOut,
+    _imageOpacityAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.97, end: 1.0)
+            .chain(CurveTween(curve: Curves.easeInOutSine)),
+        weight: 1,
       ),
-    );
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.0, end: 0.97)
+            .chain(CurveTween(curve: Curves.easeInOutSine)),
+        weight: 1,
+      ),
+    ]).animate(_imageAnimationController);
 
-    // Ripple effect for button press
-    _rippleController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+    // UI Interface fade animation
+    _interfaceController = AnimationController(
+      duration: const Duration(milliseconds: 300),
       vsync: this,
     );
 
-    _rippleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _rippleController,
-        curve: Curves.easeOut,
-      ),
+    _interfaceOpacityAnimation = CurvedAnimation(
+      parent: _interfaceController,
+      curve: Curves.easeOut,
+      reverseCurve: Curves.easeIn,
     );
 
-    // Add status listeners for the ripple effect
-    _rippleController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _rippleController.reset();
-      }
-    });
+    // Initially visible UI
+    _interfaceController.value = 1.0;
+
+    // Action buttons animation
+    _actionButtonController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    )..forward();
+
+    _actionsSlideAnimation = CurvedAnimation(
+      parent: _actionButtonController,
+      curve: Curves.easeOutQuint,
+    );
   }
 
   @override
   void dispose() {
-    _backgroundController.dispose();
+    _imageAnimationController.dispose();
     _interfaceController.dispose();
-    _pulseController.dispose();
-    _rippleController.dispose();
+    _actionButtonController.dispose();
     super.dispose();
   }
 
@@ -156,399 +387,170 @@ class _UltraPremiumWallpaperDetailState
     });
   }
 
-  void _updateTiltEffect(DragUpdateDetails details) {
+  void _updateParallaxEffect(DragUpdateDetails details) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // Calculate tilt percentage based on pointer position
+    // Create subtle parallax effect
     setState(() {
-      _tiltX = (details.globalPosition.dx / screenWidth * 2 - 1) * 5;
-      _tiltY = (details.globalPosition.dy / screenHeight * 2 - 1) * 5;
+      _offsetX = (details.globalPosition.dx / screenWidth - 0.5) * 15;
+      _offsetY = (details.globalPosition.dy / screenHeight - 0.5) * 15;
     });
   }
 
-  void _resetTilt() {
+  void _resetParallax() {
     setState(() {
-      _tiltX = 0.0;
-      _tiltY = 0.0;
+      _offsetX = 0.0;
+      _offsetY = 0.0;
     });
   }
 
   void _downloadWallpaper() {
-    // Start ripple animation for tactile feedback
-    _rippleController.forward();
-
-    setState(() {
-      _isDownloading = true;
-    });
-
-    // Simulate download with success animation
-    Future.delayed(const Duration(milliseconds: 1500), () {
-      if (mounted) {
-        setState(() {
-          _isDownloading = false;
-        });
-        _showSuccessAnimation('Downloaded');
-      }
-    });
+    downloadWallpaper();
   }
 
-  void _setWallpaper() {
-    // Start ripple animation for tactile feedback
-    _rippleController.forward();
-
-    setState(() {
-      _isSettingWallpaper = true;
-    });
-
-    // Simulate setting wallpaper
-    Future.delayed(const Duration(milliseconds: 1200), () {
-      if (mounted) {
-        setState(() {
-          _isSettingWallpaper = false;
-        });
-        _showApplyOptions();
-      }
-    });
-  }
-
-  void _startDrag(DragStartDetails details) {
-    setState(() {
-      _dragPosition = details.globalPosition.dy;
-    });
-  }
-
-  void _updateDrag(DragUpdateDetails details) {
-    final delta = _dragPosition - details.globalPosition.dy;
-
-    // If dragging up significantly, show the apply options
-    if (delta > 50) {
-      _dragPosition = details.globalPosition.dy;
-      _showApplyOptions();
-    }
-  }
-
-  void _showSuccessAnimation(String message) {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: '',
-      barrierColor: Colors.black.withOpacity(0.6),
-      transitionDuration: const Duration(milliseconds: 400),
-      pageBuilder: (context, animation1, animation2) {
-        return BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Center(
-            child: TweenAnimationBuilder<double>(
-              tween: Tween<double>(begin: 0.0, end: 1.0),
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.elasticOut,
-              builder: (context, value, child) {
-                return Transform.scale(
-                  scale: value,
-                  child: child,
-                );
-              },
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 30),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.white.withOpacity(0.9),
-                      Colors.white.withOpacity(0.8),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(25),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 20,
-                      spreadRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Success animated check mark
-                    TweenAnimationBuilder<double>(
-                      tween: Tween<double>(begin: 0.0, end: 1.0),
-                      duration: const Duration(milliseconds: 600),
-                      curve: Curves.elasticOut,
-                      builder: (context, value, child) {
-                        return Transform.scale(
-                          scale: value,
-                          child: Container(
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Color(0xFF4CAF50),
-                                  Color(0xFF8BC34A),
-                                ],
-                              ),
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color:
-                                      const Color(0xFF4CAF50).withOpacity(0.5),
-                                  blurRadius: 15,
-                                  spreadRadius: 0,
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.check,
-                              color: Colors.white,
-                              size: 50,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    TweenAnimationBuilder<double>(
-                      tween: Tween<double>(begin: 0.0, end: 1.0),
-                      duration: const Duration(milliseconds: 500),
-                      curve: Curves.easeOutCubic,
-                      builder: (context, value, child) {
-                        return Opacity(
-                          opacity: value,
-                          child: child,
-                        );
-                      },
-                      child: Text(
-                        message,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeTransition(
-          opacity: animation,
-          child: child,
-        );
-      },
-    ).then((_) {
-      // Close dialog after a delay
-      Future.delayed(const Duration(milliseconds: 800), () {
-        if (mounted) {
-          Navigator.of(context).maybePop();
-        }
-      });
-    });
-  }
-
-  void _showApplyOptions() {
+  void _showWallpaperOptions() {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      isScrollControlled: true,
+      barrierColor: Colors.black.withOpacity(0.5),
       builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: TweenAnimationBuilder<double>(
-          tween: Tween<double>(begin: 0.0, end: 1.0),
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeOutQuint,
-          builder: (context, value, child) {
-            return Transform.translate(
-              offset: Offset(0, 200 * (1 - value)),
-              child: Opacity(
-                opacity: value,
-                child: child,
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 30),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.7),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.1),
+              width: 0.5,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 30),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-            );
-          },
-          child: Container(
-            height: MediaQuery.of(context).size.height * 0.4,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.white.withOpacity(0.9),
-                  Colors.white.withOpacity(0.95),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildOptionButton(
+                    icon: Icons.home_outlined,
+                    label: 'Home',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _applyWallpaper(WallpaperManager.HOME_SCREEN);
+                      // _showMinimalistFeedback('Set as Home Screen');
+                    },
+                  ),
+                  _buildOptionButton(
+                    icon: Icons.lock_outlined,
+                    label: 'Lock',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _applyWallpaper(WallpaperManager.LOCK_SCREEN);
+                      // _showMinimalistFeedback('Set as Lock Screen');
+                    },
+                  ),
+                  _buildOptionButton(
+                    icon: Icons.smartphone_outlined,
+                    label: 'Both',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showMinimalistFeedback('Set to Both Screens');
+                      _applyWallpaper(WallpaperManager.BOTH_SCREEN);
+                    },
+                  ),
                 ],
               ),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(40),
-                topRight: Radius.circular(40),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 20,
-                  spreadRadius: 0,
-                  offset: const Offset(0, -10),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                const SizedBox(height: 12),
-                Container(
-                  width: 50,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0.0, end: 1.0),
-                  duration: const Duration(milliseconds: 800),
-                  curve: Curves.easeOutCubic,
-                  builder: (context, value, child) {
-                    return Opacity(
-                      opacity: value,
-                      child: Transform.translate(
-                        offset: Offset(0, 20 * (1 - value)),
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    'Set Wallpaper As',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildApplyOption(
-                      context,
-                      Icons.home_outlined,
-                      'Home Screen',
-                      0,
-                    ),
-                    _buildApplyOption(
-                      context,
-                      Icons.lock_outlined,
-                      'Lock Screen',
-                      1,
-                    ),
-                    _buildApplyOption(
-                      context,
-                      Icons.smartphone_outlined,
-                      'Both',
-                      2,
-                    ),
-                  ],
-                ),
-              ],
-            ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildApplyOption(
-      BuildContext context, IconData icon, String label, int delayFactor) {
+  Widget _buildOptionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0.0, end: 1.0),
-      duration: const Duration(milliseconds: 800),
-      curve: Curves.elasticOut,
-      // Add staggered delay based on position
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutQuint,
       builder: (context, value, child) {
         return Transform.scale(
           scale: value,
           child: Opacity(
-            opacity: value.clamp(0.0, 1.0),
+            opacity: value,
             child: child,
           ),
         );
       },
       child: InkWell(
-        onTap: () {
-          Navigator.pop(context);
-          _showSuccessAnimation('Applied to $label');
-        },
-        child: Container(
-          width: 100,
-          height: 120,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white,
-                Colors.grey[100]!,
-              ],
+        onTap: onTap,
+        child: Column(
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              child: Icon(
+                icon,
+                color: Colors.white,
+                size: 26,
+              ),
             ),
-            borderRadius: BorderRadius.circular(25),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.08),
-                blurRadius: 15,
-                spreadRadius: 1,
+            const SizedBox(height: 12),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
               ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFF3C8CE7),
-                      Color(0xFF00EAFF),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF3C8CE7).withOpacity(0.3),
-                      blurRadius: 10,
-                      spreadRadius: 0,
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  icon,
-                  size: 30,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 15),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showMinimalistFeedback(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: Colors.black.withOpacity(0.7),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height * 0.1,
+          left: 50,
+          right: 50,
         ),
       ),
     );
@@ -563,89 +565,52 @@ class _UltraPremiumWallpaperDetailState
         extendBodyBehindAppBar: true,
         body: GestureDetector(
           onTap: _toggleInterface,
-          onPanStart: _startDrag,
-          onPanUpdate: (details) {
-            _updateTiltEffect(details);
-            _updateDrag(details);
-          },
-          onPanEnd: (_) => _resetTilt(),
+          onPanUpdate: _updateParallaxEffect,
+          onPanEnd: (_) => _resetParallax(),
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // Animated wallpaper background with 3D tilt effect
+              // Animated wallpaper with subtle parallax effect
               Hero(
                 tag: 'wallpaper-${widget.item.thumbnailUrl}',
                 child: AnimatedBuilder(
-                  animation: _backgroundController,
+                  animation: _imageAnimationController,
                   builder: (context, child) {
-                    return TweenAnimationBuilder(
-                      tween: Tween<double>(begin: 0.0, end: 1.0),
-                      duration: const Duration(milliseconds: 1000),
-                      curve: Curves.easeOutQuart,
-                      builder: (context, value, child) {
-                        return Opacity(
-                          opacity: value,
-                          child: Transform(
-                            alignment: Alignment.center,
-                            transform: Matrix4.identity()
-                              ..setEntry(3, 2, 0.001) // perspective
-                              ..rotateX(_tiltY * 0.01)
-                              ..rotateY(-_tiltX * 0.01)
-                              ..scale(_backgroundScaleAnimation.value),
-                            child: Opacity(
-                                opacity: _backgroundOpacityAnimation.value,
-                                child: CustomImageWidget(
-                                  imagePath: SMA.formatImage(
-                                      image: widget.item.thumbnailUrl,
-                                      baseUrl: widget.item.source.url),
-                                  fit: BoxFit.contain,
-                                )
-                                // Container(
-                                //   decoration: BoxDecoration(
-                                //     image: DecorationImage(
-                                //       image: NetworkImage(widget.imageUrl),
-                                //       fit: BoxFit.cover,
-                                //     ),
-                                //   ),
-                                // ),
-                                ),
+                    return Transform.translate(
+                      offset: Offset(_offsetX, _offsetY),
+                      child: Transform.scale(
+                        scale: _imageScaleAnimation.value,
+                        child: Opacity(
+                          opacity: _imageOpacityAnimation.value,
+                          child: CustomImageWidget(
+                            imagePath: SMA.formatImage(
+                              image: widget.item.thumbnailUrl,
+                              baseUrl: widget.item.source.url,
+                            ),
+                            fit: BoxFit.cover,
                           ),
-                        );
-                      },
+                        ),
+                      ),
                     );
                   },
                 ),
               ),
 
-              // Gorgeous dynamic light effects overlay
-              AnimatedBuilder(
-                animation: _backgroundController,
-                builder: (context, child) {
-                  return Opacity(
-                    opacity: 0.4,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.purple.withOpacity(0.3),
-                            Colors.transparent,
-                            Colors.blue.withOpacity(0.3),
-                          ],
-                          stops: [
-                            0.0,
-                            0.5,
-                            1.0,
-                          ],
-                          transform: GradientRotation(
-                            _backgroundController.value * 2 * math.pi,
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
+              // Subtle gradient overlay
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withOpacity(0.4),
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.4),
+                    ],
+                    stops: const [0.0, 0.2, 0.8, 1.0],
+                  ),
+                ),
               ),
 
               // Interface elements
@@ -653,356 +618,76 @@ class _UltraPremiumWallpaperDetailState
                 animation: _interfaceController,
                 builder: (context, child) {
                   return Opacity(
-                    opacity: _interfaceController.value,
+                    opacity: _interfaceOpacityAnimation.value,
                     child: Stack(
                       children: [
-                        // Top app bar
+                        // Minimal top bar
                         Positioned(
-                          top: 0,
+                          top: MediaQuery.of(context).padding.top,
                           left: 0,
                           right: 0,
-                          child: AppBar(
-                            backgroundColor: Colors.transparent,
-                            elevation: 0,
-                            leading: BackdropFilter(
-                              filter: ImageFilter.blur(
-                                sigmaX: _blurAnimation.value,
-                                sigmaY: _blurAnimation.value,
-                              ),
-                              child: Container(
-                                margin: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.2),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: IconButton(
-                                  icon: const Icon(Icons.arrow_back_ios_new,
-                                      size: 18),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 8,
+                            ),
+                            child: Row(
+                              children: [
+                                // Minimalist back button
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.arrow_back_ios,
+                                    size: 22,
+                                  ),
                                   color: Colors.white,
                                   onPressed: () => Navigator.pop(context),
                                 ),
-                              ),
-                            ),
-                            title: Text(
-                              widget.item.title,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                shadows: [
-                                  Shadow(
-                                    color: Colors.black.withOpacity(0.5),
-                                    blurRadius: 5,
-                                  ),
-                                ],
-                              ),
+                                const Spacer(),
+                              ],
                             ),
                           ),
                         ),
 
-                        // Elegant bottom action area with glassmorphism
+                        // Minimal action buttons
                         Positioned(
-                          bottom: 0,
+                          bottom: 50,
                           left: 0,
                           right: 0,
-                          child: TweenAnimationBuilder(
-                            tween: Tween<double>(begin: 0.0, end: 1.0),
-                            duration: const Duration(milliseconds: 600),
-                            curve: Curves.easeOutCubic,
-                            builder: (context, value, child) {
+                          child: AnimatedBuilder(
+                            animation: _actionsSlideAnimation,
+                            builder: (context, child) {
                               return Transform.translate(
-                                offset: Offset(0, 100 * (1 - value)),
+                                offset: Offset(
+                                  0,
+                                  50 * (1 - _actionsSlideAnimation.value),
+                                ),
                                 child: Opacity(
-                                  opacity: value,
+                                  opacity: _actionsSlideAnimation.value,
                                   child: child,
                                 ),
                               );
                             },
-                            child: ClipRRect(
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(30),
-                                topRight: Radius.circular(30),
-                              ),
-                              child: BackdropFilter(
-                                filter:
-                                    ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                                child: Container(
-                                  height: 100,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Colors.white.withOpacity(0.1),
-                                        Colors.white.withOpacity(0.2),
-                                      ],
-                                    ),
-                                    borderRadius: const BorderRadius.only(
-                                      topLeft: Radius.circular(30),
-                                      topRight: Radius.circular(30),
-                                    ),
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.2),
-                                      width: 1.5,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      // Download button
-                                      Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          // Ripple effect animation
-                                          AnimatedBuilder(
-                                            animation: _rippleAnimation,
-                                            builder: (context, child) {
-                                              return Opacity(
-                                                opacity:
-                                                    1 - _rippleAnimation.value,
-                                                child: Transform.scale(
-                                                  scale: 1 +
-                                                      _rippleAnimation.value *
-                                                          0.5,
-                                                  child: Container(
-                                                    width: 50,
-                                                    height: 50,
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.white
-                                                          .withOpacity(0.2),
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          ),
-
-                                          // Download button
-                                          GestureDetector(
-                                            onTap: _isDownloading
-                                                ? null
-                                                : _downloadWallpaper,
-                                            child: Container(
-                                              width: 50,
-                                              height: 50,
-                                              decoration: BoxDecoration(
-                                                color: Colors.white
-                                                    .withOpacity(0.2),
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                  color: Colors.white
-                                                      .withOpacity(0.3),
-                                                  width: 1.5,
-                                                ),
-                                              ),
-                                              child: _isDownloading
-                                                  ? const SizedBox(
-                                                      width: 24,
-                                                      height: 24,
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                        color: Colors.white,
-                                                        strokeWidth: 2,
-                                                      ),
-                                                    )
-                                                  : const Icon(
-                                                      Icons.download_rounded,
-                                                      color: Colors.white,
-                                                      size: 24,
-                                                    ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-
-                                      // Apply wallpaper button
-                                      AnimatedBuilder(
-                                        animation: _pulseAnimation,
-                                        builder: (context, child) {
-                                          return Transform.scale(
-                                            scale: _pulseAnimation.value,
-                                            child: Stack(
-                                              alignment: Alignment.center,
-                                              children: [
-                                                // Ripple effect animation
-                                                AnimatedBuilder(
-                                                  animation: _rippleAnimation,
-                                                  builder: (context, child) {
-                                                    return Opacity(
-                                                      opacity: 1 -
-                                                          _rippleAnimation
-                                                              .value,
-                                                      child: Transform.scale(
-                                                        scale: 1 +
-                                                            _rippleAnimation
-                                                                    .value *
-                                                                0.3,
-                                                        child: Container(
-                                                          width: 200,
-                                                          height: 60,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        30),
-                                                            gradient:
-                                                                LinearGradient(
-                                                              colors: [
-                                                                const Color(
-                                                                        0xFF3C8CE7)
-                                                                    .withOpacity(
-                                                                        0.5),
-                                                                const Color(
-                                                                        0xFF00EAFF)
-                                                                    .withOpacity(
-                                                                        0.5),
-                                                              ],
-                                                              begin: Alignment
-                                                                  .centerLeft,
-                                                              end: Alignment
-                                                                  .centerRight,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-
-                                                // Apply button
-                                                GestureDetector(
-                                                  onTap: _isSettingWallpaper
-                                                      ? null
-                                                      : _setWallpaper,
-                                                  child: Container(
-                                                    width: 200,
-                                                    height: 60,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              30),
-                                                      gradient:
-                                                          const LinearGradient(
-                                                        colors: [
-                                                          Color(0xFF3C8CE7),
-                                                          Color(0xFF00EAFF),
-                                                        ],
-                                                        begin: Alignment
-                                                            .centerLeft,
-                                                        end: Alignment
-                                                            .centerRight,
-                                                      ),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: const Color(
-                                                                  0xFF3C8CE7)
-                                                              .withOpacity(0.5),
-                                                          blurRadius: 15,
-                                                          spreadRadius: 0,
-                                                          offset: const Offset(
-                                                              0, 5),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    child: _isSettingWallpaper
-                                                        ? const Center(
-                                                            child: SizedBox(
-                                                              width: 24,
-                                                              height: 24,
-                                                              child:
-                                                                  CircularProgressIndicator(
-                                                                color: Colors
-                                                                    .white,
-                                                                strokeWidth: 2,
-                                                              ),
-                                                            ),
-                                                          )
-                                                        : const Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Icon(
-                                                                Icons.wallpaper,
-                                                                color: Colors
-                                                                    .white,
-                                                                size: 24,
-                                                              ),
-                                                              SizedBox(
-                                                                  width: 10),
-                                                              Text(
-                                                                'Apply Wallpaper',
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 18,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  letterSpacing:
-                                                                      0.5,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // Set as wallpaper button
+                                _buildActionButton(
+                                  icon: Icons.wallpaper,
+                                  label: 'Apply',
+                                  primary: true,
+                                  onTap: _showWallpaperOptions,
+                                  isLoading: isWallpaperSetting,
                                 ),
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        // Hint text for swiping up
-                        Positioned(
-                          bottom: 110,
-                          left: 0,
-                          right: 0,
-                          child: Center(
-                            child: TweenAnimationBuilder(
-                              tween: Tween<double>(begin: 0.0, end: 1.0),
-                              duration: const Duration(milliseconds: 800),
-                              curve: Curves.easeOutCubic,
-                              builder: (context, value, child) {
-                                return Opacity(
-                                  opacity: value * 0.7,
-                                  child: child,
-                                );
-                              },
-                              child: Column(
-                                children: [
-                                  const Icon(
-                                    Icons.keyboard_arrow_up,
-                                    color: Colors.white,
-                                    size: 24,
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Text(
-                                    'Swipe up to apply',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      shadows: [
-                                        Shadow(
-                                          color: Colors.black.withOpacity(0.5),
-                                          blurRadius: 5,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                const SizedBox(width: 20),
+                                // Download button
+                                _buildActionButton(
+                                  icon: Icons.download_outlined,
+                                  label: 'Save',
+                                  primary: false,
+                                  onTap: _downloadWallpaper,
+                                  isLoading: _isDownloading,
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -1010,6 +695,64 @@ class _UltraPremiumWallpaperDetailState
                     ),
                   );
                 },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required bool primary,
+    required VoidCallback onTap,
+    required bool isLoading,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: isLoading ? null : onTap,
+        borderRadius: BorderRadius.circular(15),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 12,
+          ),
+          decoration: BoxDecoration(
+            color:
+                primary ? Colors.white.withOpacity(0.15) : Colors.transparent,
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.3),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              isLoading
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Icon(
+                      icon,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
             ],
           ),

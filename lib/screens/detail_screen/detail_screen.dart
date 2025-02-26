@@ -4,6 +4,7 @@ import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/color_constants.dart';
 import 'package:watching_app_2/core/enums/app_enums.dart';
 import 'package:watching_app_2/provider/source_provider.dart';
+import 'package:watching_app_2/provider/theme_provider.dart';
 import 'package:watching_app_2/provider/webview_controller_provider.dart';
 import 'package:watching_app_2/models/content_item.dart';
 import 'package:watching_app_2/widgets/custom_gap.dart';
@@ -11,6 +12,8 @@ import 'package:watching_app_2/widgets/custom_image_widget.dart';
 import 'package:watching_app_2/widgets/primary_button.dart';
 import 'package:watching_app_2/widgets/text_widget.dart';
 import '../../core/navigation/navigator.dart';
+import '../../provider/similar_content_provider.dart';
+import '../video_screen/components/similar_content_section.dart';
 import '../video_screen/video_screen.dart';
 import 'dart:ui';
 
@@ -120,6 +123,8 @@ class _DetailScreenState extends State<DetailScreen>
 
   @override
   Widget build(BuildContext context) {
+    var similarProvider = Provider.of<SimilarContentProvider>(context);
+
     return Scaffold(
       // backgroundColor: AppColors.primaryColor,
       extendBodyBehindAppBar: true,
@@ -158,122 +163,133 @@ class _DetailScreenState extends State<DetailScreen>
           },
         ),
       ),
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          // Hero Image Section
-          SliverToBoxAdapter(
-            child: Stack(
-              children: [
-                Hero(
-                  tag: widget.item.thumbnailUrl,
-                  child: AnimatedBuilder(
-                    animation: _scaleAnimation,
-                    builder: (context, child) {
-                      return Transform.scale(
-                        scale: _scaleAnimation.value,
-                        child: Container(
-                          height: 60.h,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.backgroundColorLight
-                                    .withOpacity(0.7),
-                                spreadRadius: 8,
-                                blurRadius: 20,
+      body: Consumer<ThemeProvider>(builder: (context, provider, _) {
+        return CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            // Hero Image Section
+            SliverToBoxAdapter(
+              child: Stack(
+                children: [
+                  Hero(
+                    tag: widget.item.thumbnailUrl,
+                    child: AnimatedBuilder(
+                      animation: _scaleAnimation,
+                      builder: (context, child) {
+                        return Transform.scale(
+                          scale: _scaleAnimation.value,
+                          child: Container(
+                            height: 60.h,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                                // boxShadow: [
+                                //   BoxShadow(
+                                //     color: AppColors.greyColor.withOpacity(0.7),
+                                //     spreadRadius: 8,
+                                //     blurRadius: 20,
+                                //   ),
+                                // ],
+                                ),
+                            child: ShaderMask(
+                              shaderCallback: (rect) {
+                                return LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    AppColors.backgroundColorLight,
+                                    AppColors.backgroundColorLight
+                                        .withOpacity(0.7),
+                                    Colors.transparent
+                                  ],
+                                  stops: const [0.0, 0.6, 1.0],
+                                ).createShader(rect);
+                              },
+                              blendMode: BlendMode.dstIn,
+                              child: CustomImageWidget(
+                                imagePath: widget.item.thumbnailUrl,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
                               ),
-                            ],
-                          ),
-                          child: ShaderMask(
-                            shaderCallback: (rect) {
-                              return LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  AppColors.backgroundColorLight,
-                                  AppColors.backgroundColorLight
-                                      .withOpacity(0.7),
-                                  Colors.transparent
-                                ],
-                                stops: const [0.0, 0.6, 1.0],
-                              ).createShader(rect);
-                            },
-                            blendMode: BlendMode.dstIn,
-                            child: CustomImageWidget(
-                              imagePath: widget.item.thumbnailUrl,
-                              fit: BoxFit.cover,
-                              width: double.infinity,
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                // Floating play button
-                Positioned(
-                  bottom: 20,
-                  right: 20,
-                  child: ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        NH.navigateTo(VideoScreen(item: widget.item));
+                        );
                       },
-                      backgroundColor: AppColors.primaryColor,
-                      child: Icon(
-                        Icons.play_arrow,
-                        size: 26.sp,
-                        color: AppColors.secondaryColor,
+                    ),
+                  ),
+                  // Floating play button
+                  Positioned(
+                    bottom: 20,
+                    right: 20,
+                    child: ScaleTransition(
+                      scale: _scaleAnimation,
+                      child: FloatingActionButton(
+                        backgroundColor: AppColors.primaryColor,
+                        onPressed: () {
+                          NH.navigateTo(VideoScreen(item: widget.item));
+                        },
+                        // backgroundColor: AppColors.primaryColor,
+                        child: Icon(
+                          Icons.play_arrow,
+                          color: AppColors.backgroundColorLight,
+                          size: 26.sp,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
 
-          // Content Section
-          SliverToBoxAdapter(
-            child: SlideTransition(
-              position: _slideAnimation,
-              child: FadeTransition(
-                opacity: _fadeInAnimation,
-                child: Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        AppColors.backgroundColorLight,
-                        AppColors.backgroundColorLight,
-                      ],
+            // Content Section
+            SliverToBoxAdapter(
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: FadeTransition(
+                  opacity: _fadeInAnimation,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: provider.isDarkTheme
+                            ? [
+                                AppColors.backgroundColorDark,
+                                AppColors.backgroundColorDark,
+                              ]
+                            : [
+                                AppColors.backgroundColorLight,
+                                AppColors.backgroundColorLight,
+                              ],
+                      ),
                     ),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const CustomGap(heightFactor: .04),
-                        _buildAnimatedTitle(),
-                        const CustomGap(heightFactor: .02),
-                        _buildMetaData(),
-                        // CustomGap(heightFactor: .02),
-                        _buildInfoCards(),
-                        const CustomGap(heightFactor: .04),
-                        _buildWatchButton(),
-                        const CustomGap(heightFactor: .04),
-                      ],
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 5.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const CustomGap(heightFactor: .04),
+                          _buildAnimatedTitle(),
+                          const CustomGap(heightFactor: .02),
+                          _buildMetaData(),
+                          // CustomGap(heightFactor: .02),
+                          _buildInfoCards(),
+                          const CustomGap(heightFactor: .04),
+                          _buildWatchButton(),
+                          const CustomGap(heightFactor: .04),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
+            SliverToBoxAdapter(
+              child: SimilarContentSection(
+                  similarContents: similarProvider.similarContents),
+            ),
+          ],
+        );
+      }),
     );
   }
 
@@ -376,7 +392,16 @@ class _DetailScreenState extends State<DetailScreen>
         _buildInfoCard(
           icon: Icons.update,
           title: 'Updated',
-          value: context.read<SourceProvider>().selectedQuery ?? 'N/A',
+          value: (context.read<SourceProvider>().selectedQuery != null)
+              ? context
+                  .read<SourceProvider>()
+                  .selectedQuery!
+                  .replaceAll("_", " ")
+                  .replaceAll("/", "")
+                  .replaceAll("{page}", '')
+                  .replaceAll("{filter}", "")
+                  .toUpperCase()
+              : 'N/A',
           color: Colors.blue,
         ),
       ],
@@ -426,7 +451,6 @@ class _DetailScreenState extends State<DetailScreen>
                 TextWidget(
                   text: value,
                   fontSize: 17.sp,
-                  color: AppColors.backgroundColorDark,
                   fontWeight: FontWeight.w600,
                 ),
               ],

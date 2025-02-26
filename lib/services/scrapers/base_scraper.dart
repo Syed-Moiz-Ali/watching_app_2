@@ -46,6 +46,10 @@ abstract class BaseScraper {
   }
 
   Future<List<ContentItem>> scrapeSimilarContent(String html) async {
+    var similarContentProvider =
+        SMA.navigationKey.currentContext!.read<SimilarContentProvider>();
+    await similarContentProvider.setSimilarContents([]);
+
     final document = parse(html);
     final similarContentElements =
         document.querySelectorAll(config.similarContentSelector!.selector!);
@@ -55,9 +59,7 @@ abstract class BaseScraper {
 
     // Optionally, you could also update your `SimilarContentProvider` here,
     // which could be done in one place across all scrapers
-    await SMA.navigationKey.currentContext!
-        .read<SimilarContentProvider>()
-        .setSimilarContents(similarContent);
+    await similarContentProvider.setSimilarContents(similarContent);
 
     return similarContent;
   }

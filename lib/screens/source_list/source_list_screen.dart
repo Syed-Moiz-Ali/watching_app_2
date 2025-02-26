@@ -124,7 +124,7 @@ class _SourceListScreenState extends State<SourceListScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      // backgroundColor: Colors.grey[50],
       appBar: CustomAppBar(
         appBarHeight: 15.h,
         elevation: 0,

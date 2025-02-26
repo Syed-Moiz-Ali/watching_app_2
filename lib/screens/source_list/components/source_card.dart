@@ -75,10 +75,11 @@ class _SourceCardState extends State<SourceCard> with TickerProviderStateMixin {
         margin: const EdgeInsets.symmetric(vertical: 8),
         elevation: 8,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(color: AppColors.greyColor)),
         shadowColor: Colors.black26,
-        color: Colors.white,
+        // color: Colors.white,
+
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           onTap: () {
@@ -100,7 +101,7 @@ class _SourceCardState extends State<SourceCard> with TickerProviderStateMixin {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.grey[200],
+                    // color: Colors.grey[200],
                     borderRadius: BorderRadius.circular(18),
                   ),
                   child: CustomImageWidget(
@@ -119,7 +120,6 @@ class _SourceCardState extends State<SourceCard> with TickerProviderStateMixin {
                         text: widget.source.name,
                         fontWeight: FontWeight.bold,
                         fontSize: 16.sp,
-                        color: AppColors.backgroundColorDark,
                       ),
                       const SizedBox(height: 6),
                       TextWidget(

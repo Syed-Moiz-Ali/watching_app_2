@@ -6,6 +6,7 @@ class ThemeProvider extends ChangeNotifier {
   ThemeMode? theme;
   setTheme(ThemeMode val) {
     theme = val;
+    setIsDarkTheme(val == ThemeMode.dark);
     notifyListeners();
   }
 

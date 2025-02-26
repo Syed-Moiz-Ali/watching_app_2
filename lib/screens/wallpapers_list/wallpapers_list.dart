@@ -208,7 +208,7 @@ class _WallpapersListState extends State<WallpapersList> {
                                   //             index], // Replace with actual image URL
                                   //       );
                                   //     });
-                                  NH.navigateTo(UltraPremiumWallpaperDetail(
+                                  NH.navigateTo(MinimalistWallpaperDetail(
                                     item: wallpapers[
                                         index], // Replace with actual image URL
                                   ));

@@ -36,12 +36,31 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    var themeProvider = context.watch<ThemeProvider>();
+    final MaterialColor blackSwatch = MaterialColor(
+      AppColors.primaryColor.value,
+      const <int, Color>{
+        50: AppColors.primaryColor,
+        100: AppColors.primaryColor,
+        200: AppColors.primaryColor,
+        300: AppColors.primaryColor,
+        400: AppColors.primaryColor,
+        500: AppColors.primaryColor,
+        600: AppColors.primaryColor,
+        700: AppColors.primaryColor,
+        800: AppColors.primaryColor,
+        900: AppColors.primaryColor,
+      },
+    );
     return ResponsiveSizer(builder: (context, orientation, screenType) {
       return MaterialApp(
         title: 'PornQueen',
         navigatorKey: SMA.navigationKey,
         debugShowCheckedModeBanner: false,
-        home: NavigationScreen(),
+        theme: AppTheme.lightTheme,
+        themeMode: themeProvider.theme,
+        darkTheme: AppTheme.darkTheme,
+        home: const NavigationScreen(),
       );
     });
   }

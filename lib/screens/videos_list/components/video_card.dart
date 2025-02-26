@@ -121,7 +121,7 @@ class _VideoCardState extends State<VideoCard>
               ],
             ),
             child: ClipRRect(
-              // borderRadius: BorderRadius.circular(widget.isGrid ? 20 : 28),
+              borderRadius: BorderRadius.circular(widget.isGrid ? 20 : 28),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                 child: Container(
@@ -406,10 +406,10 @@ class _VideoCardState extends State<VideoCard>
         vertical: widget.isGrid ? 6 : 8,
       ),
       decoration: BoxDecoration(
-        color: AppColors.primaryColor.withOpacity(0.15),
+        color: Colors.grey.withOpacity(0.15),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.primaryColor.withOpacity(0.3),
+          color: AppColors.greyColor.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -419,14 +419,14 @@ class _VideoCardState extends State<VideoCard>
           Icon(
             Icons.play_circle_outline_rounded,
             size: widget.isGrid ? 14 : 16,
-            color: AppColors.primaryColor,
+            color: Colors.grey[400],
           ),
           const SizedBox(width: 6),
           TextWidget(
             text: widget.item.source.name,
             fontSize: widget.isGrid ? 12.sp : 14.sp,
-            color: AppColors.primaryColor,
             fontWeight: FontWeight.w600,
+            color: Colors.grey[400],
           ),
         ],
       ),
