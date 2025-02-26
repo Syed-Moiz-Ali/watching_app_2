@@ -105,20 +105,20 @@ class _QueryBottomsheetState extends State<QueryBottomsheet>
     super.dispose();
   }
 
-  void _toggleSelection(String key) {
+  void _toggleSelection(String key, String value) {
     var provider = context.read<SourceProvider>();
 
     setState(() {
-      if (provider.selectedQuery == key) {
+      if (provider.selectedQuery == value) {
         provider.selectedQuery = null;
         _itemControllers[key]?.reverse();
         _selectionController.reverse();
       } else {
         // Reverse previous selection if any
-        if (provider.selectedQuery == key) {
+        if (provider.selectedQuery == value) {
           _itemControllers[provider.selectedQuery]?.reverse();
         }
-        provider.selectedQuery = key;
+        provider.selectedQuery = value;
         _itemControllers[key]?.forward();
         _selectionController.forward();
       }
@@ -216,14 +216,14 @@ class _QueryBottomsheetState extends State<QueryBottomsheet>
       itemCount: widget.source.query.length,
       itemBuilder: (context, index) {
         final entry = widget.source.query.entries.elementAt(index);
-        return _buildCategoryItem(entry.key, index);
+        return _buildCategoryItem(entry.key, entry.value, index);
       },
     );
   }
 
-  Widget _buildCategoryItem(String key, int index) {
+  Widget _buildCategoryItem(String key, String value, int index) {
     var selectedQuery = context.watch<SourceProvider>().selectedQuery;
-    final isSelected = selectedQuery == key;
+    final isSelected = selectedQuery == value;
     final itemScale = _itemScales[key] ?? const AlwaysStoppedAnimation(1.0);
     final itemSlide = _itemSlides[key] ?? const AlwaysStoppedAnimation(0.0);
 
@@ -237,7 +237,7 @@ class _QueryBottomsheetState extends State<QueryBottomsheet>
             child: Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: InkWell(
-                onTap: () => _toggleSelection(key),
+                onTap: () => _toggleSelection(key, value),
                 borderRadius: BorderRadius.circular(16),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 300),

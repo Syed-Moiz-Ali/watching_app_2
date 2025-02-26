@@ -99,21 +99,31 @@ class _CustomImageWidgetState extends State<CustomImageWidget> {
                       highlightColor: Colors.grey[100]!,
                       child: Container(color: Colors.white),
                     ),
-          errorWidget: (context, url, error) => Stack(
-            children: [
-              Opacity(
-                opacity: 0.5,
-                child: CachedNetworkImage(
-                  imageUrl: nonNSFWImage,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
+          errorWidget: (context, url, error) => Container(
+            color: Colors.grey[200],
+            child: const Center(
+              child: Icon(
+                Icons.broken_image_rounded,
+                color: Colors.grey,
+                size: 32,
               ),
-              const Center(
-                child: Icon(Icons.error),
-              ),
-            ],
+            ),
           ),
+          // Stack(
+          //   children: [
+          //     Opacity(
+          //       opacity: 0.5,
+          //       child: CachedNetworkImage(
+          //         imageUrl: nonNSFWImage,
+          //         width: double.infinity,
+          //         fit: BoxFit.cover,
+          //       ),
+          //     ),
+          //     const Center(
+          //       child: Icon(Icons.error),
+          //     ),
+          //   ],
+          // ),
           placeholderFadeInDuration: const Duration(milliseconds: 700),
           useOldImageOnUrlChange: true,
         ),

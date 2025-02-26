@@ -1,35 +1,29 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
-import 'package:watching_app_2/core/enums/app_enums.dart';
-import 'package:watching_app_2/core/navigation/navigator.dart';
-import 'package:watching_app_2/widgets/custom_appbar.dart';
-import 'package:watching_app_2/widgets/loading_indicator.dart';
 
-import '../../core/constants/color_constants.dart';
-import '../../core/global/app_global.dart';
+import '../../core/enums/app_enums.dart';
+import '../../core/navigation/navigator.dart';
 import '../../models/content_item.dart';
 import '../../models/content_source.dart';
 import '../../services/scrapers/scraper_service.dart';
+import '../../widgets/custom_appbar.dart';
 import '../../widgets/custom_floatingaction_button.dart';
 import '../../widgets/pagination_loading_indicator.dart';
 import '../../widgets/text_widget.dart';
-import '../detail_screen/detail_screen.dart';
-import 'components/query_bottomsheet.dart';
-import 'components/video_grid_view.dart';
+import '../wallpaper_detail/wallpaper_detail.dart';
+import 'components/wallpaper_grid_view.dart';
 
-class VideoListScreen extends StatefulWidget {
+class WallpapersList extends StatefulWidget {
   final ContentSource source;
 
-  const VideoListScreen({super.key, required this.source});
+  const WallpapersList({super.key, required this.source});
 
   @override
-  _VideoListScreenState createState() => _VideoListScreenState();
+  State<WallpapersList> createState() => _WallpapersListState();
 }
 
-class _VideoListScreenState extends State<VideoListScreen> {
+class _WallpapersListState extends State<WallpapersList> {
   late ScraperService scraperService;
-  List<ContentItem> videos = [];
+  List<ContentItem> wallpapers = [];
   bool isLoading = true;
   bool isLoadingMore = false; // Flag for loading more items
   String? error;
@@ -44,15 +38,13 @@ class _VideoListScreenState extends State<VideoListScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-      scraperService = ScraperService(widget.source);
-      _currentQuery = widget.source.query.entries.first.value;
+    scraperService = ScraperService(widget.source);
+    _currentQuery = widget.source.query.entries.first.value;
 
-      // Add scroll listener
-      _scrollController.addListener(_scrollListener);
+    // Add scroll listener
+    _scrollController.addListener(_scrollListener);
 
-      loadVideos();
-    });
+    loadWallpapers();
   }
 
   @override
@@ -67,12 +59,12 @@ class _VideoListScreenState extends State<VideoListScreen> {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
       if (!isLoadingMore && !isLoading && _hasMoreData) {
-        loadMoreVideos();
+        loadMoreWallpapers();
       }
     }
   }
 
-  Future<void> loadVideos({String? selectedQuery}) async {
+  Future<void> loadWallpapers({String? selectedQuery}) async {
     setState(() {
       isLoading = true;
       error = null;
@@ -85,16 +77,16 @@ class _VideoListScreenState extends State<VideoListScreen> {
     }
 
     try {
-      final newVideos =
+      final newWallpapers =
           await scraperService.getContent(_currentQuery, _currentPage);
       setState(() {
-        videos = newVideos.where((item) {
+        wallpapers = newWallpapers.where((item) {
           return item.thumbnailUrl.toString().trim().isNotEmpty &&
               item.thumbnailUrl.toString().trim() != 'NA';
         }).toList();
         isLoading = false;
         // If no videos returned or fewer than expected, assume no more data
-        if (newVideos.isEmpty) {
+        if (newWallpapers.isEmpty) {
           _hasMoreData = false;
         }
       });
@@ -107,7 +99,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
   }
 
   // New method to load more videos when scrolling ends
-  Future<void> loadMoreVideos() async {
+  Future<void> loadMoreWallpapers() async {
     if (!_hasMoreData || isLoadingMore) return;
 
     setState(() {
@@ -116,18 +108,18 @@ class _VideoListScreenState extends State<VideoListScreen> {
 
     try {
       final nextPage = _currentPage + 1;
-      final newVideos =
+      final newWallpapers =
           await scraperService.getContent(_currentQuery, nextPage);
 
       // Filter out videos with empty thumbnails
-      final filteredVideos = newVideos.where((item) {
+      final filteredWallpapers = newWallpapers.where((item) {
         return item.thumbnailUrl.toString().trim().isNotEmpty &&
             item.thumbnailUrl.toString().trim() != 'NA';
       }).toList();
 
       setState(() {
-        if (filteredVideos.isNotEmpty) {
-          videos.addAll(filteredVideos);
+        if (filteredWallpapers.isNotEmpty) {
+          wallpapers.addAll(filteredWallpapers);
           _currentPage = nextPage;
         } else {
           _hasMoreData = false; // No more data available
@@ -142,7 +134,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
     }
   }
 
-  Future<void> searchVideos(String value) async {
+  Future<void> searchWallpaper(String value) async {
     setState(() {
       isLoading = true;
       error = null;
@@ -152,15 +144,15 @@ class _VideoListScreenState extends State<VideoListScreen> {
     });
 
     try {
-      final newVideos = await scraperService.search(value, _currentPage);
+      final newWallpapers = await scraperService.search(value, _currentPage);
       setState(() {
-        videos = newVideos.where((item) {
+        wallpapers = newWallpapers.where((item) {
           return item.thumbnailUrl.toString().trim().isNotEmpty &&
               item.thumbnailUrl.toString().trim() != 'NA';
         }).toList();
         isLoading = false;
         // If no videos returned or fewer than expected, assume no more data
-        if (newVideos.isEmpty) {
+        if (newWallpapers.isEmpty) {
           _hasMoreData = false;
         }
       });
@@ -180,7 +172,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
         title: widget.source.name,
         isShowSearchbar: true,
         onSearch: (value) {
-          searchVideos(value);
+          searchWallpaper(value);
         },
       ),
       body: Stack(
@@ -193,7 +185,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
                 )
               : error != null
                   ? Center(child: Text(error!))
-                  : videos.isEmpty
+                  : wallpapers.isEmpty
                       ? const Center(
                           child: TextWidget(
                             text: 'No data found',
@@ -203,21 +195,24 @@ class _VideoListScreenState extends State<VideoListScreen> {
                       : Column(
                           children: [
                             Expanded(
-                              child: VideoGridView(
+                              child: WallpaperGridView(
+                                wallpapers: wallpapers,
                                 controller: _scrollController,
-                                videos: videos,
-                                isGrid: isGrid,
-                                currentPlayingIndex: _currentPlayingIndex,
                                 onItemTap: (index) {
-                                  NH.navigateTo(
-                                      DetailScreen(item: videos[index]));
+                                  // showModalBottomSheet(
+                                  //     isScrollControlled: true,
+                                  //     context: context,
+                                  //     builder: (context) {
+                                  //       return UltraPremiumWallpaperDetail(
+                                  //         item: wallpapers[
+                                  //             index], // Replace with actual image URL
+                                  //       );
+                                  //     });
+                                  NH.navigateTo(UltraPremiumWallpaperDetail(
+                                    item: wallpapers[
+                                        index], // Replace with actual image URL
+                                  ));
                                 },
-                                onHorizontalDragStart: (index) => setState(() {
-                                  _currentPlayingIndex = index;
-                                }),
-                                onHorizontalDragEnd: (index) => setState(() {
-                                  _currentPlayingIndex = index;
-                                }),
                               ),
                             ),
                             // Enhanced loading animation when loading more items
@@ -230,34 +225,12 @@ class _VideoListScreenState extends State<VideoListScreen> {
                               ),
                           ],
                         ),
-          _buildToggleButton(),
+          // _buildToggleButton(),
         ],
       ),
       floatingActionButton: CustomFloatingActionButton(
         source: widget.source,
-        onSelected: (query) => loadVideos(selectedQuery: query),
-      ),
-    );
-  }
-
-  Widget _buildToggleButton() {
-    return Positioned(
-      bottom: 10,
-      left: 20,
-      child: Container(
-        height: 60,
-        width: 60,
-        decoration: BoxDecoration(
-          color: AppColors.primaryColor,
-          borderRadius: BorderRadius.circular(1000),
-        ),
-        child: IconButton(
-          icon: Icon(
-            isGrid ? Icons.list : Icons.grid_view,
-            color: AppColors.backgroundColorLight,
-          ),
-          onPressed: () => setState(() => isGrid = !isGrid),
-        ),
+        onSelected: (query) => loadWallpapers(selectedQuery: query),
       ),
     );
   }

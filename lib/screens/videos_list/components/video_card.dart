@@ -121,7 +121,7 @@ class _VideoCardState extends State<VideoCard>
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(widget.isGrid ? 20 : 28),
+              // borderRadius: BorderRadius.circular(widget.isGrid ? 20 : 28),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                 child: Container(

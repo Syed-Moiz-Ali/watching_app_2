@@ -39,8 +39,11 @@ class CustomTabBar extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.primaryColor.withOpacity(0.9),
-                  AppColors.secondaryColor.withOpacity(0.95),
+                  AppColors.primaryColor.withOpacity(.8),
+                  AppColors.primaryColor.withOpacity(0.6),
+                  AppColors.primaryColor.withOpacity(0.6),
+                  AppColors.primaryColor.withOpacity(0.8),
+                  // AppColors.primaryColor,
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,

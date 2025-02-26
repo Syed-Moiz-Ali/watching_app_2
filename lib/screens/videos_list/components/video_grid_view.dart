@@ -10,6 +10,7 @@ class VideoGridView extends StatelessWidget {
   final Function(int) onItemTap;
   final Function(int) onHorizontalDragStart;
   final Function(int) onHorizontalDragEnd;
+  final ScrollController? controller; // Add ScrollController
 
   const VideoGridView({
     super.key,
@@ -19,11 +20,13 @@ class VideoGridView extends StatelessWidget {
     required this.onItemTap,
     required this.onHorizontalDragStart,
     required this.onHorizontalDragEnd,
+    this.controller, // Make it optional
   });
 
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
+      controller: controller, // Use the controller
       padding: const EdgeInsets.all(8),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: isGrid ? 2 : 1,

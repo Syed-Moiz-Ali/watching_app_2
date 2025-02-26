@@ -3,11 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
 import 'dart:ui';
 import 'package:provider/provider.dart';
+import 'package:watching_app_2/core/constants/color_constants.dart';
 import 'package:watching_app_2/provider/bottom_navigation_provider.dart';
+import 'package:watching_app_2/screens/categories_screen/categories_screen.dart';
 import 'package:watching_app_2/screens/source_list/source_list_screen.dart';
 import 'package:watching_app_2/widgets/text_widget.dart';
 
 import '../browse_content/browse_content.dart';
+import '../settings/settings_screen.dart';
 
 // Create a provider class to manage the navigation state
 
@@ -554,16 +557,17 @@ class _NavigationExampleContent extends StatelessWidget {
       body: IndexedStack(
         index: navProvider.currentIndex,
         children: [
-          AnimatedWallpaperScreen(),
-          _buildPage('Categories Page', Colors.teal),
+          const AnimatedWallpaperScreen(),
+          AdultContentCategoriesScreen(),
+          // _buildPage('Categories Page', Colors.teal),
           // _buildPage('Websites Page', Colors.blue),
           const SourceListScreen(),
           _buildPage('Favorites Page', Colors.redAccent),
-          _buildPage('Profile Page', Colors.amber),
+          const PremiumSettingsScreen(),
         ],
       ),
       bottomNavigationBar: const UltraPremiumNavBar(
-        accentColor: Colors.deepPurple, // Change to match your brand color
+        accentColor: AppColors.primaryColor, // Change to match your brand color
         enableBlur: true,
       ),
     );

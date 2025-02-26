@@ -234,7 +234,7 @@ class _CustomAppBarState extends State<CustomAppBar>
 
   Widget _buildTitle(Color textColor) {
     return Hero(
-      tag: 'app_bar_title',
+      tag: 'app_bar_title_${widget.title}',
       child: Material(
         color: Colors.transparent,
         child: TextWidget(
