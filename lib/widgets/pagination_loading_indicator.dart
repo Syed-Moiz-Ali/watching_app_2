@@ -25,7 +25,6 @@ class _PaginationLoadingIndicatorState extends State<PaginationLoadingIndicator>
   late Animation<double> _pulseAnimation;
   late Animation<Color?> _colorAnimation;
   late Animation<double> _particleAnimation;
-  late Animation<double> _waveAnimation;
 
   // Particle system variables
   final List<Particle> _particles = [];
@@ -101,10 +100,6 @@ class _PaginationLoadingIndicatorState extends State<PaginationLoadingIndicator>
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat();
-
-    _waveAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _waveController, curve: Curves.linear),
-    );
   }
 
   void _initializeParticles() {
@@ -401,7 +396,7 @@ class EnhancedLoadingPainter extends CustomPainter {
       ..strokeWidth = strokeWidth * 0.8
       ..strokeCap = StrokeCap.round;
 
-    final secondaryStartAngle = math.pi / 2;
+    const secondaryStartAngle = math.pi / 2;
     final secondaryEndAngle = 2 * math.pi * (0.3 + 0.6 * secondaryProgress);
 
     canvas.drawArc(

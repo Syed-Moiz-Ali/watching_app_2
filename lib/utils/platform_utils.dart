@@ -1,37 +1,35 @@
 import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class PlatformUtils {
-  // Singleton pattern
-  static final PlatformUtils _instance = PlatformUtils._internal();
-  factory PlatformUtils() => _instance;
-  PlatformUtils._internal();
+  final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
 
-  /// Check if device is running Android 10 or above
   Future<bool> isAndroid10OrAbove() async {
-    if (Platform.isAndroid) {
-      String release = await getAndroidVersion();
-      int version = int.tryParse(release) ?? 0;
-      return version >= 10;
-    }
-    return false;
+    if (!Platform.isAndroid) return false;
+
+    AndroidDeviceInfo androidInfo = await _deviceInfo.androidInfo;
+    return androidInfo.version.sdkInt >= 29; // Android 10 is API level 29
   }
 
-  /// Check if device is running Android 13 or above
   Future<bool> isAndroid13OrAbove() async {
-    if (Platform.isAndroid) {
-      String release = await getAndroidVersion();
-      int version = int.tryParse(release) ?? 0;
-      return version >= 13;
-    }
-    return false;
+    if (!Platform.isAndroid) return false;
+
+    AndroidDeviceInfo androidInfo = await _deviceInfo.androidInfo;
+    return androidInfo.version.sdkInt >= 33; // Android 13 is API level 33
   }
 
-  /// Get Android version as a string
-  Future<String> getAndroidVersion() async {
-    try {
-      return Platform.operatingSystemVersion.split(' ').last;
-    } catch (e) {
-      return '0';
-    }
+  // Add methods for Android 14 and 15
+  Future<bool> isAndroid14OrAbove() async {
+    if (!Platform.isAndroid) return false;
+
+    AndroidDeviceInfo androidInfo = await _deviceInfo.androidInfo;
+    return androidInfo.version.sdkInt >= 34; // Android 14 is API level 34
+  }
+
+  Future<bool> isAndroid15OrAbove() async {
+    if (!Platform.isAndroid) return false;
+
+    AndroidDeviceInfo androidInfo = await _deviceInfo.androidInfo;
+    return androidInfo.version.sdkInt >= 35; // Android 15 is API level 35
   }
 }

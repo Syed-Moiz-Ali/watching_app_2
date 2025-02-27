@@ -533,7 +533,7 @@ class _UltraPremiumNavBarState extends State<UltraPremiumNavBar>
 
 // Usage Example
 class NavigationScreen extends StatelessWidget {
-  const NavigationScreen({Key? key}) : super(key: key);
+  const NavigationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -545,7 +545,7 @@ class NavigationScreen extends StatelessWidget {
 }
 
 class _NavigationExampleContent extends StatelessWidget {
-  const _NavigationExampleContent({Key? key}) : super(key: key);
+  const _NavigationExampleContent();
 
   @override
   Widget build(BuildContext context) {
@@ -557,8 +557,8 @@ class _NavigationExampleContent extends StatelessWidget {
       body: IndexedStack(
         index: navProvider.currentIndex,
         children: [
-          const AnimatedWallpaperScreen(),
-          AdultContentCategoriesScreen(),
+          const BrowseContent(),
+          const AdultContentCategoriesScreen(),
           // _buildPage('Categories Page', Colors.teal),
           // _buildPage('Websites Page', Colors.blue),
           const SourceListScreen(),

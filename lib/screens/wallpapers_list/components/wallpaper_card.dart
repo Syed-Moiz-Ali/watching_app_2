@@ -12,10 +12,10 @@ class WallpaperCard extends StatefulWidget {
   final VoidCallback onTap;
 
   const WallpaperCard({
-    Key? key,
+    super.key,
     required this.item,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   State<WallpaperCard> createState() => _WallpaperCardState();
@@ -177,8 +177,7 @@ class _WallpaperCardState extends State<WallpaperCard>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             // Title with blurred background
-                            if (widget.item.title != null &&
-                                widget.item.title!.isNotEmpty)
+                            if (widget.item.title.isNotEmpty)
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: BackdropFilter(
@@ -192,7 +191,7 @@ class _WallpaperCardState extends State<WallpaperCard>
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      widget.item.title ?? '',
+                                      widget.item.title,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
@@ -227,7 +226,6 @@ class _WallpaperCardState extends State<WallpaperCard>
 
   // Wallpaper image with cached network image
   Widget _buildWallpaperImage() {
-    log("widget.item.thumbnailUrl is ${widget.item.thumbnailUrl}");
     return Hero(
       tag: 'wallpaper-${widget.item.thumbnailUrl}',
       child: CustomImageWidget(
@@ -264,8 +262,7 @@ class _WallpaperCardState extends State<WallpaperCard>
 
   // Quality badge widget
   Widget _buildQualityBadge() {
-    final isHD =
-        true; // You can determine this based on your ContentItem properties
+// You can determine this based on your ContentItem properties
 
     return AnimatedOpacity(
       opacity: _isLoading ? 0.0 : 1.0,
@@ -306,9 +303,9 @@ class ShimmerLoading extends StatefulWidget {
   final Widget child;
 
   const ShimmerLoading({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   State<ShimmerLoading> createState() => _ShimmerLoadingState();

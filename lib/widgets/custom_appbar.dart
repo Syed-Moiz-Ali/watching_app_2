@@ -4,7 +4,6 @@ import 'package:sizer/sizer.dart';
 import 'dart:ui';
 
 import '../core/common/common_widgets.dart';
-import '../core/constants/color_constants.dart';
 import '../core/enums/app_enums.dart';
 import '../provider/theme_provider.dart';
 import 'custom_padding.dart';

@@ -55,7 +55,6 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
 
   // Gradients
   late List<Color> _backgroundGradient;
-  late List<Color> _cardGradient;
   late List<Color> _accentGradient;
 
   // Particle positions for background animation
@@ -173,11 +172,6 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
       AppColors.backgroundColorLight.withOpacity(.5),
       Colors.white,
       AppColors.backgroundColorLight.withOpacity(.5)
-    ];
-
-    _cardGradient = [
-      AppColors.backgroundColorLight.withOpacity(0.95),
-      AppColors.backgroundColorLight.withOpacity(0.9),
     ];
 
     _accentGradient = [
@@ -1050,54 +1044,6 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
           color: Colors.white,
           fontSize: 15.sp * _textSize,
           fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFloatingActionButton() {
-    final buttonScale = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _floatingButtonController,
-      curve: const Interval(0.3, 0.9, curve: Curves.elasticOut),
-    ));
-
-    final rotation = Tween<double>(
-      begin: 0.0,
-      end: _isFloatingMenuOpen ? 0.125 : 0.0,
-    ).animate(CurvedAnimation(
-      parent: _floatingMenuController,
-      curve: Curves.easeOutBack,
-    ));
-
-    return ScaleTransition(
-      scale: buttonScale,
-      child: RotationTransition(
-        turns: rotation,
-        child: FloatingActionButton(
-          onPressed: _toggleFloatingMenu,
-          // backgroundColor: _primaryColor,
-          elevation: 8,
-          highlightElevation: 12,
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            transitionBuilder: (Widget child, Animation<double> animation) {
-              return RotationTransition(
-                turns: Tween<double>(begin: 0.5, end: 1.0).animate(animation),
-                child: ScaleTransition(
-                  scale: animation,
-                  child: child,
-                ),
-              );
-            },
-            child: Icon(
-              _isFloatingMenuOpen ? Icons.close : Icons.add,
-              key: ValueKey<bool>(_isFloatingMenuOpen),
-              color: Colors.white,
-            ),
-          ),
         ),
       ),
     );

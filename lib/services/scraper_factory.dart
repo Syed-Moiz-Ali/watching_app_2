@@ -7,6 +7,7 @@ import 'package:watching_app_2/core/extensions/videos/tabooporn2/tabooporn2.dart
 import 'package:watching_app_2/core/navigation/navigator.dart';
 import 'package:watching_app_2/widgets/error_page.dart';
 
+import '../core/extensions/photos/peakpx/peakpx.dart';
 import '../core/extensions/videos/noodlemagazine/noodlemagazine.dart';
 import '../core/extensions/videos/pornhits/pornhits.dart';
 import '../core/extensions/videos/spankbang/spankbang.dart';
@@ -28,14 +29,15 @@ class ScraperFactory {
     //wallpapers
     'pmatehunter': (source) => PMateHunter(source),
     'erowall': (source) => EroWall(source),
+    'peakpx': (source) => PeakPx(source),
     // Add more scrapers here
   };
 
   static BaseScraper createScraper(ContentSource source) {
     final builder = _scrapers[source.name.toLowerCase()];
     if (builder == null) {
-      NH.navigateTo(ErrorPage(
-          errorMessage: 'No scraper implemented for source: ${source.name}'));
+      // NH.navigateTo(ErrorPage(
+      //     errorMessage: 'No scraper implemented for source: ${source.name}'));
       throw Exception('No scraper implemented for source: ${source.name}');
     }
     return builder(source);

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -10,14 +8,12 @@ import 'package:watching_app_2/provider/similar_content_provider.dart';
 import 'package:watching_app_2/provider/webview_controller_provider.dart';
 import 'package:watching_app_2/widgets/custom_appbar.dart';
 import 'package:watching_app_2/widgets/custom_padding.dart';
-import 'package:watching_app_2/widgets/loading_indicator.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:animations/animations.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../widgets/custom_gap.dart';
 import '../../widgets/text_widget.dart';
-import 'components/similar_content_section.dart';
 
 class VideoScreen extends StatefulWidget {
   final ContentItem item;
@@ -66,80 +62,6 @@ class _VideoScreenState extends State<VideoScreen>
     //       Provider.of<WebviewControllerProvider>(context, listen: false);
     //   _setupFullscreenDetection(provider);
     // });
-  }
-
-  void _setupFullscreenDetection(WebviewControllerProvider provider) {
-    provider.webViewController.addJavaScriptChannel(
-      'FullscreenHandler',
-      onMessageReceived: (JavaScriptMessage message) {
-        if (message.message == 'enterFullscreen') {
-          _setLandscapeMode();
-        } else if (message.message == 'exitFullscreen') {
-          _setPortraitMode();
-        }
-      },
-    );
-
-    provider.webViewController.runJavaScript('''
-      // Monitor fullscreen changes
-      document.addEventListener('fullscreenchange', function() {
-        if (document.fullscreenElement) {
-          FullscreenHandler.postMessage('enterFullscreen');
-        } else {
-          FullscreenHandler.postMessage('exitFullscreen');
-        }
-      });
-
-      // For Safari/iOS
-      document.addEventListener('webkitfullscreenchange', function() {
-        if (document.webkitFullscreenElement) {
-          FullscreenHandler.postMessage('enterFullscreen');
-        } else {
-          FullscreenHandler.postMessage('exitFullscreen');
-        }
-      });
-
-      // Track video element fullscreen requests
-      document.querySelectorAll('video').forEach(function(video) {
-        video.addEventListener('enterfullscreen', function() {
-          FullscreenHandler.postMessage('enterFullscreen');
-        });
-
-        video.addEventListener('exitfullscreen', function() {
-          FullscreenHandler.postMessage('exitFullscreen');
-        });
-      });
-
-      // Track iframe fullscreen requests (for embedded players)
-      document.querySelectorAll('iframe').forEach(function(iframe) {
-        iframe.addEventListener('fullscreenchange', function() {
-          if (document.fullscreenElement === iframe) {
-            FullscreenHandler.postMessage('enterFullscreen');
-          } else if (!document.fullscreenElement) {
-            FullscreenHandler.postMessage('exitFullscreen');
-          }
-        });
-      });
-    ''');
-  }
-
-  void _setLandscapeMode() {
-    setState(() {
-      isFullscreen = true;
-    });
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-  }
-
-  void _setPortraitMode() {
-    setState(() {
-      isFullscreen = false;
-    });
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   }
 
   @override
@@ -230,7 +152,7 @@ class _VideoScreenState extends State<VideoScreen>
         ),
       );
     }
-    var similarProvider = Provider.of<SimilarContentProvider>(context);
+    Provider.of<SimilarContentProvider>(context);
     return Column(children: [
       ClipRRect(
         borderRadius:

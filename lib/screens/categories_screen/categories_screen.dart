@@ -1,9 +1,9 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
-import 'dart:ui';
 
-import 'package:watching_app_2/core/constants/color_constants.dart';
 import 'package:watching_app_2/services/source_manager.dart';
 import 'package:watching_app_2/widgets/custom_appbar.dart';
 import 'package:watching_app_2/widgets/custom_image_widget.dart';
@@ -13,7 +13,7 @@ import 'package:watching_app_2/widgets/text_widget.dart';
 import '../../models/categories_model.dart';
 
 class AdultContentCategoriesScreen extends StatefulWidget {
-  const AdultContentCategoriesScreen({Key? key}) : super(key: key);
+  const AdultContentCategoriesScreen({super.key});
 
   @override
   _AdultContentCategoriesScreenState createState() =>
@@ -24,13 +24,11 @@ class _AdultContentCategoriesScreenState
     extends State<AdultContentCategoriesScreen> with TickerProviderStateMixin {
   late AnimationController _backgroundController;
   late AnimationController _cardsController;
-  late Animation<double> _backgroundAnimation;
 
   // Adult content categories with appropriate icons, themes, and background images
   List<CategoryModel> _categories = [];
 
   // Track card hover state
-  int? _hoveredIndex;
   final List<AnimationController> _hoverControllers = [];
 
   @override
@@ -42,9 +40,6 @@ class _AdultContentCategoriesScreenState
       vsync: this,
       duration: const Duration(seconds: 20),
     );
-
-    _backgroundAnimation =
-        Tween<double>(begin: 0.0, end: 1.0).animate(_backgroundController);
 
     // Repeat the background animation indefinitely
     _backgroundController.repeat();
@@ -236,16 +231,12 @@ class _AdultContentCategoriesScreenState
   }
 
   void _onHoverStart(int index) {
-    setState(() {
-      _hoveredIndex = index;
-    });
+    setState(() {});
     _hoverControllers[index].forward();
   }
 
   void _onHoverEnd(int index) {
-    setState(() {
-      _hoveredIndex = null;
-    });
+    setState(() {});
     _hoverControllers[index].reverse();
   }
 
@@ -361,9 +352,9 @@ class CategoryDetailScreen extends StatelessWidget {
   final CategoryModel category;
 
   const CategoryDetailScreen({
-    Key? key,
+    super.key,
     required this.category,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -401,7 +392,7 @@ class CategoryDetailScreen extends StatelessWidget {
                   Colors.black.withOpacity(0.6),
                   Colors.black.withOpacity(0.9),
                 ],
-                stops: [0.0, 0.5, 0.8],
+                stops: const [0.0, 0.5, 0.8],
               ),
             ),
           ),

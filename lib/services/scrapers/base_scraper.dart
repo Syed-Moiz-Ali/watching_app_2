@@ -18,11 +18,47 @@ abstract class BaseScraper {
 
   BaseScraper(this.source, this.config);
 
-  Future<List<ContentItem>> scrapeContent(String html);
-  Future<List<VideoSource>> scrapeVideos(String html);
-  Future<List<ContentItem>> search(String query, int page);
-  Future<List<ContentItem>> getContentByType(String queryType, int page);
-  Future<List<VideoSource>> getVideos(String url);
+  // Required methods that must be implemented
+  Future<List<ContentItem>> scrapeContent(String html) {
+    final document = parse(html);
+    final contentElements =
+        document.querySelectorAll(config.contentSelector!.selector!);
+    return parseElements(contentElements);
+  }
+
+  Future<List<ContentItem>> search(String query, int page) async {
+    final url = source.getSearchUrl(query, page);
+    try {
+      final response = await ApiFetchModule.request(url: url);
+      return scrapeContent(response);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error searching: $e');
+      }
+      return [];
+    }
+  }
+
+  Future<List<ContentItem>> getContentByType(String queryType, int page) async {
+    final url = source.getQueryUrl(queryType, page);
+    return await fetchCotentAndScrape(url);
+  }
+
+  // Optional methods with default implementations
+  Future<List<VideoSource>> scrapeVideos(String html) async {
+    if (config.videoSelector != null) {
+      final document = parse(html);
+      final contentElements =
+          document.querySelectorAll(config.videoSelector!.selector!);
+      return await videoParseElement(document, contentElements.first);
+    } else {
+      return [];
+    }
+  }
+
+  Future<List<VideoSource>> getVideos(String url) async {
+    return await fetchVideoAndScrape(url);
+  }
 
   Future<List<ContentItem>> fetchCotentAndScrape(String url) async {
     try {
@@ -93,9 +129,10 @@ abstract class BaseScraper {
   }
 
   // Helper methods for all scrapers
-  Future<String?> getAttributeValue(ElementSelector selector,
+  Future<String?> getAttributeValue(ElementSelector? selector,
       {Element? element, Document? document}) async {
     try {
+      if (selector == null) return null;
       if (selector.customExtraction != null) {
         return await selector.customExtraction!(element!);
       }
@@ -107,7 +144,7 @@ abstract class BaseScraper {
           : elementTag?.text;
     } catch (e) {
       if (kDebugMode) {
-        print('Error getting attribute from ${selector.selector}: $e');
+        print('Error getting attribute from ${selector!.selector}: $e');
       }
       return null;
     }

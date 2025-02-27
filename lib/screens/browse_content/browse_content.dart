@@ -1,18 +1,22 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:watching_app_2/core/constants/color_constants.dart';
+import 'package:watching_app_2/core/navigation/navigator.dart';
+import 'package:watching_app_2/screens/browse_content/animated_searchbar.dart';
+import 'package:watching_app_2/screens/global_search/global_search_data_list.dart';
 
-class AnimatedWallpaperScreen extends StatefulWidget {
-  const AnimatedWallpaperScreen({Key? key}) : super(key: key);
+class BrowseContent extends StatefulWidget {
+  const BrowseContent({super.key});
 
   @override
-  _AnimatedWallpaperScreenState createState() =>
-      _AnimatedWallpaperScreenState();
+  _BrowseContentState createState() => _BrowseContentState();
 }
 
-class _AnimatedWallpaperScreenState extends State<AnimatedWallpaperScreen>
+class _BrowseContentState extends State<BrowseContent>
     with TickerProviderStateMixin {
   late AnimationController _backgroundAnimController;
   late AnimationController _searchBarAnimController;
@@ -188,201 +192,6 @@ class _AnimatedWallpaperScreenState extends State<AnimatedWallpaperScreen>
     );
   }
 
-  Widget _buildSearchBar() {
-    return AnimatedBuilder(
-      animation: _searchBarAnimController,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, 20 * (1 - _searchBarAnimation.value)),
-          child: GestureDetector(
-            onTap: () {
-              setState(() {
-                _isSearchFocused = true;
-                // Show keyboard when focused
-                FocusScope.of(context).requestFocus(_searchFocusNode);
-              });
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              margin: EdgeInsets.symmetric(
-                horizontal: _isSearchFocused ? 10 : 20,
-                vertical: _isSearchFocused ? 15 : 20,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-              decoration: BoxDecoration(
-                color: _isSearchFocused
-                    ? AppColors.primaryColor.withOpacity(0.6)
-                    : AppColors.primaryColor.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.4),
-                  width: 1.5,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 15,
-                    spreadRadius: 1,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  _buildAnimatedSearchIcon(),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: TextField(
-                      focusNode: _searchFocusNode,
-                      controller: _searchController,
-                      onTap: () {
-                        setState(() {
-                          _isSearchFocused = true;
-                        });
-                      },
-                      onSubmitted: (_) {
-                        setState(() {
-                          _isSearchFocused = false;
-                          // Hide keyboard when submitted
-                          _searchFocusNode.unfocus();
-                        });
-                      },
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 0.5,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: 'Search your content...',
-                        hintStyle: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                          letterSpacing: 0.5,
-                        ),
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                  AnimatedCrossFade(
-                    duration: const Duration(milliseconds: 300),
-                    crossFadeState: _isSearchFocused
-                        ? CrossFadeState.showSecond
-                        : CrossFadeState.showFirst,
-                    firstChild: _buildAnimatedFilterIcon(),
-                    secondChild: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _isSearchFocused = false;
-                          // Hide keyboard when close icon is tapped
-                          _searchFocusNode.unfocus();
-                        });
-                      },
-                      child: _buildAnimatedCloseIcon(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildAnimatedSearchIcon() {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            spreadRadius: 1,
-          ),
-        ],
-        gradient: LinearGradient(
-          colors: [
-            Colors.white.withOpacity(0.3),
-            Colors.white.withOpacity(0.1),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: const Icon(
-        Icons.search_rounded,
-        color: Colors.white,
-        size: 28,
-      ),
-    );
-  }
-
-  Widget _buildAnimatedFilterIcon() {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            spreadRadius: 1,
-          ),
-        ],
-        gradient: LinearGradient(
-          colors: [
-            Colors.white.withOpacity(0.3),
-            Colors.white.withOpacity(0.1),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: const Icon(
-        Icons.tune_rounded,
-        color: Colors.white,
-        size: 28,
-      ),
-    );
-  }
-
-  Widget _buildAnimatedCloseIcon() {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            spreadRadius: 1,
-          ),
-        ],
-        gradient: LinearGradient(
-          colors: [
-            Colors.white.withOpacity(0.3),
-            Colors.white.withOpacity(0.1),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: const Icon(
-        Icons.close_rounded,
-        color: Colors.white,
-        size: 28,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -391,9 +200,9 @@ class _AnimatedWallpaperScreenState extends State<AnimatedWallpaperScreen>
       body: Stack(
         children: [
           // Background layers
-          _buildAnimatedBackground(),
-          _buildDynamicBlobs(),
-          _buildWaves(),
+          // _buildAnimatedBackground(),
+          // _buildDynamicBlobs(),
+          // _buildWaves(),
           _buildParticleBackground(),
 
           // Main content
@@ -403,7 +212,14 @@ class _AnimatedWallpaperScreenState extends State<AnimatedWallpaperScreen>
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Center(
-                child: _buildSearchBar(),
+                child: AnimatedSearchBar(
+                  primaryColor: AppColors.primaryColor,
+                  hintText: 'Search for anything...',
+                  onSearch: (value) {
+                    NH.navigateTo(GlobalSearchDataList(query: value));
+                  },
+                  onFilterTap: () {},
+                ),
               ),
             ),
           ),

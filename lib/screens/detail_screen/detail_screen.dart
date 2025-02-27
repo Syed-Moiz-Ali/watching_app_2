@@ -181,7 +181,7 @@ class _DetailScreenState extends State<DetailScreen>
                           child: Container(
                             height: 60.h,
                             width: double.infinity,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                                 // boxShadow: [
                                 //   BoxShadow(
                                 //     color: AppColors.greyColor.withOpacity(0.7),

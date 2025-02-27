@@ -27,7 +27,6 @@ class _WallpapersListState extends State<WallpapersList> {
   bool isLoading = true;
   bool isLoadingMore = false; // Flag for loading more items
   String? error;
-  int _currentPlayingIndex = -1;
   bool isGrid = false;
   int _currentPage = 1; // Track the current page
   String _currentQuery = ''; // Track the current query

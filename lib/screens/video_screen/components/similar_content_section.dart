@@ -228,7 +228,7 @@ class _SimilarContentCardState extends State<SimilarContentCard>
                           fontWeight: FontWeight.w600,
 
                           // ),
-                          maxLine: 4,
+                          maxLine: 3,
                           overflow: TextOverflow.ellipsis,
                         ),
 

@@ -20,6 +20,7 @@ class WallpaperService {
   Future<bool> applyWallpaper(ContentItem item,
       int location, // WallpaperManager.HOME_SCREEN, LOCK_SCREEN, or BOTH_SCREEN
       {Function(double)? onProgress,
+      Function(String)? onSuccess,
       Function(String)? onError}) async {
     try {
       // Request permissions first
@@ -50,6 +51,8 @@ class WallpaperService {
       }
 
       // Set the wallpaper
+      onSuccess?.call('Wallpaper set successfully');
+
       return await WallpaperManager.setWallpaperFromFile(filePath, location);
     } catch (e) {
       onError?.call(e.toString());

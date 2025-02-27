@@ -4,10 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:watching_app_2/core/enums/app_enums.dart';
 import 'package:watching_app_2/core/navigation/navigator.dart';
 import 'package:watching_app_2/widgets/custom_appbar.dart';
-import 'package:watching_app_2/widgets/loading_indicator.dart';
 
 import '../../core/constants/color_constants.dart';
-import '../../core/global/app_global.dart';
 import '../../models/content_item.dart';
 import '../../models/content_source.dart';
 import '../../services/scrapers/scraper_service.dart';
@@ -15,7 +13,6 @@ import '../../widgets/custom_floatingaction_button.dart';
 import '../../widgets/pagination_loading_indicator.dart';
 import '../../widgets/text_widget.dart';
 import '../detail_screen/detail_screen.dart';
-import 'components/query_bottomsheet.dart';
 import 'components/video_grid_view.dart';
 
 class VideoListScreen extends StatefulWidget {
@@ -44,7 +41,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       scraperService = ScraperService(widget.source);
       _currentQuery = widget.source.query.entries.first.value;
 
