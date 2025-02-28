@@ -1,29 +1,29 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Internet permission for downloading wallpapers -->
     <uses-permission android:name="android.permission.INTERNET" />
-    
-   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!-- Storage Permissions -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    
-    <!-- For Android 10+ -->
+
+    <!-- For Android 10+ (ACCESS_MEDIA_LOCATION) -->
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
-    
+
     <!-- For Android 13+ (API 33+) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-    
+
     <!-- For Android 14+ additional permissions if needed -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 
-    
     <!-- Permission to set wallpaper -->
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
-    
+
     <!-- Permission for foreground service (if showing progress notification) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    
-    <!-- Required to query activities that can process text -->
+
+    <!-- Queries for text processing and image-related intents -->
     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
@@ -55,7 +55,7 @@
             <meta-data
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
-              />
+            />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

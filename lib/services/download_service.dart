@@ -25,7 +25,7 @@ class DownloadService {
       await permissionService.requestStoragePermissions();
 
       // Get download path
-      String downloadPath = await fileUtils.getDownloadDirectoryPath();
+      String downloadPath = await fileUtils.getTemporaryDirectoryPath();
 
       // Generate file path
       String filePath = await fileUtils.getWallpaperFilePath(

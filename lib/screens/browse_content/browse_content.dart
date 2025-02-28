@@ -23,11 +23,9 @@ class _BrowseContentState extends State<BrowseContent>
   late AnimationController _contentAnimController;
   late AnimationController _particleController;
   late AnimationController _blobAnimController;
-  late Animation<double> _searchBarAnimation;
   late List<ParticleModel> particles;
 
   final ScrollController _scrollController = ScrollController();
-  bool _isSearchFocused = false;
   // Add these to your state class
   final FocusNode _searchFocusNode = FocusNode();
   final TextEditingController _searchController = TextEditingController();
@@ -68,10 +66,6 @@ class _BrowseContentState extends State<BrowseContent>
     _searchBarAnimController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 1200));
 
-    _searchBarAnimation = Tween<double>(begin: 0, end: 1).animate(
-        CurvedAnimation(
-            parent: _searchBarAnimController, curve: Curves.elasticOut));
-
     // Content animation controller for staggered animations
     _contentAnimController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 1500));
@@ -104,62 +98,6 @@ class _BrowseContentState extends State<BrowseContent>
     super.dispose();
   }
 
-  Widget _buildAnimatedBackground() {
-    return AnimatedBuilder(
-      animation: _backgroundAnimController,
-      builder: (context, child) {
-        return Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                // Adjusted saturation and lightness for more noticeable colors
-                HSLColor.fromAHSL(
-                        1, _backgroundAnimController.value * 360, 0.55, 0.85)
-                    .toColor(),
-                HSLColor.fromAHSL(
-                        1,
-                        (_backgroundAnimController.value * 360 + 30) % 360,
-                        0.6,
-                        0.8)
-                    .toColor(),
-                HSLColor.fromAHSL(
-                        1,
-                        (_backgroundAnimController.value * 360 + 60) % 360,
-                        0.65,
-                        0.75)
-                    .toColor(),
-                HSLColor.fromAHSL(
-                        1,
-                        (_backgroundAnimController.value * 360 + 180) % 360,
-                        0.55,
-                        0.85)
-                    .toColor(),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              stops: const [0.0, 0.3, 0.7, 1.0],
-            ),
-          ),
-          child: child,
-        );
-      },
-    );
-  }
-
-  Widget _buildDynamicBlobs() {
-    return AnimatedBuilder(
-      animation: _blobAnimController,
-      builder: (context, child) {
-        return CustomPaint(
-          size: Size.infinite,
-          painter: BlobPainter(
-            animation: _blobAnimController,
-          ),
-        );
-      },
-    );
-  }
-
   Widget _buildParticleBackground() {
     return AnimatedBuilder(
       animation: _particleController,
@@ -172,20 +110,6 @@ class _BrowseContentState extends State<BrowseContent>
                 particles: particles,
                 animation: _particleController,
                 color: AppColors.backgroundColorDark),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildWaves() {
-    return AnimatedBuilder(
-      animation: _backgroundAnimController,
-      builder: (context, child) {
-        return CustomPaint(
-          size: Size.infinite,
-          painter: WavePainter(
-            animation: _backgroundAnimController,
           ),
         );
       },
@@ -214,11 +138,25 @@ class _BrowseContentState extends State<BrowseContent>
               child: Center(
                 child: AnimatedSearchBar(
                   primaryColor: AppColors.primaryColor,
+                  backgroundColor: AppColors.backgroundColorDark,
                   hintText: 'Search for anything...',
                   onSearch: (value) {
-                    NH.navigateTo(GlobalSearchDataList(query: value));
+                    if (value.isNotEmpty) {
+                      NH.navigateTo(GlobalSearchDataList(query: value));
+                    }
                   },
                   onFilterTap: () {},
+                  recentSearches: const [
+                    'Action',
+                    'Flutter',
+                    'Dart',
+                    'Firebase',
+                    'Flutter Animations',
+                    'Flutter UI',
+                  ],
+                  onRecentSearchesUpdated: (list) {
+                    print('onRecentSearchesUpdated: $list');
+                  },
                 ),
               ),
             ),

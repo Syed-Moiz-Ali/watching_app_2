@@ -1,37 +1,33 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../utils/platform_utils.dart';
+import 'package:flutter/material.dart';
+import 'package:watching_app_2/core/global/app_global.dart';
 
 class PermissionService {
-  // Singleton pattern
   static final PermissionService _instance = PermissionService._internal();
   factory PermissionService() => _instance;
   PermissionService._internal();
 
-  /// Request appropriate storage permissions based on the Android version
   Future<bool> requestStoragePermissions() async {
-    if (Platform.isAndroid) {
-      final platformUtils = PlatformUtils();
-      bool isAndroid13Plus = await platformUtils.isAndroid13OrAbove();
+    int retryCount = 0; // Track the number of retry attempts
 
-      if (isAndroid13Plus) {
-        // For Android 13+ (including 14, 15), request all necessary granular media permissions
+    while (retryCount < 2) {
+      if (Platform.isAndroid) {
+        // Request permissions for Android
         Map<Permission, PermissionStatus> statuses = await [
           Permission.photos,
           Permission.videos,
           Permission.audio,
           Permission.storage,
-          // Add these more specific permissions for file access
           Permission.manageExternalStorage,
-          // Some devices might need this for download functionality
+          Permission.accessMediaLocation,
           Permission.mediaLibrary,
         ].request();
 
-        // Check if any of the critical permissions were denied
+        // Check if any permission was denied
         bool allGranted = true;
         String deniedPermissions = '';
-
         statuses.forEach((permission, status) {
           if (status != PermissionStatus.granted &&
               status != PermissionStatus.limited) {
@@ -40,54 +36,67 @@ class PermissionService {
           }
         });
 
-        if (!allGranted) {
-          throw PlatformException(
-            code: 'PERMISSION_DENIED',
-            message:
-                'The following permissions are required: $deniedPermissions',
-          );
-        }
-
-        return true;
-      } else {
-        // For older Android versions (10-12)
-        bool isAndroid10Plus = await platformUtils.isAndroid10OrAbove();
-
-        if (isAndroid10Plus) {
-          PermissionStatus status = await Permission.storage.request();
-          if (status != PermissionStatus.granted) {
-            throw PlatformException(
-              code: 'PERMISSION_DENIED',
-              message: 'Storage permission is required to download wallpapers',
-            );
-          }
+        if (allGranted) {
+          return true; // All permissions granted
         } else {
-          // For Android 9 and below
-          PermissionStatus status = await Permission.storage.request();
-          if (status != PermissionStatus.granted) {
-            throw PlatformException(
-              code: 'PERMISSION_DENIED',
-              message: 'Storage permission is required to download wallpapers',
-            );
+          if (retryCount == 1) {
+            // After two tries, ask the user to open settings
+            return await _showSettingsDialog(deniedPermissions);
           }
+          retryCount++;
         }
+      } else if (Platform.isIOS) {
+        // iOS specific permission
+        PermissionStatus status = await Permission.photos.request();
+        if (status == PermissionStatus.granted ||
+            status == PermissionStatus.limited) {
+          return true;
+        } else {
+          if (retryCount == 1) {
+            return await _showSettingsDialog('Photo library access');
+          }
+          retryCount++;
+        }
+      }
 
-        return true;
-      }
-    } else if (Platform.isIOS) {
-      // For iOS, request photo library permission
-      PermissionStatus status = await Permission.photos.request();
-      if (status != PermissionStatus.granted &&
-          status != PermissionStatus.limited) {
-        throw PlatformException(
-          code: 'PERMISSION_DENIED',
-          message: 'Photo library access is required to save wallpapers',
-        );
-      }
-      return true;
+      // If we haven't granted permission yet, delay before retrying
+      await Future.delayed(const Duration(seconds: 2));
     }
 
-    // For other platforms
-    return true;
+    // If permission is not granted after 2 retries, show the open settings dialog
+    return false;
+  }
+
+  Future<bool> _showSettingsDialog(String deniedPermissions) async {
+    bool openSettings = await showDialog(
+          context: SMA.navigationKey.currentContext!,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Permission Denied'),
+              content: Text(
+                'The following permissions are required: $deniedPermissions. Please grant them in settings.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(
+                        context, false); // User chooses not to go to settings
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    Navigator.pop(context, true); // User wants to open settings
+                    openAppSettings();
+                  },
+                  child: const Text('Open Settings'),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+
+    return openSettings;
   }
 }

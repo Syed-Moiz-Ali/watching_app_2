@@ -41,7 +41,6 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
   final double _textSize = 1.0;
   int? _hoveredSectionIndex;
   int? _hoveredItemIndex;
-  bool _isFloatingMenuOpen = false;
   bool _contentFilteringEnabled = false;
   bool _explicitContentWarningEnabled = false;
   bool _incognitoModeEnabled = false;
@@ -179,25 +178,6 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
       AppColors.primaryColor.withOpacity(.8),
       AppColors.primaryColor.withOpacity(.85)
     ];
-  }
-
-  void _toggleFloatingMenu() {
-    setState(() {
-      _isFloatingMenuOpen = !_isFloatingMenuOpen;
-    });
-
-    if (_isFloatingMenuOpen) {
-      _floatingMenuController.forward();
-    } else {
-      _floatingMenuController.reverse();
-    }
-  }
-
-  void _scrollToSection(int index) {
-    setState(() {
-      _isFloatingMenuOpen = false;
-    });
-    _floatingMenuController.reverse();
   }
 
   @override
@@ -1044,77 +1024,6 @@ class _PremiumSettingsScreenState extends State<PremiumSettingsScreen>
           color: Colors.white,
           fontSize: 15.sp * _textSize,
           fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFloatingMenu() {
-    final translations = [
-      const Offset(0, -120),
-      const Offset(-80, -80),
-      const Offset(-120, 0),
-    ];
-
-    return IgnorePointer(
-      ignoring: !_isFloatingMenuOpen,
-      child: AnimatedOpacity(
-        opacity: _isFloatingMenuOpen ? 1.0 : 0.0,
-        duration: const Duration(milliseconds: 200),
-        child: Container(
-          color: Colors.black.withOpacity(_isFloatingMenuOpen ? 0.1 : 0.0),
-          child: Stack(
-            alignment: Alignment.bottomRight,
-            children: [
-              // Menu items
-              ...List.generate(translations.length, (index) {
-                final itemAnimation = CurvedAnimation(
-                  parent: _floatingMenuController,
-                  curve: Interval(
-                    0.0 + (index * 0.1),
-                    0.6 + (index * 0.1),
-                    curve: Curves.easeOutBack,
-                  ),
-                );
-
-                return AnimatedBuilder(
-                  animation: itemAnimation,
-                  builder: (context, child) {
-                    // Ensure opacity is always between 0.0 and 1.0
-                    final safeOpacity = itemAnimation.value.clamp(0.0, 1.0);
-
-                    return Positioned(
-                      left:
-                          80.w + (translations[index].dx * itemAnimation.value),
-                      top:
-                          90.h + (translations[index].dy * itemAnimation.value),
-                      child: Transform.scale(
-                        scale: itemAnimation.value,
-                        child: Opacity(
-                          opacity: safeOpacity, // Using the clamped value
-                          child: FloatingActionButton(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.w),
-                            ),
-                            heroTag: 'floatingMenu$index',
-                            // backgroundColor: _cardColor,
-                            foregroundColor: _primaryColor,
-                            elevation: 4,
-                            onPressed: () => _scrollToSection(index),
-                            child: Icon([
-                              Icons.color_lens,
-                              Icons.notifications,
-                              Icons.security,
-                            ][index]),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                );
-              }),
-            ],
-          ),
         ),
       ),
     );

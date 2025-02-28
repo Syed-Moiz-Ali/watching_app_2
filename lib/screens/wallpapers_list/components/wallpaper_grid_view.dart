@@ -22,7 +22,7 @@ class WallpaperGridView extends StatelessWidget {
     return GridView.builder(
       controller: controller, // Use the controller
       padding: const EdgeInsets.all(8),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: .68,
         crossAxisSpacing: 0,

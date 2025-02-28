@@ -4,6 +4,7 @@ import 'package:sizer/sizer.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:watching_app_2/models/content_source.dart';
 import 'package:watching_app_2/widgets/custom_appbar.dart';
+import '../../models/tab_model.dart';
 import '../../services/source_manager.dart';
 import '../../widgets/custom_tabbar.dart';
 import 'components/content_list.dart';
@@ -20,16 +21,8 @@ class _SourceListScreenState extends State<SourceListScreen>
   late TabController _tabController;
   final SourceManager sourceManager = SourceManager();
   bool isLoading = true;
-  List<ContentSource> sources = [];
+  Map<String, List<ContentSource>> allSources = {};
   String _currentCategory = "videos";
-  final Map<String, List<ContentSource>> _cachedSources = {};
-
-  // Page controller for custom page transitions
-  late PageController _pageController;
-
-  // Animation controllers
-  late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
@@ -37,34 +30,13 @@ class _SourceListScreenState extends State<SourceListScreen>
     _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(_handleTabSelection);
 
-    // Initialize page controller with initial page
-    _pageController = PageController(initialPage: 0);
+    // Initialize fade animation
 
-    // Initialize animation controller
-    _fadeController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _fadeController,
-        curve: Curves.easeInOut,
-      ),
-    );
-
-    loadSources("videos"); // Load default tab (videos)
+    loadAllSources();
   }
 
   void _handleTabSelection() {
     if (!_tabController.indexIsChanging) {
-      // Animate to the selected page when tab is tapped
-      _pageController.animateToPage(
-        _tabController.index,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-
       String category;
       switch (_tabController.index) {
         case 0:
@@ -82,49 +54,35 @@ class _SourceListScreenState extends State<SourceListScreen>
         default:
           category = "videos";
       }
-
       if (_currentCategory != category) {
-        _currentCategory = category;
-        loadSources(category);
+        setState(() {
+          _currentCategory = category;
+          isLoading = false;
+        });
+        // Restart animations for tab switch
       }
     }
   }
 
-  Future<void> loadSources(String category) async {
-    // If we have cached data, show it immediately to prevent UI flicker
-    if (_cachedSources.containsKey(category)) {
-      setState(() {
-        sources = _cachedSources[category]!;
-        isLoading = false;
-      });
-      _fadeController.forward(from: 0.0);
-    } else {
-      setState(() => isLoading = true);
+  Future<void> loadAllSources() async {
+    setState(() => isLoading = true);
+
+    List<String> contentTypes = ["videos", "tiktok", "photos", "manga"];
+
+    for (String category in contentTypes) {
+      final loadedSources = await sourceManager.loadSources(category);
+      allSources[category] = loadedSources;
     }
 
-    // Load data in background
-    final loadedSources = await sourceManager.loadSources(category);
-
-    // Small artificial delay for smoother transition
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    // Cache the results
-    _cachedSources[category] = loadedSources;
-
-    // Only update state if this is still the current category
-    if (_currentCategory == category && mounted) {
-      setState(() {
-        sources = loadedSources;
-        isLoading = false;
-      });
-      _fadeController.forward(from: 0.0);
+    if (mounted) {
+      setState(() => isLoading = false);
+      // Start initial animations
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Colors.grey[50],
       appBar: CustomAppBar(
         appBarHeight: 15.h,
         elevation: 0,
@@ -133,41 +91,44 @@ class _SourceListScreenState extends State<SourceListScreen>
           preferredSize: Size.fromHeight(10.h),
           child: CustomTabBar(
             tabController: _tabController,
+            tabContents: [
+              TabContent(title: 'Videos', icon: Icons.video_collection),
+              TabContent(title: 'TikTok', icon: Icons.music_note),
+              TabContent(title: 'Photos', icon: Icons.photo),
+              TabContent(title: 'Manga', icon: Icons.book),
+            ],
             onTabChanged: (index) {
-              // Handle tab change in _handleTabSelection
+              _tabController.animateTo(index);
             },
           ),
         ),
       ),
       body: Stack(
         children: [
-          // Custom PageView instead of TabBarView for more control over animations
-          PageView.builder(
-            controller: _pageController,
-            physics: const BouncingScrollPhysics(),
-            onPageChanged: (index) {
-              // Keep tab controller in sync with page changes
-              _tabController.animateTo(index);
-            },
-            itemCount: 4,
-            itemBuilder: (context, index) {
-              return FadeTransition(
-                opacity: _fadeAnimation,
-                child: isLoading
-                    ? const EnhancedShimmerLoadingList()
-                    : ContentList(
-                        sources: sources,
-                        key: ValueKey('content-list-$index-${sources.length}'),
-                      ),
-              );
-            },
-          ),
-
-          // Overlay loading indicator
           if (isLoading)
-            FadeTransition(
-              opacity: _fadeAnimation,
-              child: const EnhancedShimmerLoadingList(),
+            const EnhancedShimmerLoadingList()
+          else
+            TabBarView(
+              controller: _tabController,
+              physics: const BouncingScrollPhysics(),
+              children: [
+                ContentList(
+                  sources: allSources["videos"] ?? [],
+                  key: const ValueKey('content-list-videos'),
+                ),
+                ContentList(
+                  sources: allSources["tiktok"] ?? [],
+                  key: const ValueKey('content-list-tiktok'),
+                ),
+                ContentList(
+                  sources: allSources["photos"] ?? [],
+                  key: const ValueKey('content-list-photos'),
+                ),
+                ContentList(
+                  sources: allSources["manga"] ?? [],
+                  key: const ValueKey('content-list-manga'),
+                ),
+              ],
             ),
         ],
       ),
@@ -178,14 +139,13 @@ class _SourceListScreenState extends State<SourceListScreen>
   void dispose() {
     _tabController.removeListener(_handleTabSelection);
     _tabController.dispose();
-    _pageController.dispose();
-    _fadeController.dispose();
+
     super.dispose();
   }
 }
 
 class EnhancedShimmerLoadingList extends StatelessWidget {
-  const EnhancedShimmerLoadingList({Key? key}) : super(key: key);
+  const EnhancedShimmerLoadingList({super.key});
 
   @override
   Widget build(BuildContext context) {

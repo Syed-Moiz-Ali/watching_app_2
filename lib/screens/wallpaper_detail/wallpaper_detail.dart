@@ -1,6 +1,4 @@
 // ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
-// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
@@ -10,7 +8,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:watching_app_2/services/download_service.dart';
 import 'package:watching_app_2/services/wallpaper_service.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:watching_app_2/widgets/text_widget.dart';
 
 import '../../models/content_item.dart';
@@ -45,13 +42,11 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
   late Animation<double> _imageOpacityAnimation;
   late Animation<double> _interfaceOpacityAnimation;
   late Animation<double> _actionsSlideAnimation;
-  late Animation<double> _pulseAnimation;
 
   // State variables
   bool _interfaceVisible = true;
   bool _isDownloading = false;
   bool isWallpaperSetting = false;
-  String _downloadProgress = "0%";
   bool _isFavorite = false;
 
   // Gesture values for parallax effect
@@ -60,8 +55,6 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
   final Dio dio = Dio();
 
   // Action animation values
-  double _applyButtonScale = 1.0;
-  double _saveButtonScale = 1.0;
 
   // Animation timing configuration
   final Duration _entranceAnimationDuration = const Duration(milliseconds: 800);
@@ -142,16 +135,6 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
       vsync: this,
     )..repeat(reverse: true);
 
-    _pulseAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.05,
-    ).animate(
-      CurvedAnimation(
-        parent: _pulseAnimationController,
-        curve: Curves.easeInOutSine,
-      ),
-    );
-
     // Auto-hide interface after 5 seconds of inactivity
     Future.delayed(const Duration(seconds: 5), () {
       if (mounted && _interfaceVisible) {
@@ -218,27 +201,22 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
   void _downloadWallpaper() async {
     setState(() {
       _isDownloading = true;
-      _saveButtonScale = 0.9; // Button press effect
+// Button press effect
     });
 
     // Animate button back to normal size
     Future.delayed(_buttonAnimationDuration, () {
       if (mounted) {
-        setState(() {
-          _saveButtonScale = 1.0;
-        });
+        setState(() {});
       }
     });
 
     await downloadService.downloadWallpaper(widget.item,
         onProgress: (double progress) {
-      setState(() {
-        _downloadProgress = "$progress%";
-      });
+      setState(() {});
     }, onSuccess: (String filePath) {
       setState(() {
         _isDownloading = false;
-        _downloadProgress = "0%";
       });
       _showEnhancedFeedback(
         'Wallpaper saved to gallery',
@@ -248,7 +226,6 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
     }, onError: (String error) {
       setState(() {
         _isDownloading = false;
-        _downloadProgress = "0%";
       });
       _showEnhancedFeedback(
         'Error saving wallpaper',
@@ -261,15 +238,13 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
   _applyWallpaper(int location) {
     setState(() {
       isWallpaperSetting = true;
-      _applyButtonScale = 0.9; // Button press effect
+// Button press effect
     });
 
     // Animate button back to normal size
     Future.delayed(_buttonAnimationDuration, () {
       if (mounted) {
-        setState(() {
-          _applyButtonScale = 1.0;
-        });
+        setState(() {});
       }
     });
 
@@ -1038,7 +1013,7 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
-          margin: EdgeInsets.symmetric(horizontal: 20),
+          margin: const EdgeInsets.symmetric(horizontal: 20),
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           decoration: BoxDecoration(
             color: Colors.black.withOpacity(0.2),

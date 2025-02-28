@@ -1,7 +1,8 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/animation.dart';
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/color_constants.dart';
 import 'package:watching_app_2/core/navigation/navigator.dart';
@@ -11,7 +12,7 @@ import 'package:watching_app_2/widgets/text_widget.dart';
 class ErrorPage extends StatefulWidget {
   final String errorMessage;
 
-  ErrorPage({required this.errorMessage});
+  const ErrorPage({super.key, required this.errorMessage});
 
   @override
   _ErrorPageState createState() => _ErrorPageState();
@@ -33,28 +34,28 @@ class _ErrorPageState extends State<ErrorPage> with TickerProviderStateMixin {
     // Slide and fade controller
     _slideController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 1500),
     );
 
     // Bounce controller for the icon
     _bounceController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
 
     // Pulse controller for the button
     _pulseController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 1000),
     )..repeat(reverse: true);
 
     // Slide animation with spring effect
     _slideAnimation = Tween<Offset>(
-      begin: Offset(0.0, 1.0),
+      begin: const Offset(0.0, 1.0),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _slideController,
-      curve: SpringCurve(),
+      curve: const SpringCurve(),
     ));
 
     // Fade animation
@@ -87,7 +88,7 @@ class _ErrorPageState extends State<ErrorPage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -103,8 +104,8 @@ class _ErrorPageState extends State<ErrorPage> with TickerProviderStateMixin {
             child: FadeTransition(
               opacity: _fadeAnimation,
               child: Container(
-                margin: EdgeInsets.all(32),
-                padding: EdgeInsets.all(24),
+                margin: const EdgeInsets.all(32),
+                padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -125,7 +126,7 @@ class _ErrorPageState extends State<ErrorPage> with TickerProviderStateMixin {
                       builder: (context, child) {
                         return Transform.translate(
                           offset: Offset(0, -_bounceAnimation.value),
-                          child: Icon(
+                          child: const Icon(
                             Icons.error_outline,
                             size: 80,
                             color: Colors.redAccent,
@@ -133,9 +134,9 @@ class _ErrorPageState extends State<ErrorPage> with TickerProviderStateMixin {
                         );
                       },
                     ),
-                    SizedBox(height: 24),
+                    const SizedBox(height: 24),
                     ShaderMask(
-                      shaderCallback: (bounds) => LinearGradient(
+                      shaderCallback: (bounds) => const LinearGradient(
                         colors: [Colors.red, Colors.orange],
                       ).createShader(bounds),
                       child: TextWidget(
@@ -147,7 +148,7 @@ class _ErrorPageState extends State<ErrorPage> with TickerProviderStateMixin {
                         maxLine: 4,
                       ),
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     TextWidget(
                       text: widget.errorMessage,
                       color: Colors.white70,
@@ -155,7 +156,7 @@ class _ErrorPageState extends State<ErrorPage> with TickerProviderStateMixin {
                       maxLine: 4,
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 32),
+                    const SizedBox(height: 32),
                     AnimatedBuilder(
                       animation: _pulseAnimation,
                       builder: (context, child) {

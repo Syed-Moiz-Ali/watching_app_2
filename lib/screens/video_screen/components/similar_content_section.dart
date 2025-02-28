@@ -118,10 +118,10 @@ class SimilarContentCard extends StatefulWidget {
   final int index;
 
   const SimilarContentCard({
-    Key? key,
+    super.key,
     required this.content,
     required this.index,
-  }) : super(key: key);
+  });
 
   @override
   State<SimilarContentCard> createState() => _SimilarContentCardState();
@@ -196,8 +196,8 @@ class _SimilarContentCardState extends State<SimilarContentCard>
                     child: Hero(
                       tag: 'content-${widget.content.contentUrl}',
                       child: CustomImageWidget(
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(12)),
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(12)),
                         imagePath: widget.content.thumbnailUrl,
                         fit: BoxFit.cover,
                         // placeholder: (context, url) => Shimmer.fromColors(

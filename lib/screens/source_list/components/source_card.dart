@@ -76,7 +76,7 @@ class _SourceCardState extends State<SourceCard> with TickerProviderStateMixin {
         elevation: 8,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: AppColors.greyColor)),
+            side: const BorderSide(color: AppColors.greyColor)),
         shadowColor: Colors.black26,
         // color: Colors.white,
 

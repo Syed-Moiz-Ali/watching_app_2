@@ -40,7 +40,7 @@ class ApiFetchModule {
       // Send the request
       var res = await req.send();
       final resBody = await res.stream.bytesToString();
-      // log('Response Body: $resBody');
+      log('Response statusCode: ${res.statusCode}');
 
       if (res.statusCode >= 200 && res.statusCode < 300) {
         var data = resBody;
@@ -49,13 +49,15 @@ class ApiFetchModule {
       } else {
         var errorData = json.decode(resBody);
         // CustomToast.show(message: "error! something wrong", type: ToastType.error);
-        throw Exception('Error: ${errorData['message'] ?? res.reasonPhrase}');
+        // throw Exception('Error: ${errorData['message'] ?? res.reasonPhrase}');
+        return 'Error: ${errorData['message'] ?? res.reasonPhrase}';
       }
     } catch (error) {
       // Provide more informative error messages
       log('Request failed: $error');
       // CustomToast.show(message: error.toString(), type: ToastType.error);
-      throw Exception('Request failed: ${error.toString()}');
+      // throw Exception('Request failed: ${error.toString()}');
+      return 'Request failed: ${error.toString()}';
     }
   }
 }

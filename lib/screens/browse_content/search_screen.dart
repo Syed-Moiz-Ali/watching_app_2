@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'animated_searchbar.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({Key? key}) : super(key: key);
+  const SearchScreen({super.key});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -74,7 +74,7 @@ class _SearchScreenState extends State<SearchScreen>
               return Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
+                    colors: const [
                       Color(0xFF1a2a6c),
                       Color(0xFFb21f1f),
                       Color(0xFFfdbb2d),
@@ -104,6 +104,14 @@ class _SearchScreenState extends State<SearchScreen>
                   hintText: 'Search for anything...',
                   onSearch: _handleSearch,
                   onFilterTap: _toggleFilter,
+                  recentSearches: [
+                    'Flutter',
+                    'Dart',
+                    'Firebase',
+                    'Flutter Animations',
+                    'Flutter UI',
+                  ],
+                  onRecentSearchesUpdated: (list) {},
                 ),
 
                 // Search results
@@ -196,10 +204,10 @@ class _SearchScreenState extends State<SearchScreen>
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Color(0xFF6C63FF).withOpacity(0.2),
+                    color: const Color(0xFF6C63FF).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.article_outlined,
                     color: Colors.white,
                     size: 24,

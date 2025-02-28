@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/color_constants.dart';
+import 'package:watching_app_2/widgets/custom_image_widget.dart';
 import 'package:watching_app_2/widgets/text_widget.dart';
+
+import '../models/tab_model.dart';
 
 class CustomTabBar extends StatelessWidget {
   final TabController tabController;
   final Function(int) onTabChanged;
+  final List<TabContent> tabContents; // Add a list of TabContent
 
   const CustomTabBar({
     required this.tabController,
     required this.onTabChanged,
+    required this.tabContents, // Initialize the list of TabContent
     super.key,
   });
 
@@ -43,7 +48,6 @@ class CustomTabBar extends StatelessWidget {
                   AppColors.primaryColor.withOpacity(0.6),
                   AppColors.primaryColor.withOpacity(0.6),
                   AppColors.primaryColor.withOpacity(0.8),
-                  // AppColors.primaryColor,
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -86,60 +90,29 @@ class CustomTabBar extends StatelessWidget {
               ),
               labelColor: Colors.white,
               unselectedLabelColor: Colors.white.withOpacity(0.7),
-              tabs: const [
-                Tab(
+              tabs: tabContents.map((tabContent) {
+                return Tab(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.play_circle_outline, size: 20),
-                      SizedBox(width: 8),
+                      if (tabContent.icon is String) ...[
+                        CustomImageWidget(
+                          imagePath: tabContent.icon,
+                          width: 20,
+                          height: 20,
+                        ),
+                      ] else ...[
+                        Icon(tabContent.icon, size: 20),
+                      ],
+                      const SizedBox(width: 8),
                       TextWidget(
-                        text: 'Videos',
-                        color: AppColors.backgroundColorLight,
+                        text: tabContent.title,
+                        color: tabContent.color ?? Colors.white,
                       ),
                     ],
                   ),
-                ),
-                Tab(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.play_circle_outline, size: 20),
-                      SizedBox(width: 8),
-                      TextWidget(
-                        text: 'TikTok',
-                        color: AppColors.backgroundColorLight,
-                      ),
-                    ],
-                  ),
-                ),
-                Tab(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.photo_library_outlined, size: 20),
-                      SizedBox(width: 8),
-                      TextWidget(
-                        text: 'Photos',
-                        color: AppColors.backgroundColorLight,
-                      ),
-                    ],
-                  ),
-                ),
-                Tab(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.book_outlined, size: 20),
-                      SizedBox(width: 8),
-                      TextWidget(
-                        text: 'Mangas',
-                        color: AppColors.backgroundColorLight,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                );
+              }).toList(), // Dynamically create tabs using the model list
               onTap: onTabChanged,
             ),
           ),
