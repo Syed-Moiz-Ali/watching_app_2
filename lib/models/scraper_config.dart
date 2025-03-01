@@ -8,6 +8,7 @@ class ScraperConfig {
   final ElementSelector? previewSelector;
   final ElementSelector? qualitySelector;
   final ElementSelector? timeSelector;
+  final ElementSelector? viewsSelector;
   final ElementSelector? durationSelector; // Added this line
   final ElementSelector? watchingLinkSelector; // Added this line
   final ElementSelector? videoSelector; // Added this line
@@ -21,6 +22,7 @@ class ScraperConfig {
     this.previewSelector,
     this.qualitySelector,
     this.timeSelector,
+    this.viewsSelector,
     this.durationSelector, // Added this line
     this.watchingLinkSelector, // Added this line
     this.keywordsSelector, // Added this line

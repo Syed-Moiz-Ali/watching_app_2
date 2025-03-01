@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:watching_app_2/provider/bottom_navigation_provider.dart';
+import 'package:watching_app_2/provider/favorites_provider.dart';
 import 'package:watching_app_2/provider/source_provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/provider/theme_provider.dart';
@@ -24,6 +25,7 @@ void main() {
     ChangeNotifierProvider(create: (_) => SourceProvider()),
     ChangeNotifierProvider(create: (_) => ThemeProvider()),
     ChangeNotifierProvider(create: (_) => WebviewControllerProvider()),
+    ChangeNotifierProvider(create: (_) => FavoritesProvider()),
     ChangeNotifierProvider(create: (_) => SimilarContentProvider()),
     ChangeNotifierProvider(create: (_) => BottomNavigationProvider()),
   ], child: const MyApp()));

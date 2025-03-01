@@ -18,11 +18,20 @@ class SourceListScreen extends StatefulWidget {
 
 class _SourceListScreenState extends State<SourceListScreen>
     with TickerProviderStateMixin {
-  late TabController _tabController;
-  final SourceManager sourceManager = SourceManager();
-  bool isLoading = true;
   Map<String, List<ContentSource>> allSources = {};
+  bool isLoading = true;
+  final SourceManager sourceManager = SourceManager();
+
   String _currentCategory = "videos";
+  late TabController _tabController;
+
+  @override
+  void dispose() {
+    _tabController.removeListener(_handleTabSelection);
+    _tabController.dispose();
+
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -33,6 +42,22 @@ class _SourceListScreenState extends State<SourceListScreen>
     // Initialize fade animation
 
     loadAllSources();
+  }
+
+  Future<void> loadAllSources() async {
+    setState(() => isLoading = true);
+
+    List<String> contentTypes = ["videos", "tiktok", "photos", "manga"];
+
+    for (String category in contentTypes) {
+      final loadedSources = await sourceManager.loadSources(category);
+      allSources[category] = loadedSources;
+    }
+
+    if (mounted) {
+      setState(() => isLoading = false);
+      // Start initial animations
+    }
   }
 
   void _handleTabSelection() {
@@ -61,22 +86,6 @@ class _SourceListScreenState extends State<SourceListScreen>
         });
         // Restart animations for tab switch
       }
-    }
-  }
-
-  Future<void> loadAllSources() async {
-    setState(() => isLoading = true);
-
-    List<String> contentTypes = ["videos", "tiktok", "photos", "manga"];
-
-    for (String category in contentTypes) {
-      final loadedSources = await sourceManager.loadSources(category);
-      allSources[category] = loadedSources;
-    }
-
-    if (mounted) {
-      setState(() => isLoading = false);
-      // Start initial animations
     }
   }
 
@@ -133,14 +142,6 @@ class _SourceListScreenState extends State<SourceListScreen>
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _tabController.removeListener(_handleTabSelection);
-    _tabController.dispose();
-
-    super.dispose();
   }
 }
 

@@ -3,7 +3,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/color_constants.dart';
 import 'package:watching_app_2/widgets/custom_tabbar.dart';
@@ -38,8 +37,6 @@ class _TabbedContentViewState extends State<TabbedContentView>
   late TabController _tabController;
   late ScrollController _scrollController;
   late AnimationController _animationController;
-  int _currentPlayingIndex = -1;
-  String? _currentPlayingSourceId;
   Map<String, int> pageNoMap = {};
   late Map<String, List<ContentItem>> localCategoryResults; // New variable
   String? selectedSourceId; // Variable to store the selected source ID
@@ -221,6 +218,7 @@ class _TabbedContentViewState extends State<TabbedContentView>
           icon: '',
           pageType: '',
           query: {},
+          pageIncriment: '',
         ),
       );
 

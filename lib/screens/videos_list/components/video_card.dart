@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:watching_app_2/screens/favorites_screen/favorites_button.dart';
 import 'package:watching_app_2/widgets/custom_gap.dart';
 import 'package:watching_app_2/widgets/text_widget.dart';
 import 'dart:ui';
@@ -16,6 +17,7 @@ class VideoCard extends StatefulWidget {
   final VoidCallback onHorizontalDragStart;
   final VoidCallback onHorizontalDragEnd;
   final bool isGrid;
+  final String contentType; // Add content type for favorites
 
   const VideoCard({
     super.key,
@@ -25,6 +27,7 @@ class VideoCard extends StatefulWidget {
     required this.onHorizontalDragStart,
     required this.onHorizontalDragEnd,
     this.isGrid = false,
+    required this.contentType,
   });
 
   @override
@@ -193,6 +196,12 @@ class _VideoCardState extends State<VideoCard>
                     if (widget.item.source.isPreview == '1') _buildPlayButton(),
                     if (widget.item.duration != '0:00') _buildDurationBadge(),
                     _buildQualityBadge(),
+                    PremiumFavoriteButton(
+                      item: widget.item,
+                      contentType: widget.contentType,
+                      primaryColor: AppColors.errorColor,
+                      isGrid: widget.isGrid,
+                    ),
                   ],
                 ),
               ),
@@ -419,14 +428,14 @@ class _VideoCardState extends State<VideoCard>
           Icon(
             Icons.play_circle_outline_rounded,
             size: widget.isGrid ? 14 : 16,
-            color: Colors.grey[400],
+            color: Colors.grey[800],
           ),
           const SizedBox(width: 6),
           TextWidget(
             text: widget.item.source.name,
             fontSize: widget.isGrid ? 12.sp : 14.sp,
             fontWeight: FontWeight.w600,
-            color: Colors.grey[400],
+            color: Colors.grey[800],
           ),
         ],
       ),
@@ -453,13 +462,13 @@ class _VideoCardState extends State<VideoCard>
           Icon(
             Icons.access_time_rounded,
             size: widget.isGrid ? 14 : 16,
-            color: Colors.grey[400],
+            color: Colors.grey[800],
           ),
           const SizedBox(width: 6),
           TextWidget(
             text: widget.item.time,
             fontSize: widget.isGrid ? 12.sp : 14.sp,
-            color: Colors.grey[400],
+            color: Colors.grey[800],
             fontWeight: FontWeight.w600,
           ),
         ],

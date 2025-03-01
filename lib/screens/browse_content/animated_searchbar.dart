@@ -1,8 +1,8 @@
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
-import 'package:flutter/services.dart';
 import 'package:watching_app_2/core/constants/color_constants.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
@@ -136,7 +136,9 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
     var keyboardVisibilityController = KeyboardVisibilityController();
 
     keyboardVisibilityController.onChange.listen((bool visible) {
-      print('Keyboard visibility update. Is visible: $visible');
+      if (kDebugMode) {
+        print('Keyboard visibility update. Is visible: $visible');
+      }
       if (visible) {
         _searchFocusNode.requestFocus(); // Set focus when keyboard appears
       } else {
@@ -400,36 +402,6 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
     );
   }
 
-  Widget _buildFilterButton() {
-    return IconButton(
-      onPressed: widget.onFilterTap,
-      icon: const Icon(
-        Icons.tune_rounded,
-        size: 20,
-      ),
-      style: IconButton.styleFrom(
-        foregroundColor: widget.textColor.withOpacity(0.7),
-        backgroundColor: _isSearchFocused
-            ? widget.backgroundColor.withOpacity(0.3)
-            : Colors.transparent,
-        padding: const EdgeInsets.all(8),
-        minimumSize: const Size(36, 36),
-      ),
-    );
-  }
-
-  Widget _buildDivider() {
-    return Container(
-      height: 24,
-      width: 1,
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      decoration: BoxDecoration(
-        color: widget.textColor.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(1),
-      ),
-    );
-  }
-
   Widget _buildRecentSearchesContainer() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12),
@@ -493,8 +465,7 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
                 ),
                 const SizedBox(height: 12),
                 ...widget.recentSearches
-                    .map((search) => _buildRecentSearchItem(search))
-                    .toList(),
+                    .map((search) => _buildRecentSearchItem(search)),
               ],
             ),
           ),

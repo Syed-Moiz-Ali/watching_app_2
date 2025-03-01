@@ -1,5 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'dart:ui' as ui;
@@ -155,7 +156,9 @@ class _BrowseContentState extends State<BrowseContent>
                     'Flutter UI',
                   ],
                   onRecentSearchesUpdated: (list) {
-                    print('onRecentSearchesUpdated: $list');
+                    if (kDebugMode) {
+                      print('onRecentSearchesUpdated: $list');
+                    }
                   },
                 ),
               ),

@@ -8,6 +8,7 @@ class ContentItem {
   final String time;
   final String thumbnailUrl;
   final String contentUrl;
+  final String views;
   final ContentSource source;
   final DateTime scrapedAt;
 
@@ -17,6 +18,7 @@ class ContentItem {
     required this.quality,
     required this.time,
     required this.title,
+    required this.views,
     required this.thumbnailUrl,
     required this.contentUrl,
     required this.source,

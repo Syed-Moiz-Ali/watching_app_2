@@ -1,63 +1,72 @@
-import 'dart:developer';
+import 'dart:convert';
 
-import 'package:html/dom.dart' as html;
+import '../../../../models/content_source.dart';
+import '../../../../models/scraper_config.dart';
+import '../../../../services/scrapers/base_scraper.dart';
 
-class Sxyprn {
-  dynamic getProperty(dynamic element, String propertyName) {
-    if (element is html.Element) {
-      switch (propertyName) {
-        case 'image':
-          log('image Component is ${element.querySelector('.js-pop > .vid_container >   .post_vid_thumb ')?.outerHtml}');
-          return element
-                  .querySelector(
-                      '.js-pop > .vid_container >   .post_vid_thumb > img')
-                  ?.attributes['data-src'] ??
-              'NA';
-        case 'id':
-          return element.querySelector('.js-pop')?.attributes['href'] ?? 'NA';
-        case 'title':
-          return element.querySelector('.js-pop')?.attributes['aria-label'] ??
-              'NA';
-        case 'duration':
-          return element
-                  .querySelector(
-                      '.js-pop  > .vid_container >   .post_vid_thumb >.duration_small')
-                  ?.text ??
-              'NA';
-        case 'preview':
-          return element
-                  .querySelector(
-                      '.js-pop  > .vid_container >   .post_vid_thumb >  video')
-                  ?.attributes['src'] ??
-              'NA';
-        case 'quality':
-          return element
-                  .querySelector(
-                      '.js-pop  > .vid_container >   .post_vid_thumb > .shd_small')
-                  ?.text ??
-              'NA';
-        case 'time':
-          return element
-                  .querySelector(
-                      '.post_control >.post_time > .post_control_time')
-                  ?.text ??
-              'NA';
-        default:
-          return '';
-      }
-    } else {
-      switch (propertyName) {
-        case 'selector':
-          // log(element
-          //     .querySelectorAll(
-          //         '#content_div > .main_content > div > .post_el_small')
-          //     .first
-          //     .outerHtml);
-          return element.querySelectorAll(
-              '#content_div > .main_content > div > .post_el_small');
-        default:
-          return '';
-      }
-    }
-  }
+class SxyPrn extends BaseScraper {
+  SxyPrn(ContentSource source)
+      : super(
+          source,
+          ScraperConfig(
+            titleSelector: ElementSelector(
+              selector: '.js-pop',
+              attribute: 'aria-label', // Extract title from 'title' attribute
+            ),
+            thumbnailSelector: ElementSelector(
+              selector: '.js-pop > .vid_container >   .post_vid_thumb > img',
+              attribute: 'data-src', // Extract thumbnail from 'data-src'
+            ),
+            contentUrlSelector: ElementSelector(
+              selector: '.js-pop',
+              attribute: 'href', // Extract content URL from 'href' attribute
+            ),
+            qualitySelector: ElementSelector(
+              selector:
+                  '.js-pop  > .vid_container >   .post_vid_thumb > .shd_small',
+            ),
+            timeSelector: ElementSelector(
+              selector: '.post_control >.post_time > .post_control_time',
+            ),
+            durationSelector: ElementSelector(
+              selector:
+                  '.js-pop  > .vid_container >   .post_vid_thumb >.duration_small',
+            ),
+            previewSelector: ElementSelector(
+              selector:
+                  '.js-pop  > .vid_container >   .post_vid_thumb >  video',
+              attribute: 'src',
+            ),
+            watchingLinkSelector: ElementSelector(
+              customExtraction: (element) {
+                var scripts = element
+                    .querySelectorAll('script[type="application/ld+json"]');
+                var scriptContainingEmbedUrl = scripts.firstWhere(
+                  (element) => element.text.contains('embedUrl'),
+                );
+
+                var jsonString1 = scriptContainingEmbedUrl.text;
+                var jsonData = json.decode(jsonString1);
+
+                Map watchingLink = {};
+                Map params = {'auto': jsonData['contentUrl']};
+                watchingLink.addEntries(params.entries);
+                return Future.value(json.encode(watchingLink));
+              },
+            ),
+            keywordsSelector: ElementSelector(
+              selector: 'meta[name="keywords"]',
+              attribute: 'content',
+            ),
+            similarContentSelector: ElementSelector(
+              selector: '.user_uploads > .video-list > .video-item',
+            ),
+            videoSelector: ElementSelector(
+              selector: 'main',
+            ),
+            contentSelector: ElementSelector(
+              selector: '#content_div > .main_content > div > .post_el_small',
+            ),
+          ),
+        );
 }

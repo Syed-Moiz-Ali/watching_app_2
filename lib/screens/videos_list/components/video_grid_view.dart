@@ -11,17 +11,19 @@ class VideoGridView extends StatelessWidget {
   final Function(int) onHorizontalDragStart;
   final Function(int) onHorizontalDragEnd;
   final ScrollController? controller; // Add ScrollController
+  final String contentType;
 
-  const VideoGridView({
-    super.key,
-    required this.videos,
-    required this.isGrid,
-    required this.currentPlayingIndex,
-    required this.onItemTap,
-    required this.onHorizontalDragStart,
-    required this.onHorizontalDragEnd,
-    this.controller, // Make it optional
-  });
+  const VideoGridView(
+      {super.key,
+      required this.videos,
+      this.isGrid = false,
+      required this.currentPlayingIndex,
+      required this.onItemTap,
+      required this.onHorizontalDragStart,
+      required this.onHorizontalDragEnd,
+      this.controller, // Make it optional
+      this.contentType = 'video' // Make it optional
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +47,7 @@ class VideoGridView extends StatelessWidget {
           onTap: () => onItemTap(index),
           onHorizontalDragStart: () => onHorizontalDragStart(index),
           onHorizontalDragEnd: () => onHorizontalDragEnd(index),
+          contentType: contentType,
         );
       },
     );

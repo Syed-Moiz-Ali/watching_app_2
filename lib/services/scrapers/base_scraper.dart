@@ -184,6 +184,8 @@ abstract class BaseScraper {
               'HD',
       time: await getAttributeValue(element: element, config.timeSelector) ??
           'Unknown',
+      views: await getAttributeValue(element: element, config.viewsSelector) ??
+          'Unknown',
       scrapedAt: DateTime.now(),
       source: source,
     );

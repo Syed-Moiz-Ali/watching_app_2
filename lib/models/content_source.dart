@@ -10,6 +10,7 @@ class ContentSource {
   final String name;
   final String icon;
   final String pageType;
+  final String pageIncriment;
   final Map<String, String> query;
 
   ContentSource({
@@ -24,6 +25,7 @@ class ContentSource {
     required this.name,
     required this.icon,
     required this.pageType,
+    this.pageIncriment = '',
     required this.query,
   });
 
@@ -40,6 +42,7 @@ class ContentSource {
       name: json['name'] ?? '',
       icon: json['icon'] ?? '',
       pageType: json['pageType'] ?? '',
+      pageIncriment: json['pageIncriment'] ?? '',
       query: Map<String, String>.from(json['query'] ?? {}),
     );
   }

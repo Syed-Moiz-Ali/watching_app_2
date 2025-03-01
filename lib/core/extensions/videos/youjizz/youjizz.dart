@@ -1,94 +1,53 @@
-import 'package:html/dom.dart' as html;
+import 'dart:convert';
 
-class YouJizz {
-  dynamic getProperty(dynamic element, String propertyName) {
-    if (element is html.Element) {
-      switch (propertyName) {
-        case 'image':
-          return element
-                  .querySelector('.video-item > .frame-wrapper > a >  img')
-                  ?.attributes['data-orignal'] ??
-              '';
-        case 'id':
-          return element
-                  .querySelector('.video-item > .frame-wrapper > a ')
-                  ?.attributes['href'] ??
-              '';
-        case 'title':
-          return element
-                  .querySelector(' .video-item > .video-title > a ')
-                  ?.text ??
-              '';
-        case 'duration':
-          return element
-                  .querySelector(
-                      '.video-item  > .video-content-wrapper  > .time')
-                  ?.text
-                  .trim() ??
-              '';
-        case 'preview':
-          return element
-                  .querySelector('.video-item > .frame-wrapper > a ')
-                  ?.attributes['data-clip'] ??
-              '';
-        case 'quality':
-          return element.querySelector(
-                      '.video-item > .frame-wrapper > a >.i-hd') !=
-                  null
-              ? element
-                  .querySelector('.video-item > .frame-wrapper > a >.i-hd')!
-                  .text
-              : 'HD';
-        case 'time':
-          return "";
-        default:
-          return '';
-      }
-    } else {
-      switch (propertyName) {
-        case 'selector':
-          return element.querySelectorAll(' .clearfix > .video-thumb');
-        default:
-          return '';
-      }
-    }
-  }
+import '../../../../models/content_source.dart';
+import '../../../../models/scraper_config.dart';
+import '../../../../services/scrapers/base_scraper.dart';
 
-  dynamic getVideos(dynamic element, String propertyName) {
-    if (element is html.Element) {
-      Map watchingLink = {};
-      // log('the link of this is ${element.querySelector('#video_html5_api')!.outerHtml}');
-      var links = element
-          .querySelector('.responsive-player > iframe')
-          ?.attributes['src'];
-      Map params = {'auto': links};
-      watchingLink.addEntries(params.entries);
-
-      // final streamDataJson = match.group(1)?.replaceAll("'", '"') ?? '';
-      // final streamUrls = Map<String, dynamic>.from(streamDataJson);
-      // final keywords = match2!.group(1) ?? '';
-      switch (propertyName) {
-        case 'watchingLink':
-
-          // return Episode(streamUrls: streamUrls, keywords: keywords);
-
-          return watchingLink;
-        // case 'keywords':
-        //   return keywords;
-        default:
-          return '';
-      }
-    } else {
-      switch (propertyName) {
-        case 'selector':
-          return element.querySelectorAll('.video-wrapper');
-        case 'keywords':
-          return element
-              .querySelector('meta[name="keywords"]')
-              ?.attributes['content'];
-        default:
-          return '';
-      }
-    }
-  }
+class YouJizz extends BaseScraper {
+  YouJizz(ContentSource source)
+      : super(
+          source,
+          ScraperConfig(
+              titleSelector: ElementSelector(
+                selector: '.video-item > .frame-wrapper > a ',
+              ),
+              thumbnailSelector: ElementSelector(
+                  selector: '.video-item > .frame-wrapper > a >  img',
+                  attribute: 'data-orignal'),
+              contentUrlSelector: ElementSelector(
+                selector: '.video-item > .frame-wrapper > a ',
+                attribute: 'href', // Extract content URL from 'href' attribute
+              ),
+              durationSelector: ElementSelector(
+                selector: '.video-item  > .video-content-wrapper  > .time',
+                // attribute: 'text', // Extract duration from text content
+              ),
+              previewSelector: ElementSelector(
+                selector: '.video-item > .frame-wrapper > a',
+                attribute: 'data-clip', // Extract duration from text content
+              ),
+              watchingLinkSelector: ElementSelector(
+                customExtraction: (element) {
+                  Map watchingLinks = {};
+                  var links = element
+                      .querySelector('video > source')
+                      ?.attributes['src'];
+                  Map params = {'auto': links};
+                  watchingLinks.addEntries(params.entries);
+                  // Return the encoded JSON string of watching links
+                  return Future.value(json.encode(watchingLinks));
+                },
+              ),
+              keywordsSelector: ElementSelector(
+                selector: 'meta[name="keywords"]',
+                attribute: 'content', // Extract duration from text content
+              ),
+              contentSelector:
+                  ElementSelector(selector: '.clearfix > .video-thumb'),
+              videoSelector: ElementSelector(selector: '..video-wrapper'),
+              similarContentSelector: ElementSelector(
+                  selector:
+                      '.g1-more-from > .g1-collection > .g1-collection-viewport > .g1-collection-item')),
+        );
 }

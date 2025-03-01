@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:watching_app_2/widgets/custom_padding.dart';
+import 'package:watching_app_2/widgets/primary_button.dart';
 import 'package:watching_app_2/widgets/text_widget.dart';
 
 import '../../models/content_item.dart';
@@ -177,10 +179,18 @@ class _GlobalSearchDataListState extends State<GlobalSearchDataList>
     } catch (e) {
       if (mounted) {
         setState(() {
+          // Instead of just setting error, initialize empty list for this source
           errorMap["${category}_${source.url}"] =
               'Failed to load videos from ${source.name}: $e';
+          if (allCategoryResults[category] == null) {
+            allCategoryResults[category] = {};
+          }
+          // Set empty list for failed source but don't stop execution
+          allCategoryResults[category]![source.searchUrl] = [];
+          hasMoreDataMap[sourceKey] = false;
         });
       }
+      // Don't rethrow the error - allow execution to continue
     }
   }
 
@@ -211,24 +221,22 @@ class _GlobalSearchDataListState extends State<GlobalSearchDataList>
         children: [
           Icon(Icons.error_outline, size: 48, color: Colors.red[300]),
           const SizedBox(height: 16),
-          TextWidget(
-            text: errorMsg ?? 'An unknown error occurred',
-            textAlign: TextAlign.center,
-            color: Colors.red[300],
+          CustomPadding(
+            horizontalFactor: .04,
+            child: TextWidget(
+              text: errorMsg ?? 'An unknown error occurred',
+              textAlign: TextAlign.center,
+              maxLine: 4,
+              color: Colors.red[300],
+            ),
           ),
           const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () => loadSourcesAndSearch(_currentCategory),
-            icon: const Icon(Icons.refresh),
-            label: const TextWidget(text: 'Try Again'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).primaryColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
+          PrimaryButton(
+            onTap: () => loadSourcesAndSearch(_currentCategory),
+            text: 'Try Again',
+            width: .4,
+            fontSize: 17.sp,
+            borderRadius: 100.w,
           ),
         ],
       ),
@@ -279,152 +287,6 @@ class _GlobalSearchDataListState extends State<GlobalSearchDataList>
   }
 
   // Completion of the _showSearchDialog() function
-  void _showSearchDialog() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: 80.h,
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Container(
-                width: 40,
-                height: 5,
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              TextWidget(
-                text: 'Search Content',
-                fontSize: 20.sp,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColor,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _searchController,
-                autofocus: true,
-                decoration: InputDecoration(
-                  hintText: 'Search...',
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      _searchController.clear();
-                    },
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                onSubmitted: (value) {
-                  Navigator.pop(context);
-                  if (value.isNotEmpty) {
-                    setState(() {
-                      _currentQuery = value;
-                      // Reset all data structures
-                      _initializeDataStructures();
-                    });
-                    loadSourcesAndSearch(_currentCategory);
-                  }
-                },
-              ),
-              const SizedBox(height: 24),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextWidget(
-                      text: 'Recent Searches',
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    const SizedBox(height: 12),
-                    // Here you would display recent searches
-                    // This is a placeholder - you'd implement recent searches storage
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: 5,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            leading: const Icon(Icons.history),
-                            title: TextWidget(text: 'Example search $index'),
-                            trailing: const Icon(Icons.north_west),
-                            onTap: () {
-                              // Set search text and perform search
-                              _searchController.text = 'Example search $index';
-                              Navigator.pop(context);
-                              setState(() {
-                                _currentQuery = 'Example search $index';
-                                _initializeDataStructures();
-                              });
-                              loadSourcesAndSearch(_currentCategory);
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    if (_searchController.text.isNotEmpty) {
-                      setState(() {
-                        _currentQuery = _searchController.text;
-                        // Reset all data structures
-                        _initializeDataStructures();
-                      });
-                      loadSourcesAndSearch(_currentCategory);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: TextWidget(
-                    text: 'Search',
-                    fontSize: 17.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
 // Main build method that was likely missing from your snippet
   @override

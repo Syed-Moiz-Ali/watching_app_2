@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/color_constants.dart';
 import 'package:watching_app_2/core/enums/app_enums.dart';
+import 'package:watching_app_2/core/global/app_global.dart';
 import 'package:watching_app_2/provider/source_provider.dart';
 import 'package:watching_app_2/provider/theme_provider.dart';
 import 'package:watching_app_2/provider/webview_controller_provider.dart';
@@ -206,7 +207,9 @@ class _DetailScreenState extends State<DetailScreen>
                               },
                               blendMode: BlendMode.dstIn,
                               child: CustomImageWidget(
-                                imagePath: widget.item.thumbnailUrl,
+                                imagePath: SMA.formatImage(
+                                    image: widget.item.thumbnailUrl,
+                                    baseUrl: widget.item.source.url),
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                               ),

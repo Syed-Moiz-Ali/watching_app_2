@@ -10,6 +10,7 @@ import 'package:watching_app_2/screens/source_list/source_list_screen.dart';
 import 'package:watching_app_2/widgets/text_widget.dart';
 
 import '../browse_content/browse_content.dart';
+import '../favorites_screen/favorites_screen.dart';
 import '../settings/settings_screen.dart';
 
 // Create a provider class to manage the navigation state
@@ -556,36 +557,20 @@ class _NavigationExampleContent extends StatelessWidget {
       extendBody: true,
       body: IndexedStack(
         index: navProvider.currentIndex,
-        children: [
-          const BrowseContent(),
-          const AdultContentCategoriesScreen(),
+        children: const [
+          BrowseContent(),
+          AdultContentCategoriesScreen(),
           // _buildPage('Categories Page', Colors.teal),
           // _buildPage('Websites Page', Colors.blue),
-          const SourceListScreen(),
-          _buildPage('Favorites Page', Colors.redAccent),
-          const PremiumSettingsScreen(),
+          SourceListScreen(),
+          FavoritesScreen(),
+          PremiumSettingsScreen(),
         ],
       ),
       bottomNavigationBar: const UltraPremiumNavBar(
         accentColor:
             AppColors.secondaryColor, // Change to match your brand color
         enableBlur: true,
-      ),
-    );
-  }
-
-  Widget _buildPage(String title, Color color) {
-    return Container(
-      color: color.withOpacity(0.2),
-      child: Center(
-        child: Text(
-          title,
-          style: TextStyle(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.bold,
-            color: color.withOpacity(0.8),
-          ),
-        ),
       ),
     );
   }

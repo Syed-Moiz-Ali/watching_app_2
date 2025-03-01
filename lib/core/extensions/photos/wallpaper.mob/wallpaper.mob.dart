@@ -1,91 +1,55 @@
-import 'package:html/dom.dart' as html;
+import 'package:html/dom.dart';
 
-class WallpaperMob {
-  dynamic getProperty(dynamic element, String propertyName) {
-    if (element is html.Element) {
-      switch (propertyName) {
-        case 'image':
-          var srcset =
-              element.querySelector('div > a > img')?.attributes['srcset'];
-          var imageUrl = '';
-          if (srcset != null) {
-            // Split the srcset attribute by comma to get individual sources
-            var sources = srcset.split(', ');
-            if (sources.isNotEmpty) {
-              // Get the first source
-              var firstSource = sources.last;
-              // Split the first source by space to get the URL and size
-              var parts = firstSource.split(' ');
-              if (parts.length >= 2) {
-                // The URL is the first part
-                imageUrl = parts[0];
-              }
-            }
-          }
-          // log('image is $imageUrl');
-          return imageUrl.trim();
-        case 'id':
-          return element.querySelector('div > a')?.attributes['href'] ?? '';
-        case 'title':
-          return element.querySelector('div > a  > img')?.attributes['alt'] ??
-              '';
-        case 'duration':
-          return "";
-        case 'preview':
-          return '';
-        case 'quality':
-          return "";
-        case 'time':
-          return "";
-        default:
-          return '';
-      }
-    } else {
-      switch (propertyName) {
-        case 'selector':
-          return element.querySelectorAll(
-              '.container-2  > .image-gallery-items > .image-gallery-items__item ');
-        default:
-          return '';
-      }
-    }
-  }
+import '../../../../models/content_source.dart';
+import '../../../../models/scraper_config.dart';
+import '../../../../services/scrapers/base_scraper.dart';
 
-  dynamic getVideos(dynamic element, String propertyName) {
-    if (element is html.Element) {
-      Map watchingLink = {};
-      // log('the link of this is ${element.querySelector('#video_html5_api')!.outerHtml}');
-      var links = element
-          .querySelector('.responsive-player > iframe')
-          ?.attributes['src'];
-      Map params = {'auto': links};
-      watchingLink.addEntries(params.entries);
-
-      // final streamDataJson = match.group(1)?.replaceAll("'", '"') ?? '';
-      // final streamUrls = Map<String, dynamic>.from(streamDataJson);
-      // final keywords = match2!.group(1) ?? '';
-      switch (propertyName) {
-        case 'watchingLink':
-
-          // return Episode(streamUrls: streamUrls, keywords: keywords);
-
-          return watchingLink;
-        // case 'keywords':
-        //   return keywords;
-        default:
-          return '';
-      }
-    } else {
-      switch (propertyName) {
-        case 'selector':
-          return element.querySelectorAll('#main');
-        case 'keywords':
-          return element
-              .querySelector('meta[name="keywords"]')
-              ?.attributes['content'];
-        default:
-          return '';
-      }
-    }
-  }
+class WallpaperMob extends BaseScraper {
+  WallpaperMob(ContentSource source)
+      : super(
+          source,
+          ScraperConfig(
+            titleSelector: ElementSelector(
+              selector: 'div > a >  img',
+              attribute: 'alt', // Extract title from 'title' attribute
+            ),
+            thumbnailSelector: ElementSelector(
+              customExtraction: (Element element) {
+                var srcset = element
+                    .querySelector('div > a > img')
+                    ?.attributes['srcset'];
+                var imageUrl = '';
+                if (srcset != null) {
+                  // Split the srcset attribute by comma to get individual sources
+                  var sources = srcset.split(', ');
+                  if (sources.isNotEmpty) {
+                    // Get the first source
+                    var firstSource = sources.last;
+                    // Split the first source by space to get the URL and size
+                    var parts = firstSource.split(' ');
+                    if (parts.length >= 2) {
+                      // The URL is the first part
+                      imageUrl = parts[0];
+                    }
+                  }
+                } else {
+                  imageUrl = element
+                          .querySelector('figure > a > img')
+                          ?.attributes['data-src'] ??
+                      '';
+                }
+                // log('image is $imageUrl');
+                return Future.value(imageUrl.trim());
+              },
+            ),
+            contentUrlSelector: ElementSelector(
+              selector: 'div > a',
+              attribute: 'href', // Extract content URL from 'href' attribute
+            ),
+            contentSelector: ElementSelector(
+              selector:
+                  '.container-2  > .image-gallery-items > .image-gallery-items__item ',
+            ),
+          ),
+        );
 }

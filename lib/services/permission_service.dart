@@ -1,13 +1,14 @@
 import 'dart:io';
-import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:watching_app_2/core/global/app_global.dart';
 
 class PermissionService {
-  static final PermissionService _instance = PermissionService._internal();
   factory PermissionService() => _instance;
+
   PermissionService._internal();
+
+  static final PermissionService _instance = PermissionService._internal();
 
   Future<bool> requestStoragePermissions() async {
     int retryCount = 0; // Track the number of retry attempts
@@ -27,12 +28,10 @@ class PermissionService {
 
         // Check if any permission was denied
         bool allGranted = true;
-        String deniedPermissions = '';
         statuses.forEach((permission, status) {
           if (status != PermissionStatus.granted &&
               status != PermissionStatus.limited) {
             allGranted = false;
-            deniedPermissions += '$permission, ';
           }
         });
 
@@ -41,7 +40,7 @@ class PermissionService {
         } else {
           if (retryCount == 1) {
             // After two tries, ask the user to open settings
-            return await _showSettingsDialog(deniedPermissions);
+            // return await _showSettingsDialog(deniedPermissions);
           }
           retryCount++;
         }

@@ -104,7 +104,7 @@ class _SearchScreenState extends State<SearchScreen>
                   hintText: 'Search for anything...',
                   onSearch: _handleSearch,
                   onFilterTap: _toggleFilter,
-                  recentSearches: [
+                  recentSearches: const [
                     'Flutter',
                     'Dart',
                     'Firebase',

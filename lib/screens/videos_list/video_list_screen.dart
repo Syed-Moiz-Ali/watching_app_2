@@ -73,7 +73,9 @@ class _VideoListScreenState extends State<VideoListScreen> {
     setState(() {
       isLoading = true;
       error = null;
-      _currentPage = 1; // Reset page number
+      _currentPage = widget.source.pageIncriment.isNotEmpty
+          ? int.parse(widget.source.pageIncriment)
+          : 1; // Reset page number
       _hasMoreData = true; // Reset more data flag
     });
 
@@ -112,7 +114,9 @@ class _VideoListScreenState extends State<VideoListScreen> {
     });
 
     try {
-      final nextPage = _currentPage + 1;
+      final nextPage = widget.source.pageIncriment.isNotEmpty
+          ? _currentPage + int.parse(widget.source.pageIncriment)
+          : _currentPage + 1;
       final newVideos =
           await scraperService.getContent(_currentQuery, nextPage);
 
@@ -143,7 +147,9 @@ class _VideoListScreenState extends State<VideoListScreen> {
     setState(() {
       isLoading = true;
       error = null;
-      _currentPage = 1; // Reset page number
+      _currentPage = widget.source.pageIncriment.isNotEmpty
+          ? int.parse(widget.source.pageIncriment)
+          : 1; // Reset page number
       _currentQuery = value; // Update current query
       _hasMoreData = true; // Reset more data flag
     });

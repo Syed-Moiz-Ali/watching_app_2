@@ -87,7 +87,7 @@ class NoodleMagazine extends BaseScraper {
                 attribute: 'content', // Extract duration from text content
               ),
               similarContentSelector: ElementSelector(
-                selector: '.related_videos > .item',
+                selector: '.box > #list_videos > .item',
               ),
               contentSelector:
                   ElementSelector(selector: '#list_videos > .item'),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/color_constants.dart';
+import 'package:watching_app_2/core/global/app_global.dart';
 import 'package:watching_app_2/core/navigation/navigator.dart';
 import 'package:watching_app_2/models/content_item.dart';
 import 'package:watching_app_2/screens/detail_screen/detail_screen.dart';
@@ -198,7 +199,9 @@ class _SimilarContentCardState extends State<SimilarContentCard>
                       child: CustomImageWidget(
                         borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(12)),
-                        imagePath: widget.content.thumbnailUrl,
+                        imagePath: SMA.formatImage(
+                            image: widget.content.thumbnailUrl,
+                            baseUrl: widget.content.source.url),
                         fit: BoxFit.cover,
                         // placeholder: (context, url) => Shimmer.fromColors(
                         //   baseColor: Colors.grey[300]!,

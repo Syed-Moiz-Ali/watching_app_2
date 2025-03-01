@@ -57,6 +57,8 @@ dependencies:
   device_info_plus: ^11.3.0
   flutter_svg: ^2.0.17
   flutter_keyboard_visibility: ^6.0.0
+  sqflite: ^2.3.3+1
+  path: ^1.9.0
 
 dev_dependencies:
   flutter_test:

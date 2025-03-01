@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/color_constants.dart';
 import 'package:watching_app_2/core/navigation/navigator.dart';
@@ -16,12 +15,12 @@ class ContentItemWidget extends StatefulWidget {
   final bool isGrid;
 
   const ContentItemWidget({
-    Key? key,
+    super.key,
     required this.item,
     required this.index,
     required this.sourceId,
     this.isGrid = false,
-  }) : super(key: key);
+  });
 
   @override
   State<ContentItemWidget> createState() => _ContentItemWidgetState();
@@ -33,7 +32,6 @@ class _ContentItemWidgetState extends State<ContentItemWidget>
   late Animation<double> _scaleAnimation;
   late Animation<double> _opacityAnimation;
   late Animation<Offset> _slideAnimation;
-  bool _isPlaying = false;
 
   @override
   void initState() {
@@ -69,9 +67,6 @@ class _ContentItemWidgetState extends State<ContentItemWidget>
 
   @override
   Widget build(BuildContext context) {
-    _isPlaying =
-        widget.index == widget.index && widget.sourceId == widget.sourceId;
-
     return SlideTransition(
       position: _slideAnimation,
       child: ScaleTransition(
@@ -286,7 +281,7 @@ class _ContentItemWidgetState extends State<ContentItemWidget>
             end: Alignment.bottomCenter,
             colors: [
               Theme.of(context).cardColor,
-              Theme.of(context).colorScheme.surfaceVariant,
+              Theme.of(context).colorScheme.surfaceContainerHighest,
             ],
           ),
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
