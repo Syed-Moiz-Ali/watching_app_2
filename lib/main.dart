@@ -12,6 +12,7 @@ import 'core/global/app_global.dart';
 import 'provider/similar_content_provider.dart';
 import 'provider/webview_controller_provider.dart';
 import 'screens/bottom_navigation/bottom_navigation_screen.dart';
+import 'screens/share/share_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +47,7 @@ class MyApp extends StatelessWidget {
         theme: AppTheme.lightTheme,
         themeMode: themeProvider.theme,
         darkTheme: AppTheme.darkTheme,
-        home: const NavigationScreen(),
+        home: ShareScreen(),
       );
     });
   }
