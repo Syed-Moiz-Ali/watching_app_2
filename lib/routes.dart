@@ -127,7 +127,7 @@ class AppRoutes {
         return _createRoute(const FavoritesScreen(), settings, transitionType);
 
       case share:
-        return _createRoute(const ShareScreen(), settings, transitionType);
+        return _createRoute(ShareScreen(), settings, transitionType);
 
       case sourceList:
         return _createRoute(const SourceListScreen(), settings, transitionType);
