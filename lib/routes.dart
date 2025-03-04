@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:watching_app_2/screens/bottom_navigation/bottom_navigation_screen.dart';
 import 'package:watching_app_2/screens/detail_screen/detail_screen.dart';
@@ -47,7 +48,9 @@ class AppRoutes {
     const allTypes = TransitionType.values;
     _appWideTransition = allTypes[_random.nextInt(allTypes.length)];
     _initialized = true;
-    print('Selected app-wide transition: $_appWideTransition');
+    if (kDebugMode) {
+      print('Selected app-wide transition: $_appWideTransition');
+    }
   }
 
   static const String home = '/';

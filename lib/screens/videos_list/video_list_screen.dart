@@ -13,7 +13,6 @@ import '../../services/scrapers/scraper_service.dart';
 import '../../widgets/custom_floatingaction_button.dart';
 import '../../widgets/pagination_loading_indicator.dart';
 import '../../widgets/text_widget.dart';
-import '../detail_screen/detail_screen.dart';
 import 'components/video_grid_view.dart';
 
 class VideoListScreen extends StatefulWidget {

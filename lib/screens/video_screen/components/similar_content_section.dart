@@ -5,7 +5,6 @@ import 'package:watching_app_2/core/constants/color_constants.dart';
 import 'package:watching_app_2/core/global/app_global.dart';
 import 'package:watching_app_2/core/navigation/navigator.dart';
 import 'package:watching_app_2/models/content_item.dart';
-import 'package:watching_app_2/screens/detail_screen/detail_screen.dart';
 import 'package:watching_app_2/widgets/custom_image_widget.dart';
 import 'package:watching_app_2/widgets/text_widget.dart';
 
