@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/navigation/navigator.dart';
-import 'package:watching_app_2/screens/wallpapers_list/wallpapers_list.dart';
+import 'package:watching_app_2/routes.dart';
 import 'package:watching_app_2/widgets/custom_image_widget.dart';
 import 'package:watching_app_2/widgets/text_widget.dart';
 import 'package:watching_app_2/models/content_source.dart';
@@ -87,9 +87,13 @@ class _SourceCardState extends State<SourceCard> with TickerProviderStateMixin {
             provider.selectedQuery = widget.source.query.entries.first.value;
             provider.updateState();
             if (widget.source.type == '1') {
-              NH.navigateTo(VideoListScreen(source: widget.source));
+              NH.nameNavigateTo(AppRoutes.videoList,
+                  arguments: {"source": widget.source});
+              // NH.navigateTo(VideoListScreen(source: widget.source));
             } else if (widget.source.type == '3') {
-              NH.navigateTo(WallpapersList(source: widget.source));
+              // NH.navigateTo(WallpapersList(source: widget.source));
+              NH.nameNavigateTo(AppRoutes.wallpapers,
+                  arguments: {"source": widget.source});
             } else if (widget.source.type == '4') {
               NH.navigateTo(VideoListScreen(source: widget.source));
             }

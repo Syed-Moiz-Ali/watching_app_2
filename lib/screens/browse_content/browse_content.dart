@@ -7,8 +7,8 @@ import 'dart:ui' as ui;
 
 import 'package:watching_app_2/core/constants/color_constants.dart';
 import 'package:watching_app_2/core/navigation/navigator.dart';
+import 'package:watching_app_2/routes.dart';
 import 'package:watching_app_2/screens/browse_content/animated_searchbar.dart';
-import 'package:watching_app_2/screens/global_search/global_search_data_list.dart';
 
 class BrowseContent extends StatefulWidget {
   const BrowseContent({super.key});
@@ -143,7 +143,9 @@ class _BrowseContentState extends State<BrowseContent>
                   hintText: 'Search for anything...',
                   onSearch: (value) {
                     if (value.isNotEmpty) {
-                      NH.navigateTo(GlobalSearchDataList(query: value));
+                      // NH.navigateTo(GlobalSearchDataList(query: value));
+                      NH.nameForceNavigate(AppRoutes.globalSearch,
+                          arguments: {'query': value});
                     }
                   },
                   onFilterTap: () {},

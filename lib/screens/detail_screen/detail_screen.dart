@@ -8,6 +8,7 @@ import 'package:watching_app_2/provider/source_provider.dart';
 import 'package:watching_app_2/provider/theme_provider.dart';
 import 'package:watching_app_2/provider/webview_controller_provider.dart';
 import 'package:watching_app_2/models/content_item.dart';
+import 'package:watching_app_2/routes.dart';
 import 'package:watching_app_2/widgets/custom_gap.dart';
 import 'package:watching_app_2/widgets/custom_image_widget.dart';
 import 'package:watching_app_2/widgets/primary_button.dart';
@@ -15,7 +16,6 @@ import 'package:watching_app_2/widgets/text_widget.dart';
 import '../../core/navigation/navigator.dart';
 import '../../provider/similar_content_provider.dart';
 import '../video_screen/components/similar_content_section.dart';
-import '../video_screen/video_screen.dart';
 import 'dart:ui';
 
 class DetailScreen extends StatefulWidget {
@@ -228,7 +228,9 @@ class _DetailScreenState extends State<DetailScreen>
                       child: FloatingActionButton(
                         backgroundColor: AppColors.primaryColor,
                         onPressed: () {
-                          NH.navigateTo(VideoScreen(item: widget.item));
+                          // NH.navigateTo(VideoScreen(item: widget.item));
+                          NH.nameNavigateTo(AppRoutes.video,
+                              arguments: {'item': widget.item});
                         },
                         // backgroundColor: AppColors.primaryColor,
                         child: Icon(
@@ -471,7 +473,8 @@ class _DetailScreenState extends State<DetailScreen>
         width: .8,
         borderRadius: 100.w,
         onTap: () {
-          NH.navigateTo(VideoScreen(item: widget.item));
+          // NH.navigateTo(VideoScreen(item: widget.item));
+          NH.nameNavigateTo(AppRoutes.video, arguments: {'item': widget.item});
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

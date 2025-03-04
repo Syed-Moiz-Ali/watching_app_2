@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:watching_app_2/routes.dart';
 
 import '../../core/enums/app_enums.dart';
 import '../../core/navigation/navigator.dart';
@@ -9,7 +10,6 @@ import '../../widgets/custom_appbar.dart';
 import '../../widgets/custom_floatingaction_button.dart';
 import '../../widgets/pagination_loading_indicator.dart';
 import '../../widgets/text_widget.dart';
-import '../wallpaper_detail/wallpaper_detail.dart';
 import 'components/wallpaper_grid_view.dart';
 
 class WallpapersList extends StatefulWidget {
@@ -198,19 +198,12 @@ class _WallpapersListState extends State<WallpapersList> {
                                 wallpapers: wallpapers,
                                 controller: _scrollController,
                                 onItemTap: (index) {
-                                  // showModalBottomSheet(
-                                  //     isScrollControlled: true,
-                                  //     context: context,
-                                  //     builder: (context) {
-                                  //       return UltraPremiumWallpaperDetail(
-                                  //         item: wallpapers[
-                                  //             index], // Replace with actual image URL
-                                  //       );
-                                  //     });
-                                  NH.navigateTo(MinimalistWallpaperDetail(
-                                    item: wallpapers[
-                                        index], // Replace with actual image URL
-                                  ));
+                                  // NH.navigateTo(MinimalistWallpaperDetail(
+                                  //   item: wallpapers[
+                                  //       index], // Replace with actual image URL
+                                  // ));
+                                  NH.nameNavigateTo(AppRoutes.wallpaperDetail,
+                                      arguments: {'item': wallpapers[index]});
                                 },
                               ),
                             ),

@@ -9,6 +9,8 @@ import 'package:watching_app_2/screens/detail_screen/detail_screen.dart';
 import 'package:watching_app_2/widgets/custom_image_widget.dart';
 import 'package:watching_app_2/widgets/text_widget.dart';
 
+import '../../../routes.dart';
+
 class SimilarContentSection extends StatefulWidget {
   final List<ContentItem> similarContents;
 
@@ -97,7 +99,9 @@ class _SimilarContentSectionState extends State<SimilarContentSection>
                               //         context,
                               //         listen: false);
                               // provider.loadVideos(content);
-                              NH.navigateTo(DetailScreen(item: content));
+                              // NH.navigateTo(DetailScreen(item: content));
+                              NH.nameNavigateTo(AppRoutes.detail,
+                                  arguments: {'item': content});
                             },
                             child: SimilarContentCard(
                                 content: content, index: index)),

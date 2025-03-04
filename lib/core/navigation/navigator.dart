@@ -55,4 +55,47 @@ class NH {
       ),
     );
   }
+
+  static Future<void> nameNavigateTo(String routeName,
+      {Map<String, dynamic>? arguments}) {
+    return Navigator.pushNamed(
+      SMA.navigationKey.currentContext!,
+      routeName,
+      arguments: arguments,
+    );
+  }
+
+  /// **Navigate and replace the current screen using named routes**
+  static Future<void> nameForceNavigate(String routeName,
+      {Map<String, dynamic>? arguments}) {
+    return Navigator.pushReplacementNamed(
+      SMA.navigationKey.currentContext!,
+      routeName,
+      arguments: arguments,
+    );
+  }
+
+  /// **Navigate and remove all previous routes**
+  static Future<void> nameNavigateAndRemoveUntil(String routeName,
+      {Map<String, dynamic>? arguments}) {
+    return Navigator.pushNamedAndRemoveUntil(
+      SMA.navigationKey.currentContext!,
+      routeName,
+      (route) => false, // Removes all previous routes
+      arguments: arguments,
+    );
+  }
+
+  /// **Navigate back to the previous screen**
+  static void nameNavigateBack() {
+    if (Navigator.canPop(SMA.navigationKey.currentContext!)) {
+      Navigator.pop(SMA.navigationKey.currentContext!);
+    }
+  }
+
+  /// **Navigate back until a specific route is found**
+  static void nameNavigateBackUntil(String routeName) {
+    Navigator.popUntil(
+        SMA.navigationKey.currentContext!, ModalRoute.withName(routeName));
+  }
 }

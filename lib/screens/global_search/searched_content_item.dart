@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/color_constants.dart';
 import 'package:watching_app_2/core/navigation/navigator.dart';
-import 'package:watching_app_2/screens/detail_screen/detail_screen.dart';
+import 'package:watching_app_2/routes.dart';
 import 'package:watching_app_2/widgets/custom_image_widget.dart';
 import 'package:watching_app_2/widgets/text_widget.dart';
 
@@ -87,7 +87,9 @@ class _ContentItemWidgetState extends State<ContentItemWidget>
           setState(() {
             _controller.reverse().then((_) {
               _controller.forward();
-              NH.navigateTo(DetailScreen(item: widget.item));
+              // NH.navigateTo(DetailScreen(item: widget.item));
+              NH.nameNavigateTo(AppRoutes.detail,
+                  arguments: {'item': widget.item});
             });
           });
         },

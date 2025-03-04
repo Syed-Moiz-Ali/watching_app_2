@@ -14,8 +14,8 @@ import 'package:watching_app_2/widgets/text_widget.dart';
 import '../../core/navigation/navigator.dart';
 import '../../models/tab_model.dart';
 import '../../provider/favorites_provider.dart';
+import '../../routes.dart';
 import '../../widgets/custom_appbar.dart';
-import '../detail_screen/detail_screen.dart';
 import '../videos_list/components/video_grid_view.dart';
 
 class FavoritesScreen extends StatefulWidget {
@@ -250,7 +250,9 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
                   _currentPlayingIndex = index;
                 }),
                 onItemTap: (index) {
-                  NH.navigateTo(DetailScreen(item: favorites[index]));
+                  // NH.navigateTo(DetailScreen(item: favorites[index]));
+                  NH.nameNavigateTo(AppRoutes.detail,
+                      arguments: {'item': favorites[index]});
                 },
               );
             });

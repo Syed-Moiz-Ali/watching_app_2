@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:watching_app_2/core/enums/app_enums.dart';
 import 'package:watching_app_2/core/navigation/navigator.dart';
+import 'package:watching_app_2/routes.dart';
 import 'package:watching_app_2/widgets/custom_appbar.dart';
 
 import '../../core/constants/color_constants.dart';
@@ -212,8 +213,10 @@ class _VideoListScreenState extends State<VideoListScreen> {
                                 isGrid: isGrid,
                                 currentPlayingIndex: _currentPlayingIndex,
                                 onItemTap: (index) {
-                                  NH.navigateTo(
-                                      DetailScreen(item: videos[index]));
+                                  NH.nameNavigateTo(AppRoutes.detail,
+                                      arguments: {"item": videos[index]});
+                                  // NH.navigateTo(
+                                  //     DetailScreen(item: videos[index]));
                                 },
                                 onHorizontalDragStart: (index) => setState(() {
                                   _currentPlayingIndex = index;
