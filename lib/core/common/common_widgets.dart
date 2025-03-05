@@ -6,11 +6,11 @@ import 'package:watching_app_2/core/global/app_global.dart';
 import '../constants/color_constants.dart';
 import '../enums/app_enums.dart';
 import '../navigation/navigator.dart';
-import '../../provider/theme_provider.dart';
-import '../../widgets/custom_gap.dart';
-import '../../widgets/custom_icon.dart';
-import '../../widgets/custom_padding.dart';
-import '../../widgets/text_widget.dart';
+import '../../presentation/provider/theme_provider.dart';
+import '../../presentation/widgets/misc/custom_gap.dart';
+import '../../presentation/widgets/misc/custom_icon.dart';
+import '../../presentation/widgets/misc/custom_padding.dart';
+import '../../presentation/widgets/misc/text_widget.dart';
 
 class CommonWidgets {
   static customAppBarIcon(

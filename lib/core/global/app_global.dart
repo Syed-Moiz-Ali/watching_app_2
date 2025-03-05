@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../models/content_item.dart';
+import '../../data/models/content_item.dart';
 
 class SMA {
   static GlobalKey<NavigatorState> navigationKey = GlobalKey();

@@ -56,16 +56,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:watching_app_2/provider/bottom_navigation_provider.dart';
-import 'package:watching_app_2/provider/favorites_provider.dart';
-import 'package:watching_app_2/provider/source_provider.dart';
-import 'package:sizer/sizer.dart';
-import 'package:watching_app_2/provider/theme_provider.dart';
-import 'package:watching_app_2/provider/similar_content_provider.dart';
-import 'package:watching_app_2/provider/webview_controller_provider.dart';
-import 'core/constants/color_constants.dart';
-import 'core/global/app_global.dart';
-import 'routes.dart';
+import 'package:watching_app_2/presentation/provider/bottom_navigation_provider.dart';
+import 'package:watching_app_2/presentation/provider/favorites_provider.dart';
+import 'package:watching_app_2/presentation/provider/source_provider.dart';
+import 'package:watching_app_2/presentation/provider/theme_provider.dart';
+import 'package:watching_app_2/presentation/provider/similar_content_provider.dart';
+import 'package:watching_app_2/presentation/provider/webview_controller_provider.dart';
+import 'app.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -81,25 +78,4 @@ void main() {
     ChangeNotifierProvider(create: (_) => SimilarContentProvider()),
     ChangeNotifierProvider(create: (_) => BottomNavigationProvider()),
   ], child: const MyApp()));
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    var themeProvider = context.watch<ThemeProvider>();
-    return ResponsiveSizer(builder: (context, orientation, screenType) {
-      return MaterialApp(
-        title: 'Queen',
-        navigatorKey: SMA.navigationKey,
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        themeMode: themeProvider.theme,
-        darkTheme: AppTheme.darkTheme,
-        initialRoute: AppRoutes.home,
-        onGenerateRoute: AppRoutes.generateRoute,
-      );
-    });
-  }
 }
