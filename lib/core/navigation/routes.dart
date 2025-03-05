@@ -12,6 +12,7 @@ import 'package:watching_app_2/presentation/screens/wallpapers_list/wallpapers_l
 
 import '../../presentation/screens/global_search/global_search_data_list.dart';
 import '../../presentation/screens/wallpaper_detail/wallpaper_detail.dart';
+import '../../presentation/widgets/misc/network_banner_widget.dart';
 
 enum TransitionType {
   fadeIn,
@@ -152,7 +153,16 @@ class AppRoutes {
       Widget page, RouteSettings settings, TransitionType type) {
     return PageRouteBuilder<dynamic>(
       settings: settings,
-      pageBuilder: (context, animation, secondaryAnimation) => page,
+      pageBuilder: (context, animation, secondaryAnimation) => Stack(
+        children: [
+          page,
+          const Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: NetworkBannerWidget()), // Network banner on every screen
+        ],
+      ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         // Primary animation with enhanced curves
         final primaryAnimation = CurvedAnimation(

@@ -184,11 +184,11 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
         return FutureBuilder<List<ContentItem>>(
             future: favoritesProvider.getFavoritesByType(widget.contentType),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
+              // if (snapshot.connectionState == ConnectionState.waiting) {
+              //   return const Center(
+              //     child: CircularProgressIndicator(),
+              //   );
+              // }
 
               if (snapshot.hasError) {
                 return Center(
@@ -238,22 +238,25 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
                 return AnimatedEmptyState(contentType: widget.contentType);
               }
 
-              return VideoGridView(
-                videos: favorites,
-                isGrid: widget.isGrid,
-                contentType: widget.contentType,
-                currentPlayingIndex: _currentPlayingIndex,
-                onHorizontalDragStart: (index) => setState(() {
-                  _currentPlayingIndex = index;
-                }),
-                onHorizontalDragEnd: (index) => setState(() {
-                  _currentPlayingIndex = index;
-                }),
-                onItemTap: (index) {
-                  // NH.navigateTo(DetailScreen(item: favorites[index]));
-                  NH.nameNavigateTo(AppRoutes.detail,
-                      arguments: {'item': favorites[index]});
-                },
+              return AnimationConfiguration.synchronized(
+                duration: const Duration(milliseconds: 800),
+                child: VideoGridView(
+                  videos: favorites,
+                  isGrid: widget.isGrid,
+                  contentType: widget.contentType,
+                  currentPlayingIndex: _currentPlayingIndex,
+                  onHorizontalDragStart: (index) => setState(() {
+                    _currentPlayingIndex = index;
+                  }),
+                  onHorizontalDragEnd: (index) => setState(() {
+                    _currentPlayingIndex = index;
+                  }),
+                  onItemTap: (index) {
+                    // NH.navigateTo(DetailScreen(item: favorites[index]));
+                    NH.nameNavigateTo(AppRoutes.detail,
+                        arguments: {'item': favorites[index]});
+                  },
+                ),
               );
             });
       },

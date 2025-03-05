@@ -6,6 +6,8 @@ import 'dart:ui';
 import 'package:watching_app_2/core/constants/color_constants.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
+import '../../../core/global/app_global.dart';
+
 class AnimatedSearchBar extends StatefulWidget {
   const AnimatedSearchBar({
     super.key,
@@ -148,7 +150,7 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
   }
 
   void _handleFocusChange() {
-    log("Focus changed: ${_searchFocusNode.hasFocus}");
+    SMA.logger.logInfo("Focus changed: ${_searchFocusNode.hasFocus}");
     setState(() {
       _isSearchFocused = _searchFocusNode.hasFocus;
       if (_isSearchFocused) {

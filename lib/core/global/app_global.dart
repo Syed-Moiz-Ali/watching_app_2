@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/models/content_item.dart';
+import '../services/logger_service.dart';
+import '../services/service_locator.dart';
 
 class SMA {
   static GlobalKey<NavigatorState> navigationKey = GlobalKey();
@@ -16,6 +18,7 @@ class SMA {
     pref = await SharedPreferences.getInstance();
   }
 
+  static LoggingService logger = locator<LoggingService>();
   static String formatImage({
     required String baseUrl,
     required String image,

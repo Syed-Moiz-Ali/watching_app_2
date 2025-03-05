@@ -288,10 +288,6 @@ class _AdultContentCategoriesScreenState
                 ],
               ),
             ),
-
-            // Animated hover border
-
-            // Arrow indicator on hover
           ],
         ),
       ),
@@ -403,12 +399,6 @@ class CategoryDetailScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Spacer(flex: 3),
-                // Icon(
-                //   category['icon'],
-                //   size: 60,
-                //   color: Colors.white.withOpacity(0.8),
-                // ),
-                // SizedBox(height: 24),
                 Text(
                   category.title,
                   style: const TextStyle(
@@ -432,19 +422,7 @@ class CategoryDetailScreen extends StatelessWidget {
                   width: double.infinity,
                   height: 56,
                   decoration: BoxDecoration(
-                    // gradient: LinearGradient(
-                    //   colors: category['colors'],
-                    //   begin: Alignment.centerLeft,
-                    //   end: Alignment.centerRight,
-                    // ),
                     borderRadius: BorderRadius.circular(28),
-                    // boxShadow: [
-                    //   BoxShadow(
-                    //     color: category['colors'][0].withOpacity(0.5),
-                    //     blurRadius: 16,
-                    //     offset: Offset(0, 8),
-                    //   ),
-                    // ],
                   ),
                   child: Material(
                     color: Colors.transparent,

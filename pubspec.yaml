@@ -61,6 +61,9 @@ dependencies:
   url_launcher: ^6.3.1
   uni_links: ^0.5.1
   share_plus: ^10.1.4
+  wakelock_plus: ^1.2.10
+  logger: ^2.5.0
+  get_it: ^8.0.3
 
 dev_dependencies:
   flutter_test:

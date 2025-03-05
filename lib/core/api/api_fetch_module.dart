@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:http/http.dart' as http;
+import 'package:watching_app_2/core/global/app_global.dart';
 
 class ApiFetchModule {
   static Future<dynamic> request({
@@ -13,7 +14,7 @@ class ApiFetchModule {
   }) async {
     // Build the URI with query parameters if provided
     final uri = Uri.parse(url).replace(queryParameters: queryParams);
-    log('uri is $uri');
+
     var req = http.Request(type.toUpperCase(), uri);
 
     Map<String, String> headers = {
@@ -22,9 +23,8 @@ class ApiFetchModule {
 
     // Add token if required
 
-    log('Request URL: ${uri.toString()}');
-    log('Request Type: $type');
-    log('Request Body: ${json.encode(body)}');
+    SMA.logger.logInfo(
+        'Request URL: ${uri.toString()}\n Request Type: $type \n Request Body: ${json.encode(body)}');
 
     req.headers.addAll(headers);
     req.body = json.encode(body);
@@ -40,7 +40,7 @@ class ApiFetchModule {
       // Send the request
       var res = await req.send();
       final resBody = await res.stream.bytesToString();
-      log('Response statusCode: ${res.statusCode}');
+      // SMA.logger.logInfo('Response statusCode: ${res.statusCode}');
 
       if (res.statusCode >= 200 && res.statusCode < 300) {
         var data = resBody;
@@ -50,11 +50,13 @@ class ApiFetchModule {
         var errorData = json.decode(resBody);
         // CustomToast.show(message: "error! something wrong", type: ToastType.error);
         // throw Exception('Error: ${errorData['message'] ?? res.reasonPhrase}');
+        SMA.logger
+            .logError('Error: ${errorData['message'] ?? res.reasonPhrase}');
         return 'Error: ${errorData['message'] ?? res.reasonPhrase}';
       }
     } catch (error) {
       // Provide more informative error messages
-      log('Request failed: $error');
+      SMA.logger.logError('Request failed: $error');
       // CustomToast.show(message: error.toString(), type: ToastType.error);
       // throw Exception('Request failed: ${error.toString()}');
       return 'Request failed: ${error.toString()}';

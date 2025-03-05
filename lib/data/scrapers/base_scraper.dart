@@ -65,7 +65,7 @@ abstract class BaseScraper {
       final response = await ApiFetchModule.request(url: url);
       return scrapeContent(response);
     } catch (e) {
-      log('Error fetching data from $url: $e');
+      SMA.logger.logError('Error fetching data from $url: $e');
       return [];
     }
   }
@@ -76,7 +76,7 @@ abstract class BaseScraper {
       scrapeSimilarContent(response); // We call it here in base class.
       return scrapeVideos(response);
     } catch (e) {
-      log('Error fetching data from $url: $e');
+      SMA.logger.logError('Error fetching data from $url: $e');
       return [];
     }
   }
@@ -107,7 +107,7 @@ abstract class BaseScraper {
         final item = await parseElement(element);
         items.add(item);
       } catch (e) {
-        log('Error parsing element: $e');
+        SMA.logger.logError('Error parsing element: $e');
       }
     }
     return items;
@@ -122,7 +122,7 @@ abstract class BaseScraper {
           document, element); // Reuses parseElement from BaseScraper
       items.add(item);
     } catch (e) {
-      log('Error parsing element: $e');
+      SMA.logger.logError('Error parsing element: $e');
     }
 
     return items;

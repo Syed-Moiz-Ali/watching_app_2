@@ -71,15 +71,13 @@ class _SourceCardState extends State<SourceCard> with TickerProviderStateMixin {
           ),
         );
       },
-      child: Card(
+      child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8),
-        elevation: 8,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: const BorderSide(color: AppColors.greyColor)),
-        shadowColor: Colors.black26,
-        // color: Colors.white,
-
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.greyColor),
+          // boxShadow: [AppColors.shadow]
+        ),
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           onTap: () {
