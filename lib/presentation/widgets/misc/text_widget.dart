@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:watching_app_2/core/global/app_global.dart';
+import 'package:watching_app_2/core/global/globals.dart';
 
-import '../../../core/enums/app_enums.dart';
+import '../../../core/enums/enums.dart';
 
 class TextWidget extends StatelessWidget {
   final Color? color;

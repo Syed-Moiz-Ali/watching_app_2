@@ -1,14 +1,14 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
-import 'package:watching_app_2/presentation/screens/favorites_screen/favorites_button.dart';
-import 'package:watching_app_2/presentation/widgets/misc/custom_gap.dart';
+import 'package:watching_app_2/presentation/screens/favorites_screen/favorite_button.dart';
+import 'package:watching_app_2/presentation/widgets/misc/gap.dart';
 import 'package:watching_app_2/presentation/widgets/misc/text_widget.dart';
-import 'dart:ui';
-import '../../../../core/constants/color_constants.dart';
-import '../../../../core/global/app_global.dart';
+import '../../../../core/constants/colors.dart';
+import '../../../../core/global/globals.dart';
 import '../../../../data/models/content_item.dart';
-import '../../../widgets/misc/custom_image_widget.dart';
-import '../../../widgets/misc/custom_video_player.dart';
+import '../../../widgets/misc/image.dart';
+import '../../../widgets/misc/video_player_widget.dart';
 
 class VideoCard extends StatefulWidget {
   final ContentItem item;
@@ -179,7 +179,7 @@ class _VideoCardState extends State<VideoCard>
                   fit: StackFit.expand,
                   children: [
                     if (widget.item.source.isPreview == '1' && widget.isPlaying)
-                      CustomVideoPlayer(
+                      VideoPlayerWidget(
                         imageUrl: SMA.formatImage(
                           image: widget.item.thumbnailUrl,
                           baseUrl: widget.item.source.url,
@@ -196,7 +196,7 @@ class _VideoCardState extends State<VideoCard>
                     if (widget.item.source.isPreview == '1') _buildPlayButton(),
                     if (widget.item.duration != '0:00') _buildDurationBadge(),
                     _buildQualityBadge(),
-                    PremiumFavoriteButton(
+                    FavoriteButton(
                       item: widget.item,
                       contentType: widget.contentType,
                       primaryColor: AppColors.errorColor,
@@ -393,10 +393,10 @@ class _VideoCardState extends State<VideoCard>
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: widget.isGrid ? 12 : 16),
-                Row(
+                Wrap(
                   children: [
                     _buildSourceBadge(),
-                    const SizedBox(width: 12),
+                    const CustomGap(widthFactor: .01),
                     _buildTimeBadge(),
                   ],
                 ),
@@ -430,7 +430,7 @@ class _VideoCardState extends State<VideoCard>
             size: widget.isGrid ? 14 : 16,
             color: Colors.grey[800],
           ),
-          const SizedBox(width: 6),
+          const CustomGap(widthFactor: .005),
           TextWidget(
             text: widget.item.source.name,
             fontSize: widget.isGrid ? 12.sp : 14.sp,
@@ -464,7 +464,7 @@ class _VideoCardState extends State<VideoCard>
             size: widget.isGrid ? 14 : 16,
             color: Colors.grey[800],
           ),
-          const SizedBox(width: 6),
+          const CustomGap(widthFactor: .005),
           TextWidget(
             text: widget.item.time,
             fontSize: widget.isGrid ? 12.sp : 14.sp,

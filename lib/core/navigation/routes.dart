@@ -1,18 +1,18 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:watching_app_2/presentation/screens/bottom_navigation/bottom_navigation_screen.dart';
-import 'package:watching_app_2/presentation/screens/detail_screen/detail_screen.dart';
-import 'package:watching_app_2/presentation/screens/favorites_screen/favorites_screen.dart';
+import 'package:watching_app_2/presentation/screens/bottom_navigation/navigation_screen.dart';
+import 'package:watching_app_2/presentation/screens/detail_screen/content_detail.dart';
+import 'package:watching_app_2/presentation/screens/favorites_screen/favorites.dart';
 import 'package:watching_app_2/presentation/screens/share/share_screen.dart';
-import 'package:watching_app_2/presentation/screens/source_list/source_list_screen.dart';
-import 'package:watching_app_2/presentation/screens/video_screen/video_screen.dart';
-import 'package:watching_app_2/presentation/screens/videos_list/video_list_screen.dart';
-import 'package:watching_app_2/presentation/screens/wallpapers_list/wallpapers_list.dart';
+import 'package:watching_app_2/presentation/screens/source_list/sources.dart';
+import 'package:watching_app_2/presentation/screens/video_screen/video_player.dart';
+import 'package:watching_app_2/presentation/screens/videos_list/videos.dart';
+import 'package:watching_app_2/presentation/screens/wallpapers_list/wallpapers.dart';
 
-import '../../presentation/screens/global_search/global_search_data_list.dart';
+import '../../presentation/screens/global_search/search_results_list.dart';
 import '../../presentation/screens/wallpaper_detail/wallpaper_detail.dart';
-import '../../presentation/widgets/misc/network_banner_widget.dart';
+import '../../presentation/widgets/network/network_banner.dart';
 
 enum TransitionType {
   fadeIn,
@@ -95,14 +95,14 @@ class AppRoutes {
       case detail:
         if (args.containsKey('item')) {
           return _createRoute(
-              DetailScreen(item: args['item']), settings, transitionType);
+              ContentDetail(item: args['item']), settings, transitionType);
         }
         return _errorRoute(settings.name);
 
       case wallpapers:
         if (args.containsKey('source')) {
           return _createRoute(
-              WallpapersList(source: args['source']), settings, transitionType);
+              Wallpapers(source: args['source']), settings, transitionType);
         }
         return _errorRoute(settings.name);
 
@@ -116,30 +116,30 @@ class AppRoutes {
       case video:
         if (args.containsKey('item')) {
           return _createRoute(
-              VideoScreen(item: args['item']), settings, transitionType);
+              VideoPlayer(item: args['item']), settings, transitionType);
         }
         return _errorRoute(settings.name);
 
       case globalSearch:
         if (args.containsKey('query')) {
-          return _createRoute(GlobalSearchDataList(query: args['query']),
-              settings, transitionType);
+          return _createRoute(SearchResultsList(query: args['query']), settings,
+              transitionType);
         }
         return _errorRoute(settings.name);
 
       case favorites:
-        return _createRoute(const FavoritesScreen(), settings, transitionType);
+        return _createRoute(const Favorites(), settings, transitionType);
 
       case share:
         return _createRoute(ShareScreen(), settings, transitionType);
 
       case sourceList:
-        return _createRoute(const SourceListScreen(), settings, transitionType);
+        return _createRoute(const Sources(), settings, transitionType);
 
       case videoList:
         if (args.containsKey('source')) {
-          return _createRoute(VideoListScreen(source: args['source']), settings,
-              transitionType);
+          return _createRoute(
+              Videos(source: args['source']), settings, transitionType);
         }
         return _errorRoute(settings.name);
 
@@ -160,7 +160,7 @@ class AppRoutes {
               top: 0,
               left: 0,
               right: 0,
-              child: NetworkBannerWidget()), // Network banner on every screen
+              child: NetworkBanner()), // Network banner on every screen
         ],
       ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {

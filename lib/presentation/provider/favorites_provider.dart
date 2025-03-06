@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:watching_app_2/data/models/content_item.dart';
-import 'package:watching_app_2/data/database/favorites_database.dart'; // Assuming this is where your database code will be
+import 'package:watching_app_2/data/database/local_database.dart'; // Assuming this is where your database code will be
 
 // Favorites provider that manages favorites state
 class FavoritesProvider with ChangeNotifier {
   // Database instance
-  final FavoritesDatabase _database = FavoritesDatabase.instance;
+  final LocalDatabase _database = LocalDatabase.instance;
 
   // Cache for favorites
   final Map<String, List<ContentItem>> _favoritesByType = {};
@@ -242,13 +242,13 @@ class FavoritesProvider with ChangeNotifier {
 }
 
 // Enhanced database class with additional method needed for provider
-extension FavoritesDatabaseExtension on FavoritesDatabase {
+extension FavoritesDatabaseExtension on LocalDatabase {
   // Add this method to your FavoritesDatabase class
   Future<int> removeByContentUrl(String contentUrl) async {
     final db = await database;
     return await db.delete(
-      FavoritesDatabase.FAVORITES_TABLE,
-      where: '${FavoritesDatabase.COLUMN_CONTENT_URL} = ?',
+      LocalDatabase.FAVORITES_TABLE,
+      where: '${LocalDatabase.COLUMN_CONTENT_URL} = ?',
       whereArgs: [contentUrl],
     );
   }

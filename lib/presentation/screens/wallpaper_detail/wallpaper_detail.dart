@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
-import 'package:watching_app_2/core/global/app_global.dart';
+import 'package:watching_app_2/core/global/globals.dart';
 import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
@@ -11,7 +11,7 @@ import 'package:watching_app_2/core/services/wallpaper_service.dart';
 import 'package:watching_app_2/presentation/widgets/misc/text_widget.dart';
 
 import '../../../data/models/content_item.dart';
-import '../../widgets/misc/custom_image_widget.dart';
+import '../../widgets/misc/image.dart';
 
 class MinimalistWallpaperDetail extends StatefulWidget {
   final ContentItem item;

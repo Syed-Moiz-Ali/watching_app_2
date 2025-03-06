@@ -1,12 +1,11 @@
-import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:provider/provider.dart';
 import 'package:watching_app_2/data/models/video_source.dart';
 
-import '../../core/api/api_fetch_module.dart';
-import '../../core/global/app_global.dart';
+import '../../core/api/api_client.dart';
+import '../../core/global/globals.dart';
 import '../models/content_item.dart';
 import '../models/content_source.dart';
 import '../models/scraper_config.dart';
@@ -29,7 +28,7 @@ abstract class BaseScraper {
   Future<List<ContentItem>> search(String query, int page) async {
     final url = source.getSearchUrl(query, page);
     try {
-      final response = await ApiFetchModule.request(url: url);
+      final response = await ApiClient.request(url: url);
       return scrapeContent(response);
     } catch (e) {
       if (kDebugMode) {
@@ -62,7 +61,7 @@ abstract class BaseScraper {
 
   Future<List<ContentItem>> fetchCotentAndScrape(String url) async {
     try {
-      final response = await ApiFetchModule.request(url: url);
+      final response = await ApiClient.request(url: url);
       return scrapeContent(response);
     } catch (e) {
       SMA.logger.logError('Error fetching data from $url: $e');
@@ -72,7 +71,7 @@ abstract class BaseScraper {
 
   Future<List<VideoSource>> fetchVideoAndScrape(String url) async {
     try {
-      final response = await ApiFetchModule.request(url: url);
+      final response = await ApiClient.request(url: url);
       scrapeSimilarContent(response); // We call it here in base class.
       return scrapeVideos(response);
     } catch (e) {

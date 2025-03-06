@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
-import 'package:watching_app_2/core/global/app_global.dart';
+import 'package:watching_app_2/core/global/globals.dart';
 
 class PermissionService {
   factory PermissionService() => _instance;

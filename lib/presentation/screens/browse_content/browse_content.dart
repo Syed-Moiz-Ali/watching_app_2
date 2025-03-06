@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'dart:ui' as ui;
 
-import 'package:watching_app_2/core/constants/color_constants.dart';
-import 'package:watching_app_2/core/navigation/navigator.dart';
+import 'package:watching_app_2/core/constants/colors.dart';
+import 'package:watching_app_2/core/navigation/app_navigator.dart';
 import 'package:watching_app_2/core/navigation/routes.dart';
-import 'package:watching_app_2/presentation/screens/browse_content/animated_searchbar.dart';
+import 'package:watching_app_2/presentation/screens/browse_content/animated_search_bar.dart';
 
 class BrowseContent extends StatefulWidget {
   const BrowseContent({super.key});
@@ -144,7 +144,7 @@ class _BrowseContentState extends State<BrowseContent>
                   onSearch: (value) {
                     if (value.isNotEmpty) {
                       // NH.navigateTo(GlobalSearchDataList(query: value));
-                      NH.nameForceNavigate(AppRoutes.globalSearch,
+                      NH.nameNavigateTo(AppRoutes.globalSearch,
                           arguments: {'query': value});
                     }
                   },

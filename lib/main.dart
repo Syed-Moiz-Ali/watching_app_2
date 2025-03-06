@@ -56,14 +56,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:watching_app_2/presentation/provider/bottom_navigation_provider.dart';
+import 'package:watching_app_2/presentation/provider/navigation_provider.dart';
 import 'package:watching_app_2/presentation/provider/favorites_provider.dart';
 import 'package:watching_app_2/presentation/provider/source_provider.dart';
 import 'package:watching_app_2/presentation/provider/theme_provider.dart';
 import 'package:watching_app_2/presentation/provider/similar_content_provider.dart';
-import 'package:watching_app_2/presentation/provider/webview_controller_provider.dart';
+import 'package:watching_app_2/presentation/provider/webview_provider.dart';
 import 'app.dart';
-import 'core/services/network_service.dart';
+import 'core/services/network_status_service.dart';
 import 'core/services/service_locator.dart';
 
 void main() {
@@ -76,11 +76,11 @@ void main() {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => SourceProvider()),
     ChangeNotifierProvider(create: (_) => ThemeProvider()..initializeTheme()),
-    ChangeNotifierProvider(create: (_) => WebviewControllerProvider()),
+    ChangeNotifierProvider(create: (_) => WebviewProvider()),
     ChangeNotifierProvider(
         create: (_) => NetworkServiceProvider()..initConnectivity()),
     ChangeNotifierProvider(create: (_) => FavoritesProvider()),
     ChangeNotifierProvider(create: (_) => SimilarContentProvider()),
-    ChangeNotifierProvider(create: (_) => BottomNavigationProvider()),
+    ChangeNotifierProvider(create: (_) => NavigationProvider()),
   ], child: const SafeArea(child: MyApp())));
 }

@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:watching_app_2/data/models/categories_model.dart';
+import 'package:watching_app_2/data/models/category_model.dart';
 import 'package:watching_app_2/data/models/content_source.dart';
 
 class SourceManager {

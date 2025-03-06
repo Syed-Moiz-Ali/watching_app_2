@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/constants/color_constants.dart';
+import '../../../core/constants/colors.dart';
 
 class CustomLoadingIndicator extends StatelessWidget {
   final Color? color;

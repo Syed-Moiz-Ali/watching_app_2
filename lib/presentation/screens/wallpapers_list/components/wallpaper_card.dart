@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:flutter/services.dart';
-import 'package:watching_app_2/core/global/app_global.dart';
-import 'package:watching_app_2/presentation/widgets/misc/custom_image_widget.dart';
+import 'package:watching_app_2/core/global/globals.dart';
+import 'package:watching_app_2/presentation/widgets/misc/image.dart';
 import '../../../../data/models/content_item.dart';
 
 class WallpaperCard extends StatefulWidget {

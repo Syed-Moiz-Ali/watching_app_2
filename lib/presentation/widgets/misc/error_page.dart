@@ -4,8 +4,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
-import 'package:watching_app_2/core/constants/color_constants.dart';
-import 'package:watching_app_2/core/navigation/navigator.dart';
+import 'package:watching_app_2/core/constants/colors.dart';
+import 'package:watching_app_2/core/navigation/app_navigator.dart';
 import 'package:watching_app_2/presentation/widgets/buttons/primary_button.dart';
 import 'package:watching_app_2/presentation/widgets/misc/text_widget.dart';
 

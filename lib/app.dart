@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
-import 'core/constants/color_constants.dart';
-import 'core/global/app_global.dart';
+import 'core/constants/colors.dart';
+import 'core/global/globals.dart';
 import 'core/navigation/routes.dart';
 import 'presentation/provider/theme_provider.dart';
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/constants/color_constants.dart';
-import '../../../core/enums/app_enums.dart';
-import '../../../core/global/app_global.dart';
+import '../../../core/constants/colors.dart';
+import '../../../core/enums/enums.dart';
+import '../../../core/global/globals.dart';
 import '../misc/text_widget.dart';
 
 class PrimaryButton extends StatelessWidget {

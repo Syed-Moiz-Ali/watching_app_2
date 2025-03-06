@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import 'package:watching_app_2/core/navigation/navigator.dart';
+import 'package:watching_app_2/core/navigation/app_navigator.dart';
 import 'package:watching_app_2/core/navigation/routes.dart';
-import 'package:watching_app_2/presentation/widgets/misc/custom_image_widget.dart';
+import 'package:watching_app_2/presentation/widgets/misc/image.dart';
 import 'package:watching_app_2/presentation/widgets/misc/text_widget.dart';
 import 'package:watching_app_2/data/models/content_source.dart';
-import 'package:watching_app_2/core/constants/color_constants.dart';
-import 'package:watching_app_2/presentation/screens/videos_list/video_list_screen.dart';
+import 'package:watching_app_2/core/constants/colors.dart';
+import 'package:watching_app_2/presentation/screens/videos_list/videos.dart';
 
 import '../../../provider/source_provider.dart';
 
@@ -93,7 +93,7 @@ class _SourceCardState extends State<SourceCard> with TickerProviderStateMixin {
               NH.nameNavigateTo(AppRoutes.wallpapers,
                   arguments: {"source": widget.source});
             } else if (widget.source.type == '4') {
-              NH.navigateTo(VideoListScreen(source: widget.source));
+              NH.navigateTo(Videos(source: widget.source));
             }
           },
           child: Padding(

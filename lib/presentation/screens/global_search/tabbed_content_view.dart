@@ -2,17 +2,18 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:sizer/sizer.dart';
-import 'package:watching_app_2/core/constants/color_constants.dart';
-import 'package:watching_app_2/presentation/widgets/misc/custom_tabbar.dart';
+import 'package:watching_app_2/core/constants/colors.dart';
+import 'package:watching_app_2/presentation/widgets/misc/tabbar.dart';
 import 'package:watching_app_2/presentation/widgets/misc/text_widget.dart';
 
+import '../../../core/navigation/app_navigator.dart';
+import '../../../core/navigation/routes.dart';
 import '../../../data/models/content_item.dart';
 import '../../../data/models/content_source.dart';
 import '../../../data/models/tab_model.dart';
 import '../../../data/scrapers/scraper_service.dart';
-import 'searched_content_item.dart';
+import '../videos_list/components/video_grid_view.dart';
 
 class TabbedContentView extends StatefulWidget {
   final Map<String, List<ContentItem>> categoryResults;
@@ -40,6 +41,7 @@ class _TabbedContentViewState extends State<TabbedContentView>
   Map<String, int> pageNoMap = {};
   late Map<String, List<ContentItem>> localCategoryResults; // New variable
   String? selectedSourceId; // Variable to store the selected source ID
+  int _currentPlayingIndex = -1;
 
   @override
   void initState() {
@@ -187,9 +189,27 @@ class _TabbedContentViewState extends State<TabbedContentView>
               controller: _tabController,
               physics: const BouncingScrollPhysics(),
               children: sourcesWithContent.map((entry) {
-                final sourceId = entry.key;
+                // final sourceId = entry.key;
                 final results = entry.value;
-                return _buildContentRow(results, sourceId);
+                return VideoGridView(
+                  controller: _scrollController,
+                  videos: results,
+                  isGrid: widget.isGrid,
+                  currentPlayingIndex: _currentPlayingIndex,
+                  onItemTap: (index) {
+                    NH.nameNavigateTo(AppRoutes.detail,
+                        arguments: {"item": results[index]});
+                    // NH.navigateTo(
+                    //     DetailScreen(item: videos[index]));
+                  },
+                  onHorizontalDragStart: (index) => setState(() {
+                    _currentPlayingIndex = index;
+                  }),
+                  onHorizontalDragEnd: (index) => setState(() {
+                    _currentPlayingIndex = index;
+                  }),
+                );
+                // _buildContentRow(results, sourceId);
               }).toList(),
             ),
           ),
@@ -235,68 +255,6 @@ class _TabbedContentViewState extends State<TabbedContentView>
         onTabChanged: (value) {},
         tabContents: tabList,
       ),
-    );
-  }
-
-  Widget _buildContentRow(List<ContentItem> items, String sourceId) {
-    if (items.isEmpty) return const SizedBox.shrink();
-
-    return AnimationLimiter(
-      child: widget.isGrid
-          ? GridView.builder(
-              controller: _scrollController,
-              shrinkWrap: true,
-              padding: EdgeInsets.all(16.sp),
-              physics: const BouncingScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.85,
-                crossAxisSpacing: 12.sp,
-                mainAxisSpacing: 12.sp,
-              ),
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                return AnimationConfiguration.staggeredGrid(
-                  position: index,
-                  duration: const Duration(milliseconds: 600),
-                  columnCount: 2,
-                  child: ScaleAnimation(
-                    scale: 0.85,
-                    child: FadeInAnimation(
-                      child: ContentItemWidget(
-                        item: items[index],
-                        index: index,
-                        sourceId: sourceId,
-                        isGrid: widget.isGrid,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            )
-          : ListView.builder(
-              controller: _scrollController,
-              shrinkWrap: true,
-              padding: EdgeInsets.all(16.sp),
-              physics: const BouncingScrollPhysics(),
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                return AnimationConfiguration.staggeredList(
-                  position: index,
-                  duration: const Duration(milliseconds: 600),
-                  child: SlideAnimation(
-                    verticalOffset: 50.0,
-                    child: FadeInAnimation(
-                      child: ContentItemWidget(
-                          item: items[index],
-                          index: index,
-                          sourceId: sourceId,
-                          isGrid: widget.isGrid),
-                    ),
-                  ),
-                );
-              },
-            ),
     );
   }
 }
