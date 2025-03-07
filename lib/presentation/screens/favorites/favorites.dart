@@ -16,7 +16,7 @@ import '../../../data/models/tab_model.dart';
 import '../../provider/favorites_provider.dart';
 import '../../../core/navigation/routes.dart';
 import '../../widgets/appbars/app_bar.dart';
-import '../videos_list/components/video_grid_view.dart';
+import '../videos/components/video_grid_view.dart';
 
 class Favorites extends StatefulWidget {
   const Favorites({super.key});

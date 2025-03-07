@@ -154,6 +154,7 @@ class _CustomAppBarState extends State<CustomAppBar>
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: AppBar(
+                scrolledUnderElevation: 0,
                 // backgroundColor: Colors.transparent,
                 automaticallyImplyLeading: false,
                 toolbarHeight: widget.appBarHeight,

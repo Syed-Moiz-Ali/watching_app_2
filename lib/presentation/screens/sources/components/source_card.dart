@@ -7,9 +7,9 @@ import 'package:watching_app_2/presentation/widgets/misc/image.dart';
 import 'package:watching_app_2/presentation/widgets/misc/text_widget.dart';
 import 'package:watching_app_2/data/models/content_source.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
-import 'package:watching_app_2/presentation/screens/videos_list/videos.dart';
 
 import '../../../provider/source_provider.dart';
+import '../../videos/videos.dart';
 
 class SourceCard extends StatefulWidget {
   final ContentSource source;

@@ -1,17 +1,17 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:watching_app_2/presentation/screens/bottom_navigation/navigation_screen.dart';
-import 'package:watching_app_2/presentation/screens/detail_screen/content_detail.dart';
-import 'package:watching_app_2/presentation/screens/favorites_screen/favorites.dart';
-import 'package:watching_app_2/presentation/screens/share/share_screen.dart';
-import 'package:watching_app_2/presentation/screens/source_list/sources.dart';
-import 'package:watching_app_2/presentation/screens/video_screen/video_player.dart';
-import 'package:watching_app_2/presentation/screens/videos_list/videos.dart';
-import 'package:watching_app_2/presentation/screens/wallpapers_list/wallpapers.dart';
 
-import '../../presentation/screens/global_search/search_results_list.dart';
+import '../../presentation/screens/content_detail/content_detail.dart';
+import '../../presentation/screens/favorites/favorites.dart';
+import '../../presentation/screens/navigation_screen/navigation_screen.dart';
+import '../../presentation/screens/search_results_list/search_results_list.dart';
+import '../../presentation/screens/share/share_screen.dart';
+import '../../presentation/screens/sources/sources.dart';
+import '../../presentation/screens/video_player/video_player.dart';
+import '../../presentation/screens/videos/videos.dart';
 import '../../presentation/screens/wallpaper_detail/wallpaper_detail.dart';
+import '../../presentation/screens/wallpapers/wallpapers.dart';
 import '../../presentation/widgets/network/network_banner.dart';
 
 enum TransitionType {
@@ -60,7 +60,7 @@ class AppRoutes {
   static const String detail = '/detail';
   static const String video = '/video';
   static const String favorites = '/favorites';
-  static const String globalSearch = '/global-search';
+  static const String searchResult = '/search-result';
   static const String settings = '/settings';
   static const String share = '/share';
   static const String sourceList = '/source-list';
@@ -120,7 +120,7 @@ class AppRoutes {
         }
         return _errorRoute(settings.name);
 
-      case globalSearch:
+      case searchResult:
         if (args.containsKey('query')) {
           return _createRoute(SearchResultsList(query: args['query']), settings,
               transitionType);

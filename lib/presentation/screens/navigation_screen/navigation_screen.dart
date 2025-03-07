@@ -5,13 +5,15 @@ import 'dart:ui';
 import 'package:provider/provider.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/presentation/provider/navigation_provider.dart';
-import 'package:watching_app_2/presentation/screens/categories_screen/categories.dart';
-import 'package:watching_app_2/presentation/screens/source_list/sources.dart';
+
 import 'package:watching_app_2/presentation/widgets/misc/text_widget.dart';
 
 import '../browse_content/browse_content.dart';
-import '../favorites_screen/favorites.dart';
+
+import '../categories/categories.dart';
+import '../favorites/favorites.dart';
 import '../settings/settings.dart';
+import '../sources/sources.dart';
 
 // Create a provider class to manage the navigation state
 

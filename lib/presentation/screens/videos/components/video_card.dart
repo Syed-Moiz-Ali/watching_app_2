@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
-import 'package:watching_app_2/presentation/screens/favorites_screen/favorite_button.dart';
 import 'package:watching_app_2/presentation/widgets/misc/gap.dart';
 import 'package:watching_app_2/presentation/widgets/misc/text_widget.dart';
 import '../../../../core/constants/colors.dart';
@@ -9,6 +8,7 @@ import '../../../../core/global/globals.dart';
 import '../../../../data/models/content_item.dart';
 import '../../../widgets/misc/image.dart';
 import '../../../widgets/misc/video_player_widget.dart';
+import '../../favorites/favorite_button.dart';
 
 class VideoCard extends StatefulWidget {
   final ContentItem item;

@@ -2,12 +2,14 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/core/navigation/app_navigator.dart';
 import 'package:watching_app_2/core/navigation/routes.dart';
+import 'package:watching_app_2/presentation/provider/search_provider.dart';
 import 'package:watching_app_2/presentation/screens/browse_content/animated_search_bar.dart';
 
 class BrowseContent extends StatefulWidget {
@@ -144,7 +146,8 @@ class _BrowseContentState extends State<BrowseContent>
                   onSearch: (value) {
                     if (value.isNotEmpty) {
                       // NH.navigateTo(GlobalSearchDataList(query: value));
-                      NH.nameNavigateTo(AppRoutes.globalSearch,
+                      context.read<SearchProvider>().setAllCategoryResults({});
+                      NH.nameNavigateTo(AppRoutes.searchResult,
                           arguments: {'query': value});
                     }
                   },

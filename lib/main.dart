@@ -58,6 +58,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:watching_app_2/presentation/provider/navigation_provider.dart';
 import 'package:watching_app_2/presentation/provider/favorites_provider.dart';
+import 'package:watching_app_2/presentation/provider/search_provider.dart';
 import 'package:watching_app_2/presentation/provider/source_provider.dart';
 import 'package:watching_app_2/presentation/provider/theme_provider.dart';
 import 'package:watching_app_2/presentation/provider/similar_content_provider.dart';
@@ -82,5 +83,6 @@ void main() {
     ChangeNotifierProvider(create: (_) => FavoritesProvider()),
     ChangeNotifierProvider(create: (_) => SimilarContentProvider()),
     ChangeNotifierProvider(create: (_) => NavigationProvider()),
+    ChangeNotifierProvider(create: (_) => SearchProvider()),
   ], child: const SafeArea(child: MyApp())));
 }

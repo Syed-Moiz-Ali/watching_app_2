@@ -5,7 +5,7 @@ import 'package:watching_app_2/core/constants/colors.dart';
 
 import '../../../core/global/globals.dart';
 import '../../../data/models/content_source.dart';
-import '../../screens/videos_list/components/query_bottom_sheet.dart';
+import '../../screens/videos/components/query_bottom_sheet.dart';
 
 class CustomFloatingActionButton extends StatefulWidget {
   final ContentSource source;

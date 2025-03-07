@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:watching_app_2/presentation/screens/favorites_screen/remove_favorite_dialog.dart';
+import '../../../presentation/screens/favorites/remove_favorite_dialog.dart';
 import 'dart:math' as math;
 
 import '../../provider/favorites_provider.dart';

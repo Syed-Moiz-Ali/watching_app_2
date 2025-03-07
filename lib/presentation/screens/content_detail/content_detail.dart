@@ -15,7 +15,7 @@ import 'package:watching_app_2/presentation/widgets/buttons/primary_button.dart'
 import 'package:watching_app_2/presentation/widgets/misc/text_widget.dart';
 import '../../../core/navigation/app_navigator.dart';
 import '../../provider/similar_content_provider.dart';
-import '../video_screen/components/similar_content.dart';
+import '../video_player/components/similar_content.dart';
 import 'dart:ui';
 
 class ContentDetail extends StatefulWidget {

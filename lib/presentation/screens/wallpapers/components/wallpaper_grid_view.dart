@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:watching_app_2/presentation/screens/wallpapers_list/components/wallpaper_card.dart';
 
 import '../../../../data/models/content_item.dart';
+import '../../wallpapers/components/wallpaper_card.dart';
 
 class WallpaperGridView extends StatelessWidget {
   final List<ContentItem> wallpapers;
