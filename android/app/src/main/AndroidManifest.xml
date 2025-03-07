@@ -74,11 +74,11 @@
             </intent-filter>
 
             <!-- Auto-verification of deep links to a website -->
-            <intent-filter android:autoVerify="true">
+            <intent-filter android:label="Main screen" android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="yourwebsite.com" />
+                <data android:scheme="https" android:host="yourwebsite.com" android:pathPrefix="/details" />
             </intent-filter>
         </activity>
         
