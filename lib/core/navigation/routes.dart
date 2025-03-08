@@ -2,17 +2,17 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../presentation/screens/content_detail/content_detail.dart';
-import '../../presentation/screens/favorites/favorites.dart';
-import '../../presentation/screens/navigation_screen/navigation_screen.dart';
-import '../../presentation/screens/search_results_list/search_results_list.dart';
-import '../../presentation/screens/share/share_screen.dart';
-import '../../presentation/screens/sources/sources.dart';
-import '../../presentation/screens/video_player/video_player.dart';
-import '../../presentation/screens/videos/videos.dart';
-import '../../presentation/screens/wallpaper_detail/wallpaper_detail.dart';
-import '../../presentation/screens/wallpapers/wallpapers.dart';
-import '../../presentation/widgets/network/network_banner.dart';
+import '../../features/videos/presentation/screens/content_detail.dart';
+import '../../shared/screens/favorites/favorites.dart';
+import '../../shared/screens/navigation_screen.dart';
+import '../../shared/screens/search_results_list/search_results_list.dart';
+import '../../shared/screens/share_screen.dart';
+import '../../shared/screens/sources/sources.dart';
+import '../../shared/screens/video_player/video_player.dart';
+import '../../features/videos/presentation/screens/videos.dart';
+import '../../features/wallpapers/presentation/screens/wallpaper_detail.dart';
+import '../../features/wallpapers/presentation/screens/wallpapers.dart';
+import '../../shared/widgets/network/network_banner.dart';
 
 enum TransitionType {
   fadeIn,

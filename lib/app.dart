@@ -7,6 +7,8 @@ import 'core/constants/colors.dart';
 import 'core/global/globals.dart';
 import 'core/navigation/routes.dart';
 import 'presentation/provider/theme_provider.dart';
+import 'presentation/themes/app_theme.dart';
+import 'presentation/themes/dark_theme.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -52,9 +54,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         title: 'Queen',
         navigatorKey: SMA.navigationKey,
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        themeMode: themeProvider.theme,
-        darkTheme: AppTheme.darkTheme,
+        theme: AppTheme.lightTheme, // Light theme
+        darkTheme: DarkTheme.darkTheme, // Dark theme
+        themeMode: themeProvider.themeMode, // Use ThemeMode from provider
         initialRoute: AppRoutes.home,
         onGenerateRoute: AppRoutes.generateRoute,
       );

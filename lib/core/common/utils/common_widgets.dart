@@ -7,10 +7,10 @@ import '../../constants/colors.dart';
 import '../../enums/enums.dart';
 import '../../navigation/app_navigator.dart';
 import '../../../presentation/provider/theme_provider.dart';
-import '../../../presentation/widgets/misc/gap.dart';
-import '../../../presentation/widgets/misc/icon.dart';
-import '../../../presentation/widgets/misc/padding.dart';
-import '../../../presentation/widgets/misc/text_widget.dart';
+import '../../../shared/widgets/misc/gap.dart';
+import '../../../shared/widgets/misc/icon.dart';
+import '../../../shared/widgets/misc/padding.dart';
+import '../../../shared/widgets/misc/text_widget.dart';
 
 class CommonWidgets {
   static customAppBarIcon(

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
@@ -62,6 +64,7 @@ abstract class BaseScraper {
   Future<List<ContentItem>> fetchCotentAndScrape(String url) async {
     try {
       final response = await ApiClient.request(url: url);
+      // log("reponse is ${response}");
       return scrapeContent(response);
     } catch (e) {
       SMA.logger.logError('Error fetching data from $url: $e');
@@ -72,6 +75,7 @@ abstract class BaseScraper {
   Future<List<VideoSource>> fetchVideoAndScrape(String url) async {
     try {
       final response = await ApiClient.request(url: url);
+
       scrapeSimilarContent(response); // We call it here in base class.
       return scrapeVideos(response);
     } catch (e) {

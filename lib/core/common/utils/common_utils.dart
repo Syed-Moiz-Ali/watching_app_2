@@ -6,8 +6,8 @@ import 'package:watching_app_2/core/global/globals.dart';
 import '../../constants/colors.dart';
 import '../../enums/enums.dart';
 import '../../../presentation/provider/theme_provider.dart';
-import '../../../presentation/widgets/buttons/primary_button.dart';
-import '../../../presentation/widgets/misc/text_widget.dart';
+import '../../../shared/widgets/buttons/primary_button.dart';
+import '../../../shared/widgets/misc/text_widget.dart';
 
 class CommonFunctions {
   static scrollToIndex({

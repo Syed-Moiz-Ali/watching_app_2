@@ -1,22 +1,23 @@
 import 'package:watching_app_2/data/models/scraper_config.dart';
+import 'package:watching_app_2/data/scrapers/sources/manga/kissmanga.dart';
 
-import '../repository/photos/elitebabe.dart';
-import '../repository/photos/erowall/erowall.dart';
-import '../repository/photos/peakpx/peakpx.dart';
-import '../repository/photos/pmatehunter/pmatehunter.dart';
-import '../repository/photos/wallpaper.mob/wallpaper.mob.dart';
-import '../repository/photos/wallpaperporn/wallpaperporn.dart';
-import '../repository/videos/baddies/baddies.dart';
-import '../repository/videos/crazyShit/crazyShit.dart';
-import '../repository/videos/goodPorn/goodPorn.dart';
-import '../repository/videos/hqporner/hqporner.dart';
-import '../repository/videos/noodlemagazine/noodlemagazine.dart';
-import '../repository/videos/pimpbunny/pimpbunny.dart';
-import '../repository/videos/pornhits/pornhits.dart';
-import '../repository/videos/spankbang/spankbang.dart';
-import '../repository/videos/sxyprn/sxyprn.dart';
-import '../repository/videos/tabooporn2/tabooporn2.dart';
-import '../repository/videos/youjizz/youjizz.dart';
+import '../../data/scrapers/sources/photos/elitebabe.dart';
+import '../../data/scrapers/sources/photos/erowall.dart';
+import '../../data/scrapers/sources/photos/peakpx.dart';
+import '../../data/scrapers/sources/photos/pmatehunter.dart';
+import '../../data/scrapers/sources/photos/wallpaper.mob.dart';
+import '../../data/scrapers/sources/photos/wallpaperporn.dart';
+import '../../data/scrapers/sources/videos/baddies.dart';
+import '../../data/scrapers/sources/videos/crazyShit.dart';
+import '../../data/scrapers/sources/videos/goodPorn.dart';
+import '../../data/scrapers/sources/videos/hqporner.dart';
+import '../../data/scrapers/sources/videos/noodlemagazine.dart';
+import '../../data/scrapers/sources/videos/pimpbunny.dart';
+import '../../data/scrapers/sources/pornhits.dart';
+import '../../data/scrapers/sources/videos/spankbang.dart';
+import '../../data/scrapers/sources/videos/sxyprn.dart';
+import '../../data/scrapers/sources/videos/tabooporn2.dart';
+import '../../data/scrapers/sources/videos/youjizz.dart';
 import '../../data/models/content_source.dart';
 import '../../data/scrapers/base_scraper.dart';
 
@@ -60,6 +61,9 @@ class ScraperFactory {
     'wallpaperbetter': (source) => PeakPx(source),
     'wallpaper.mob': (source) => WallpaperMob(source),
     'wallpaperporn': (source) => WallpaperPorn(source),
+
+    //manga
+    'kissmanga': (source) => KissManga(source),
 
     // Add more scrapers here
   };
