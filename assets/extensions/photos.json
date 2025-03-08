@@ -108,30 +108,29 @@
     "isEmbed": "0",
     "icon": "https://cdn.pmatehunter.com/wp-content/themes/masonry/images/favicons/apple-touch-icon.png",
     "query": {
-      "pics": "updates/sort/filter/ord/popular/content/pix/quality/0/tags/0/mpage/{page}/",
       "archive": "archive/page/{page}/",
       "trending": "updates/",
       "newest": "updates/sort/newest/mpage/{page}/",
-      "popular": "updates/sort/popular/mpage/{page}/"
+      "popular": "updates/sort/popular/mpage/{page}/",
+      "pics": "updates/sort/filter/ord/popular/content/pix/quality/0/tags/0/mpage/{page}/"
     }
   },
   {
-    "url": "https://www.elitebabes.com/",
+    "url": "https://www.elitebabes.com/gridapi/?content=updates",
     "type": "3",
     "NSFW": "1",
     "getType": "1",
     "decodeType": "1",
     "isPreview": "0",
-    "name": "pmatehunter",
+    "name": "elitebabes",
     "pageType": "mpage/",
     "isEmbed": "0",
     "icon": "https://cdn.elitebabes.com/wp-content/themes/masonry/images/favicons/apple-touch-icon.png",
     "query": {
-      "pics": "updates/sort/filter/ord/popular/content/pix/quality/0/tags/0/mpage/{page}/",
-      "archive": "archive/page/{page}/",
-      "trending": "updates/",
-      "newest": "updates/sort/newest/mpage/{page}/",
-      "popular": "updates/sort/popular/mpage/{page}/"
+      
+      "trending": "&sort=trending&mpage={page}",
+      "newest": "&sort=newest&mpage={page}",
+      "popular": "&sort=popular&mpage={page}"
     }
   },
   {

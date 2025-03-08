@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:watching_app_2/data/models/content_item.dart';
-import 'package:watching_app_2/data/database/local_database.dart'; // Assuming this is where your database code will be
+
+import '../../core/services/database_manager.dart';
+import '../../data/database/local_database.dart';
 
 // Favorites provider that manages favorites state
 class FavoritesProvider with ChangeNotifier {
-  // Database instance
-  final LocalDatabase _database = LocalDatabase.instance;
+  // DatabaseManager instance instead of LocalDatabase
+  final DatabaseManager _dbManager = DatabaseManager();
 
   // Cache for favorites
   final Map<String, List<ContentItem>> _favoritesByType = {};
@@ -46,7 +48,7 @@ class FavoritesProvider with ChangeNotifier {
 
   // Load all favorites from database
   Future<void> _loadAllFavorites() async {
-    _allFavorites = await _database.getAllFavorites();
+    _allFavorites = await _dbManager.getAllFavorites();
 
     // Clear and rebuild type-specific caches
     _favoritesByType.clear();
@@ -64,13 +66,7 @@ class FavoritesProvider with ChangeNotifier {
   }
 
   // Helper method to determine content type of an item
-  // This assumes we've added a contentType field to the ContentItem class
-  // or we're maintaining this information separately
   String _getContentType(ContentItem item) {
-    // If you've modified ContentItem to include a contentType field, use that
-    // Otherwise you need to implement logic to determine the type
-    // For example, based on source.type or other properties
-
     // This is just a placeholder - implement your actual logic
     if (item.source.type.contains('video')) {
       return ContentTypes.VIDEO;
@@ -95,11 +91,10 @@ class FavoritesProvider with ChangeNotifier {
     }
 
     if (!_isInitialized || _favoritesByType[contentType] == null) {
-      // Load from database if not in cache
       _setLoading(true);
       try {
         _favoritesByType[contentType] =
-            await _database.getFavoritesByType(contentType);
+            await _dbManager.getFavoritesByType(contentType);
         _countsCache[contentType] = _favoritesByType[contentType]!.length;
       } finally {
         _setLoading(false);
@@ -117,8 +112,7 @@ class FavoritesProvider with ChangeNotifier {
 
     _setLoading(true);
     try {
-      // Add to database
-      await _database.addToFavorites(item, contentType);
+      await _dbManager.addToFavorites(item, contentType);
 
       // Update caches
       if (_favoritesByType[contentType] != null) {
@@ -147,13 +141,11 @@ class FavoritesProvider with ChangeNotifier {
 
     _setLoading(true);
     try {
-      // Find the item in database and remove it
-      final bool isFavorite = await _database.isFavorite(item.contentUrl);
+      final bool isFavorite = await _dbManager.isFavorite(item.contentUrl);
       if (isFavorite) {
-        // Since we don't have the database ID here, we need to query by contentUrl
-        // This is why we might need to enhance our database with a method like:
-        // removeByContentUrl(String contentUrl)
-        await _database.removeByContentUrl(item.contentUrl);
+        // Using removeFromFavorites with ID would be ideal, but since we only have contentUrl
+        // we'll need to modify DatabaseManager to support this
+        await _dbManager.removeFromFavoritesByContentUrl(item.contentUrl);
 
         // Update caches
         if (_favoritesByType[contentType] != null) {
@@ -179,7 +171,7 @@ class FavoritesProvider with ChangeNotifier {
 
   // Toggle favorite status
   Future<void> toggleFavorite(ContentItem item, String contentType) async {
-    final bool isFavorite = await _database.isFavorite(item.contentUrl);
+    final bool isFavorite = await _dbManager.isFavorite(item.contentUrl);
     if (isFavorite) {
       await removeFromFavorites(item, contentType);
     } else {
@@ -189,7 +181,7 @@ class FavoritesProvider with ChangeNotifier {
 
   // Check if an item is favorite
   Future<bool> isFavorite(String contentUrl) async {
-    return await _database.isFavorite(contentUrl);
+    return await _dbManager.isFavorite(contentUrl);
   }
 
   // Get count by type
@@ -202,7 +194,7 @@ class FavoritesProvider with ChangeNotifier {
       return _countsCache[contentType]!;
     }
 
-    final count = await _database.getFavoritesCountByType(contentType);
+    final count = await _dbManager.getFavoritesCountByType(contentType);
     _countsCache[contentType] = count;
     return count;
   }
@@ -213,7 +205,7 @@ class FavoritesProvider with ChangeNotifier {
       return _totalCount!;
     }
 
-    _totalCount = await _database.getTotalFavoritesCount();
+    _totalCount = await _dbManager.getTotalFavoritesCount();
     return _totalCount!;
   }
 
@@ -239,17 +231,18 @@ class FavoritesProvider with ChangeNotifier {
       _setLoading(false);
     }
   }
-}
 
-// Enhanced database class with additional method needed for provider
-extension FavoritesDatabaseExtension on LocalDatabase {
-  // Add this method to your FavoritesDatabase class
-  Future<int> removeByContentUrl(String contentUrl) async {
-    final db = await database;
-    return await db.delete(
-      LocalDatabase.FAVORITES_TABLE,
-      where: '${LocalDatabase.COLUMN_CONTENT_URL} = ?',
-      whereArgs: [contentUrl],
-    );
+  // Additional methods using DatabaseManager features
+  Future<String> createBackup() async {
+    return await _dbManager.backupDatabase();
+  }
+
+  Future<void> restoreBackup(String backupPath) async {
+    await _dbManager.restoreDatabase(backupPath);
+    await refresh(); // Refresh the cache after restore
+  }
+
+  Future<void> deleteBackup(String backupPath) async {
+    await _dbManager.deleteBackup(backupPath);
   }
 }

@@ -1,5 +1,6 @@
 import 'package:watching_app_2/data/models/scraper_config.dart';
 
+import '../repository/photos/elitebabe.dart';
 import '../repository/photos/erowall/erowall.dart';
 import '../repository/photos/peakpx/peakpx.dart';
 import '../repository/photos/pmatehunter/pmatehunter.dart';
@@ -52,6 +53,7 @@ class ScraperFactory {
 
     //wallpapers
     'pmatehunter': (source) => PMateHunter(source),
+    'elitebabes': (source) => EliteBabe(source),
     'erowall': (source) => EroWall(source),
     'peakpx': (source) => PeakPx(source),
     'pxfuel': (source) => PeakPx(source),

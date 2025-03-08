@@ -7,6 +7,7 @@ import 'dart:ui';
 
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
+import 'package:watching_app_2/core/services/backup_service.dart';
 import 'package:watching_app_2/presentation/widgets/misc/text_widget.dart';
 
 import '../../provider/theme_provider.dart';
@@ -465,16 +466,22 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                   type: _SettingType.toggle,
                 ),
                 _SettingItem(
-                  title: 'Auto Backup',
-                  subtitle: 'Automatically backup your data',
+                  title: 'Backup',
+                  subtitle: 'backup your data',
                   icon: Icons.backup,
-                  value: _autoBackupEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      _autoBackupEnabled = value;
-                    });
+                  onTap: () {
+                    BackupService().createBackup();
                   },
-                  type: _SettingType.toggle,
+                  type: _SettingType.button,
+                ),
+                _SettingItem(
+                  title: 'Restore',
+                  subtitle: 'restore your data',
+                  icon: Icons.backup,
+                  onTap: () {
+                    BackupService().restoreBackup();
+                  },
+                  type: _SettingType.button,
                 ),
               ],
             ),

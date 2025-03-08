@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
@@ -15,7 +17,7 @@ class TabbedContentView extends StatefulWidget {
   final List<ContentSource> sources;
   final bool isGrid;
   final String query;
-  final Function(String sourceId)? onLoadMore;
+  final Future Function(String sourceId)? onLoadMore;
 
   const TabbedContentView({
     super.key,
@@ -36,8 +38,10 @@ class _TabbedContentViewState extends State<TabbedContentView>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<double> _slideAnimation;
-  late ScrollController _scrollController;
+  final Map<String, ScrollController> _scrollControllers = {};
   final PageController _pageController = PageController();
+  int _currentPlayingIndex = -1;
+  final Map<String, bool> _isLoading = {};
 
   @override
   void initState() {
@@ -65,14 +69,36 @@ class _TabbedContentViewState extends State<TabbedContentView>
       ),
     );
 
-    _scrollController = ScrollController();
+    for (var entry in sourcesWithContent) {
+      _scrollControllers[entry.key] = ScrollController();
+      _isLoading[entry.key] = false;
+    }
+
     _animationController.forward();
+  }
+
+  @override
+  void didUpdateWidget(TabbedContentView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.categoryResults != widget.categoryResults) {
+      final newSourcesWithContent = widget.categoryResults.entries
+          .where((entry) => entry.value.isNotEmpty)
+          .toList();
+      for (var entry in newSourcesWithContent) {
+        _scrollControllers.putIfAbsent(entry.key, () => ScrollController());
+        _isLoading.putIfAbsent(entry.key, () => false);
+      }
+      _scrollControllers
+          .removeWhere((key, _) => !widget.categoryResults.containsKey(key));
+      _isLoading
+          .removeWhere((key, _) => !widget.categoryResults.containsKey(key));
+    }
   }
 
   @override
   void dispose() {
     _animationController.dispose();
-    _scrollController.dispose();
+    _scrollControllers.forEach((_, controller) => controller.dispose());
     _pageController.dispose();
     super.dispose();
   }
@@ -108,10 +134,7 @@ class _TabbedContentViewState extends State<TabbedContentView>
       height: 100.h,
       child: Stack(
         children: [
-          // Background blur effect
           _buildBackgroundEffect(sourcesWithContent),
-
-          // Main content
           Column(
             children: [
               _buildPremiumSourceSelector(sourcesWithContent),
@@ -139,10 +162,9 @@ class _TabbedContentViewState extends State<TabbedContentView>
     final results = selectedEntry.value;
     if (results.isEmpty) return const SizedBox();
 
-    // Use first item thumbnail as blurred background
     return Positioned.fill(
       child: Opacity(
-        opacity: 0.2,
+        opacity: .4,
         child: results[0].thumbnailUrl.isNotEmpty
             ? CustomImageWidget(
                 imagePath: SMA.formatImage(
@@ -168,11 +190,8 @@ class _TabbedContentViewState extends State<TabbedContentView>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.search_off_rounded,
-              size: 60.sp,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.search_off_rounded,
+                size: 60.sp, color: Colors.grey[400]),
             SizedBox(height: 16.sp),
             TextWidget(
               text: 'No content available',
@@ -207,7 +226,7 @@ class _TabbedContentViewState extends State<TabbedContentView>
               Colors.black.withOpacity(0.1),
               Colors.black.withOpacity(1),
               Colors.black.withOpacity(1),
-              Colors.black.withOpacity(0.1),
+              Colors.black.withOpacity(0.1)
             ],
             stops: const [0.0, 0.05, 0.95, 1.0],
           ).createShader(bounds);
@@ -249,22 +268,18 @@ class _TabbedContentViewState extends State<TabbedContentView>
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     curve: Curves.easeOutQuint,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 5.sp,
-                      vertical: 5.sp,
-                    ),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 5.sp, vertical: 5.sp),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: isSelected
                             ? [
-                                // const Color(0xFF3D7FFF),
                                 AppColors.primaryColor,
-                                // const Color(0xFF6515EB),
                                 AppColors.primaryColor.withOpacity(.7)
                               ]
                             : [
                                 Colors.black.withOpacity(0.3),
-                                Colors.black.withOpacity(0.1),
+                                Colors.black.withOpacity(0.1)
                               ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -273,23 +288,20 @@ class _TabbedContentViewState extends State<TabbedContentView>
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: AppColors.primaryColor.withOpacity(.3),
-                                blurRadius: 20,
-                                spreadRadius: -2,
-                                offset: const Offset(0, 4),
-                              ),
+                                  color: AppColors.primaryColor.withOpacity(.3),
+                                  blurRadius: 20,
+                                  spreadRadius: -2,
+                                  offset: const Offset(0, 4))
                             ]
                           : [],
                       border: Border.all(
-                        color: isSelected
-                            ? Colors.white.withOpacity(0.6)
-                            : Colors.white.withOpacity(0.1),
-                        width: 1.5,
-                      ),
+                          color: isSelected
+                              ? Colors.white.withOpacity(0.6)
+                              : Colors.white.withOpacity(0.1),
+                          width: 1.5),
                     ),
                     child: Row(
                       children: [
-                        // Source icon with subtle glow for selected source
                         Stack(
                           alignment: Alignment.center,
                           children: [
@@ -301,11 +313,10 @@ class _TabbedContentViewState extends State<TabbedContentView>
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppColors.primaryColor
-                                          .withOpacity(.7),
-                                      blurRadius: 1,
-                                      spreadRadius: 1,
-                                    ),
+                                        color: AppColors.primaryColor
+                                            .withOpacity(.7),
+                                        blurRadius: 1,
+                                        spreadRadius: 1)
                                   ],
                                 ),
                               ),
@@ -318,23 +329,17 @@ class _TabbedContentViewState extends State<TabbedContentView>
                                 image: source.icon.isNotEmpty
                                     ? DecorationImage(
                                         image: NetworkImage(source.icon),
-                                        fit: BoxFit.contain,
-                                      )
+                                        fit: BoxFit.contain)
                                     : null,
                               ),
                               child: source.icon.isEmpty
-                                  ? Icon(
-                                      Icons.video_library,
-                                      color: Colors.white,
-                                      size: 14.sp,
-                                    )
+                                  ? Icon(Icons.video_library,
+                                      color: Colors.white, size: 14.sp)
                                   : null,
                             ),
                           ],
                         ),
                         SizedBox(width: 10.sp),
-
-                        // Source name and count with animated transition
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -350,9 +355,7 @@ class _TabbedContentViewState extends State<TabbedContentView>
                             SizedBox(height: 4.sp),
                             Container(
                               padding: EdgeInsets.symmetric(
-                                horizontal: 6.sp,
-                                vertical: 2.sp,
-                              ),
+                                  horizontal: 6.sp, vertical: 2.sp),
                               decoration: BoxDecoration(
                                 color: isSelected
                                     ? Colors.white.withOpacity(0.4)
@@ -405,21 +408,25 @@ class _TabbedContentViewState extends State<TabbedContentView>
         final sourceId = entry.key;
         final results = entry.value;
 
-        // Only build the selected page to improve performance
-        if (sourceId != _selectedSourceId) {
-          return const SizedBox();
-        }
+        if (sourceId != _selectedSourceId) return const SizedBox();
 
-        // _scrollController = ScrollController();
-        _scrollController.addListener(() {
-          if (widget.onLoadMore != null &&
-              results.isNotEmpty &&
-              results.length >= 10 &&
-              _scrollController.position.pixels >=
-                  _scrollController.position.maxScrollExtent - 300) {
-            widget.onLoadMore!(sourceId);
-          }
-        });
+        // Safely get or create scroll controller
+        final scrollController = _scrollControllers[sourceId] ??
+            (_scrollControllers[sourceId] = ScrollController());
+
+        if (!scrollController.hasListeners) {
+          scrollController.addListener(() {
+            if (_isLoading[sourceId] == true) return;
+
+            if (widget.onLoadMore != null &&
+                results.isNotEmpty &&
+                results.length >= 10 &&
+                scrollController.position.pixels >=
+                    scrollController.position.maxScrollExtent - 300) {
+              _loadMoreContent(sourceId);
+            }
+          });
+        }
 
         return AnimatedBuilder(
           animation: _animationController,
@@ -434,37 +441,75 @@ class _TabbedContentViewState extends State<TabbedContentView>
           },
           child: Container(
             padding: EdgeInsets.only(top: 8.sp, left: 12.sp, right: 12.sp),
-            child: VideoGridView(
-              controller: _scrollController,
-              videos: results,
-              isGrid: widget.isGrid,
-              currentPlayingIndex: -1,
-              onItemTap: (index) {
-                // Add scale animation for tap
-                final scaleController = AnimationController(
-                  duration: const Duration(milliseconds: 200),
-                  vsync: this,
-                );
-                final scaleAnimation = Tween<double>(begin: 1.0, end: 0.95)
-                    .animate(CurvedAnimation(
-                  parent: scaleController,
-                  curve: Curves.easeInOut,
-                ));
+            child: Stack(
+              children: [
+                VideoGridView(
+                  controller: scrollController,
+                  videos: results,
+                  isGrid: widget.isGrid,
+                  onItemTap: (itemIndex) {
+                    final scaleController = AnimationController(
+                        duration: const Duration(milliseconds: 200),
+                        vsync: this);
+                    final scaleAnimation =
+                        Tween<double>(begin: 1.0, end: 0.95).animate(
+                      CurvedAnimation(
+                          parent: scaleController, curve: Curves.easeInOut),
+                    );
 
-                scaleController.forward().then((_) {
-                  scaleController.reverse().then((_) {
-                    scaleController.dispose();
-                    NH.nameNavigateTo(AppRoutes.detail,
-                        arguments: {"item": results[index]});
-                  });
-                });
-              },
-              onHorizontalDragStart: (index) {},
-              onHorizontalDragEnd: (index) {},
+                    scaleController.forward().then((_) {
+                      scaleController.reverse().then((_) {
+                        scaleController.dispose();
+                        NH.nameNavigateTo(AppRoutes.detail,
+                            arguments: {"item": results[itemIndex]});
+                      });
+                    });
+                  },
+                  currentPlayingIndex: _currentPlayingIndex,
+                  onHorizontalDragStart: (index) => setState(() {
+                    _currentPlayingIndex = index;
+                  }),
+                  onHorizontalDragEnd: (index) => setState(() {
+                    _currentPlayingIndex = index;
+                  }),
+                ),
+                if (_isLoading[sourceId] == true)
+                  Positioned(
+                    bottom: 20.sp,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+              ],
             ),
           ),
         );
       },
     );
+  }
+
+  Future<void> _loadMoreContent(String sourceId) async {
+    if (_isLoading[sourceId] == true || widget.onLoadMore == null) return;
+
+    setState(() {
+      _isLoading[sourceId] = true;
+    });
+
+    log('Starting load more for source: $sourceId, current item count: ${widget.categoryResults[sourceId]?.length}');
+
+    try {
+      await widget.onLoadMore!(sourceId);
+      log('Load more completed for source: $sourceId, new item count: ${widget.categoryResults[sourceId]?.length}');
+    } catch (e) {
+      log('Load more failed for source: $sourceId, error: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading[sourceId] = false;
+        });
+      }
+    }
   }
 }

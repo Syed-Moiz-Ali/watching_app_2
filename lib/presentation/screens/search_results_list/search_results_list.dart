@@ -163,14 +163,20 @@ class _SearchResultsListState extends State<SearchResultsList>
         //             provider.errorMap[provider.currentCategory], provider)
         //         :
         categoryResults.isEmpty || totalResults == 0
-            ? _buildNoResultsView(provider)
+            ? Center(
+                child: PaginationLoadingIndicator(
+                  loadingText: 'loading ${widget.query} videos',
+                ),
+              )
             : TabbedContentView(
                 categoryResults: categoryResults,
                 sources: provider.sources,
                 isGrid: provider.isGrid,
                 query: widget.query,
                 onLoadMore: (sourceId) {
-                  provider.loadMoreContent(provider.currentCategory, sourceId);
+                  return provider.loadMoreContent(
+                      provider.currentCategory, sourceId);
+                  // return true;
                 },
               );
   }

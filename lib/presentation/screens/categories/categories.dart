@@ -2,7 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:watching_app_2/core/navigation/app_navigator.dart';
+import 'package:watching_app_2/core/navigation/routes.dart';
 
 import 'package:watching_app_2/core/services/source_manager.dart';
 import 'package:watching_app_2/presentation/widgets/appbars/app_bar.dart';
@@ -11,6 +14,7 @@ import 'package:watching_app_2/presentation/widgets/misc/padding.dart';
 import 'package:watching_app_2/presentation/widgets/misc/text_widget.dart';
 
 import '../../../data/models/category_model.dart';
+import '../../provider/search_provider.dart';
 
 class Categories extends StatefulWidget {
   const Categories({super.key});
@@ -99,79 +103,76 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        extendBodyBehindAppBar: true,
-        appBar: CustomAppBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          title: 'Explore',
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.search, size: 26),
-              onPressed: () {
-                HapticFeedback.lightImpact();
-                // Search functionality
-              },
-            ),
-            _buildPremiumBadge(),
-            const SizedBox(width: 12),
-          ],
-        ),
-        body: Stack(
-          children: [
-            // Enhanced animated background
-            _buildAnimatedBackground(),
+    return Scaffold(
+      // backgroundColor: Colors.black,
+      extendBodyBehindAppBar: true,
+      appBar: CustomAppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        title: 'Explore',
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search, size: 26),
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              // Search functionality
+            },
+          ),
+          _buildPremiumBadge(),
+          const SizedBox(width: 12),
+        ],
+      ),
+      body: Stack(
+        children: [
+          // Enhanced animated background
+          _buildAnimatedBackground(),
 
-            // Elegant overlay gradient
-            _buildOverlayGradient(),
+          // Elegant overlay gradient
+          _buildOverlayGradient(),
 
-            // Main content
-            SafeArea(
-              child: _isLoading
-                  ? _buildShimmerLoading()
-                  : CustomPadding(
-                      horizontalFactor: .04,
-                      topFactor: .02,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Premium section title
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 16, left: 4),
-                            child: TextWidget(
-                              text: 'Premium Collections',
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
+          // Main content
+          SafeArea(
+            child: _isLoading
+                ? _buildShimmerLoading()
+                : CustomPadding(
+                    horizontalFactor: .04,
+                    topFactor: .02,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Premium section title
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16, left: 4),
+                          child: TextWidget(
+                            text: 'Premium Collections',
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
                           ),
+                        ),
 
-                          // Enhanced grid view
-                          Expanded(
-                            child: GridView.builder(
-                              physics: const BouncingScrollPhysics(),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 16,
-                                mainAxisSpacing: 16,
-                                childAspectRatio: 0.85,
-                              ),
-                              itemCount: _categories.length,
-                              itemBuilder: (context, index) {
-                                return _buildAnimatedCategoryCard(index);
-                              },
+                        // Enhanced grid view
+                        Expanded(
+                          child: GridView.builder(
+                            physics: const BouncingScrollPhysics(),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                              childAspectRatio: 0.85,
                             ),
+                            itemCount: _categories.length,
+                            itemBuilder: (context, index) {
+                              return _buildAnimatedCategoryCard(index);
+                            },
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-            ),
-          ],
-        ),
+                  ),
+          ),
+        ],
       ),
     );
   }
@@ -201,14 +202,11 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
           Icon(Icons.verified_user,
               size: 16, color: Colors.white.withOpacity(0.9)),
           const SizedBox(width: 8),
-          const Text(
-            'PREMIUM',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-              letterSpacing: 0.5,
-            ),
+          TextWidget(
+            text: 'PREMIUM',
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 12.sp,
           ),
         ],
       ),
@@ -468,14 +466,11 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
                                 color: Colors.red[700],
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Text(
-                                'PREMIUM',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.5,
-                                ),
+                              child: TextWidget(
+                                text: 'PREMIUM',
+                                color: Colors.white,
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
@@ -502,14 +497,11 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
                           opacity: _hoverControllers[index].value,
                           child: Padding(
                             padding: const EdgeInsets.only(bottom: 8),
-                            child: Text(
-                              'Exclusive Content',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 0.5,
-                              ),
+                            child: TextWidget(
+                              text: 'Exclusive Content',
+                              color: Colors.white.withOpacity(0.8),
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         );
@@ -533,12 +525,10 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
                           size: 14,
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          '${(index + 1) * 1250}+ views',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.7),
-                            fontSize: 12,
-                          ),
+                        TextWidget(
+                          text: '${(index + 1) * 1250}+ views',
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 12.sp,
                         ),
                       ],
                     ),
@@ -730,25 +720,11 @@ class _EnhancedCategoryDetailScreenState
                     tag: 'category_${widget.category.id}',
                     child: SizedBox(
                       height: MediaQuery.of(context).size.height * 0.6,
-                      child: ShaderMask(
-                        shaderCallback: (rect) {
-                          return const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black,
-                              Colors.transparent,
-                            ],
-                            stops: [0.0, 0.1],
-                          ).createShader(rect);
-                        },
-                        blendMode: BlendMode.dstIn,
-                        child: CustomImageWidget(
-                          imagePath: widget.category.image,
-                          fit: BoxFit.cover,
-                          height: MediaQuery.of(context).size.height * 0.6,
-                          width: double.infinity,
-                        ),
+                      child: CustomImageWidget(
+                        imagePath: widget.category.image,
+                        fit: BoxFit.cover,
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        width: double.infinity,
                       ),
                     ),
                   ),
@@ -835,14 +811,11 @@ class _EnhancedCategoryDetailScreenState
                                     ),
                                     borderRadius: BorderRadius.circular(16),
                                   ),
-                                  child: const Text(
-                                    'EXCLUSIVE PREMIUM',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                      letterSpacing: 0.5,
-                                    ),
+                                  child: TextWidget(
+                                    text: 'EXCLUSIVE PREMIUM',
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12.sp,
                                   ),
                                 ),
                               ),
@@ -857,20 +830,11 @@ class _EnhancedCategoryDetailScreenState
                               ).animate(titleAnimation),
                               child: FadeTransition(
                                 opacity: titleAnimation,
-                                child: Text(
-                                  widget.category.title,
-                                  style: TextStyle(
-                                    fontSize: 34,
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.white,
-                                    letterSpacing: 0.5,
-                                    shadows: [
-                                      Shadow(
-                                        color: Colors.black.withOpacity(0.5),
-                                        blurRadius: 10,
-                                      )
-                                    ],
-                                  ),
+                                child: TextWidget(
+                                  text: widget.category.title,
+                                  fontSize: 26.sp,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
@@ -945,209 +909,206 @@ class _EnhancedCategoryDetailScreenState
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // About section
-                              const Text(
-                                'About This Collection',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
+                              TextWidget(
+                                text: 'About This Collection',
+                                fontSize: 20.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
                               const SizedBox(height: 16),
-                              Text(
-                                'Experience our exclusive premium collection featuring the best ${widget.category.title.toLowerCase()} content. Updated daily with carefully curated material for our premium members.',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white.withOpacity(0.8),
-                                  height: 1.5,
-                                ),
+                              TextWidget(
+                                text:
+                                    'Experience our exclusive premium collection featuring the best ${widget.category.title.toLowerCase()} content. Updated daily with carefully curated material for our premium members.',
+                                fontSize: 16.sp,
+                                maxLine: 10,
+                                color: Colors.white.withOpacity(0.8),
                               ),
                               const SizedBox(height: 30),
 
-                              // Featured section
-                              const Text(
-                                'Featured Content',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
+                              // // Featured section
+                              //  TextWidget(text:
+                              //   'Featured Content',
 
-                              // Featured items grid
-                              SizedBox(
-                                height: 200,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  physics: const BouncingScrollPhysics(),
-                                  itemCount: 4,
-                                  itemBuilder: (context, index) {
-                                    return Container(
-                                      width: 160,
-                                      margin: const EdgeInsets.only(right: 16),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16),
-                                        image: DecorationImage(
-                                          image: NetworkImage(
-                                            'https://picsum.photos/200/300?random=$index',
-                                          ),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                          gradient: LinearGradient(
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter,
-                                            colors: [
-                                              Colors.transparent,
-                                              Colors.black.withOpacity(0.8),
-                                            ],
-                                          ),
-                                        ),
-                                        padding: const EdgeInsets.all(12),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Item ${index + 1}',
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              'Premium content',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.white
-                                                    .withOpacity(0.7),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
+                              //     fontSize: 20.sp,
+                              //     fontWeight: FontWeight.bold,
+                              //     color: Colors.white,
+
+                              // ),
+                              // const SizedBox(height: 16),
+
+                              // // Featured items grid
+                              // SizedBox(
+                              //   height: 200,
+                              //   child: ListView.builder(
+                              //     scrollDirection: Axis.horizontal,
+                              //     physics: const BouncingScrollPhysics(),
+                              //     itemCount: 4,
+                              //     itemBuilder: (context, index) {
+                              //       return Container(
+                              //         width: 160,
+                              //         margin: const EdgeInsets.only(right: 16),
+                              //         decoration: BoxDecoration(
+                              //           borderRadius: BorderRadius.circular(16),
+                              //           image: DecorationImage(
+                              //             image: NetworkImage(
+                              //               'https://picsum.photos/200/300?random=$index',
+                              //             ),
+                              //             fit: BoxFit.cover,
+                              //           ),
+                              //         ),
+                              //         child: Container(
+                              //           decoration: BoxDecoration(
+                              //             borderRadius:
+                              //                 BorderRadius.circular(16),
+                              //             gradient: LinearGradient(
+                              //               begin: Alignment.topCenter,
+                              //               end: Alignment.bottomCenter,
+                              //               colors: [
+                              //                 Colors.transparent,
+                              //                 Colors.black.withOpacity(0.8),
+                              //               ],
+                              //             ),
+                              //           ),
+                              //           padding: const EdgeInsets.all(12),
+                              //           child: Column(
+                              //             mainAxisAlignment:
+                              //                 MainAxisAlignment.end,
+                              //             crossAxisAlignment:
+                              //                 CrossAxisAlignment.start,
+                              //             children: [
+                              //               TextWidget(text:
+                              //                 'Item ${index + 1}',
+                              //                 style: const TextStyle(
+                              //                   fontSize: 16,
+                              //                   fontWeight: FontWeight.bold,
+                              //                   color: Colors.white,
+                              //                 ),
+                              //               ),
+                              //               const SizedBox(height: 4),
+                              //               TextWidget(text:
+                              //                 'Premium content',
+                              //                 style: TextStyle(
+                              //                   fontSize: 12,
+                              //                   color: Colors.white
+                              //                       .withOpacity(0.7),
+                              //                 ),
+                              //               ),
+                              //             ],
+                              //           ),
+                              //         ),
+                              //       );
+                              //     },
+                              //   ),
+                              // ),
                               const SizedBox(height: 30),
 
                               // Reviews section
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(
-                                    'User Reviews',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {},
-                                    child: const Text(
-                                      'See All',
-                                      style: TextStyle(
-                                        color: Colors.blue,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
+                              // Row(
+                              //   mainAxisAlignment:
+                              //       MainAxisAlignment.spaceBetween,
+                              //   children: [
+                              //      TextWidget(text:
+                              //       'User Reviews',
 
-                              // Review items
-                              _buildReviewItem(
-                                'Emily Johnson',
-                                'https://picsum.photos/200/300?random=10',
-                                'Absolutely love this premium content! Worth every penny of my subscription.',
-                                4.8,
-                              ),
-                              const SizedBox(height: 16),
-                              _buildReviewItem(
-                                'Michael Smith',
-                                'https://picsum.photos/200/300?random=11',
-                                'High quality content that keeps me coming back. Daily updates are fantastic.',
-                                4.5,
-                              ),
+                              //         fontSize: 20.sp,
+                              //         fontWeight: FontWeight.bold,
+                              //         color: Colors.white,
 
-                              const SizedBox(height: 50),
+                              //     ),
+                              //     TextButton(
+                              //       onPressed: () {},
+                              //       child: const TextWidget(text:
+                              //         'See All',
+                              //         style: TextStyle(
+                              //           color: Colors.blue,
+                              //         ),
+                              //       ),
+                              //     ),
+                              //   ],
+                              // ),
+                              // const SizedBox(height: 16),
 
-                              // Related categories
-                              const Text(
-                                'You May Also Like',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
+                              // // Review items
+                              // _buildReviewItem(
+                              //   'Emily Johnson',
+                              //   'https://picsum.photos/200/300?random=10',
+                              //   'Absolutely love this premium content! Worth every penny of my subscription.',
+                              //   4.8,
+                              // ),
+                              // const SizedBox(height: 16),
+                              // _buildReviewItem(
+                              //   'Michael Smith',
+                              //   'https://picsum.photos/200/300?random=11',
+                              //   'High quality content that keeps me coming back. Daily updates are fantastic.',
+                              //   4.5,
+                              // ),
 
-                              // Related categories grid
-                              GridView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  childAspectRatio: 1.5,
-                                  crossAxisSpacing: 16,
-                                  mainAxisSpacing: 16,
-                                ),
-                                itemCount: 4,
-                                itemBuilder: (context, index) {
-                                  return Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(16),
-                                      image: DecorationImage(
-                                        image: NetworkImage(
-                                          'https://picsum.photos/200/300?random=${20 + index}',
-                                        ),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16),
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            Colors.transparent,
-                                            Colors.black.withOpacity(0.7),
-                                          ],
-                                        ),
-                                      ),
-                                      padding: const EdgeInsets.all(12),
-                                      child: Align(
-                                        alignment: Alignment.bottomLeft,
-                                        child: Text(
-                                          'Related ${index + 1}',
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
+                              // const SizedBox(height: 50),
 
-                              const SizedBox(height: 50),
+                              // // Related categories
+                              // const TextWidget(text:
+                              //   'You May Also Like',
+                              //   style: TextStyle(
+                              //     fontSize: 20,
+                              //     fontWeight: FontWeight.bold,
+                              //     color: Colors.white,
+                              //   ),
+                              // ),
+                              // const SizedBox(height: 16),
+
+                              // // Related categories grid
+                              // GridView.builder(
+                              //   shrinkWrap: true,
+                              //   physics: const NeverScrollableScrollPhysics(),
+                              //   gridDelegate:
+                              //       const SliverGridDelegateWithFixedCrossAxisCount(
+                              //     crossAxisCount: 2,
+                              //     childAspectRatio: 1.5,
+                              //     crossAxisSpacing: 16,
+                              //     mainAxisSpacing: 16,
+                              //   ),
+                              //   itemCount: 4,
+                              //   itemBuilder: (context, index) {
+                              //     return Container(
+                              //       decoration: BoxDecoration(
+                              //         borderRadius: BorderRadius.circular(16),
+                              //         image: DecorationImage(
+                              //           image: NetworkImage(
+                              //             'https://picsum.photos/200/300?random=${20 + index}',
+                              //           ),
+                              //           fit: BoxFit.cover,
+                              //         ),
+                              //       ),
+                              //       child: Container(
+                              //         decoration: BoxDecoration(
+                              //           borderRadius: BorderRadius.circular(16),
+                              //           gradient: LinearGradient(
+                              //             begin: Alignment.topCenter,
+                              //             end: Alignment.bottomCenter,
+                              //             colors: [
+                              //               Colors.transparent,
+                              //               Colors.black.withOpacity(0.7),
+                              //             ],
+                              //           ),
+                              //         ),
+                              //         padding: const EdgeInsets.all(12),
+                              //         child: Align(
+                              //           alignment: Alignment.bottomLeft,
+                              //           child: TextWidget(text:
+                              //             'Related ${index + 1}',
+                              //             style: const TextStyle(
+                              //               fontSize: 16,
+                              //               fontWeight: FontWeight.bold,
+                              //               color: Colors.white,
+                              //             ),
+                              //           ),
+                              //         ),
+                              //       ),
+                              //     );
+                              //   },
+                              // ),
+
+                              // const SizedBox(height: 50),
                             ],
                           ),
                         ),
@@ -1173,12 +1134,10 @@ class _EnhancedCategoryDetailScreenState
           color: Colors.white.withOpacity(0.7),
         ),
         const SizedBox(width: 4),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.white.withOpacity(0.7),
-          ),
+        TextWidget(
+          text: text,
+          fontSize: 14.sp,
+          color: Colors.white.withOpacity(0.7),
         ),
       ],
     );
@@ -1189,6 +1148,9 @@ class _EnhancedCategoryDetailScreenState
     return ElevatedButton(
       onPressed: () {
         HapticFeedback.mediumImpact();
+        context.read<SearchProvider>().setAllCategoryResults({});
+        NH.nameNavigateTo(AppRoutes.searchResult,
+            arguments: {"query": widget.category.title.toLowerCase()});
         // Action functionality
       },
       style: ElevatedButton.styleFrom(
@@ -1216,13 +1178,10 @@ class _EnhancedCategoryDetailScreenState
             children: [
               Icon(icon, color: Colors.white),
               const SizedBox(width: 8),
-              Text(
-                text,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+              TextWidget(
+                text: text,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
             ],
           ),
@@ -1272,13 +1231,10 @@ class _EnhancedCategoryDetailScreenState
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                  TextWidget(
+                    text: name,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                   const SizedBox(height: 4),
                   Row(
@@ -1293,12 +1249,10 @@ class _EnhancedCategoryDetailScreenState
                         );
                       }),
                       const SizedBox(width: 4),
-                      Text(
-                        rating.toString(),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white.withOpacity(0.7),
-                        ),
+                      TextWidget(
+                        text: rating.toString(),
+                        fontSize: 12.sp,
+                        color: Colors.white.withOpacity(0.7),
                       ),
                     ],
                   ),
@@ -1307,13 +1261,10 @@ class _EnhancedCategoryDetailScreenState
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            comment,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white.withOpacity(0.8),
-              height: 1.4,
-            ),
+          TextWidget(
+            text: comment,
+            fontSize: 14.sp,
+            color: Colors.white.withOpacity(0.8),
           ),
         ],
       ),

@@ -1,5 +1,8 @@
 // ignore_for_file: constant_identifier_names
 
+import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'dart:convert';
@@ -200,6 +203,22 @@ class LocalDatabase {
     );
   }
 
+  Future<bool> removeFromFavoritesByContentUrl(String contentUrl) async {
+    try {
+      final db = await database;
+      final rowsAffected = await db.delete(
+        LocalDatabase.FAVORITES_TABLE,
+        where: '${LocalDatabase.COLUMN_CONTENT_URL} = ?',
+        whereArgs: [contentUrl],
+      );
+      final success = rowsAffected > 0;
+      print('Remove by content URL ${success ? 'succeeded' : 'failed'}');
+      return success;
+    } catch (e) {
+      throw Exception('Failed to remove by content URL: $e');
+    }
+  }
+
   // Check if an item is in favorites
   Future<bool> isFavorite(String contentUrl) async {
     final db = await database;
@@ -352,5 +371,82 @@ class LocalDatabase {
   Future close() async {
     final db = await database;
     db.close();
+  }
+
+  Future<String> createBackup() async {
+    try {
+      final db = await database;
+
+      // Get the application documents directory
+      final directory = await getDownloadsDirectory();
+
+      // Create a backup directory if it doesn't exist
+      final backupDir = Directory('${directory!.path}/backups');
+      if (!await backupDir.exists()) {
+        await backupDir.create(recursive: true);
+      }
+
+      // Generate backup filename with timestamp
+      final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
+      final backupPath = '${backupDir.path}/favorites_backup_$timestamp.db';
+
+      // Get current database path
+      final dbPath = db.path;
+
+      // Copy the database file to backup location
+      final dbFile = File(dbPath);
+      await dbFile.copy(backupPath);
+
+      return backupPath;
+    } catch (e) {
+      throw Exception('Failed to create backup: $e');
+    }
+  }
+
+  // Restore database from a backup file
+  Future<void> restoreBackup(String backupPath) async {
+    try {
+      final db = await database;
+
+      // Close the current database
+      await db.close();
+      _database = null; // Reset the database instance
+
+      // Get current database path
+      final currentDbPath = await getDatabasesPath();
+      final dbPath = join(currentDbPath, 'favorites.db');
+
+      // Copy backup file to current database location
+      final backupFile = File(backupPath);
+      if (!await backupFile.exists()) {
+        throw Exception('Backup file not found');
+      }
+
+      // Delete existing database file if it exists
+      final currentDbFile = File(dbPath);
+      if (await currentDbFile.exists()) {
+        await currentDbFile.delete();
+      }
+
+      // Restore by copying backup to original location
+      await backupFile.copy(dbPath);
+
+      // Reinitialize the database
+      _database = await _initDB('favorites.db');
+    } catch (e) {
+      throw Exception('Failed to restore backup: $e');
+    }
+  }
+
+  // Delete a specific backup
+  Future<void> deleteBackup(String backupPath) async {
+    try {
+      final backupFile = File(backupPath);
+      if (await backupFile.exists()) {
+        await backupFile.delete();
+      }
+    } catch (e) {
+      throw Exception('Failed to delete backup: $e');
+    }
   }
 }

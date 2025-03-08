@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import '../../../data/models/content_item.dart';
 import '../../../data/models/content_source.dart';
@@ -6,14 +8,14 @@ import '../../../core/services/source_manager.dart';
 
 class SearchProvider with ChangeNotifier {
   Map<String, Map<String, List<ContentItem>>> _allCategoryResults = {};
-  List<String> _categories = ["videos", "movies", "tv_shows", "anime"];
-  Map<String, int> _currentPageMap = {};
-  Map<String, String?> _errorMap = {};
-  Map<String, bool> _hasMoreDataMap = {};
+  final List<String> _categories = ["videos", "movies", "tv_shows", "anime"];
+  final Map<String, int> _currentPageMap = {};
+  final Map<String, String?> _errorMap = {};
+  final Map<String, bool> _hasMoreDataMap = {};
   bool _isGrid = false;
   bool _isLoading = false;
-  Map<String, bool> _isLoadingMoreMap = {};
-  Map<String, ScraperService> _scraperServices = {};
+  final Map<String, bool> _isLoadingMoreMap = {};
+  final Map<String, ScraperService> _scraperServices = {};
   final SourceManager _sourceManager = SourceManager();
   List<ContentSource> _sources = [];
   int _activeSourceIndex = 0;
@@ -81,7 +83,6 @@ class SearchProvider with ChangeNotifier {
         await _searchVideosFromSource(activeSources[i], category);
       }
 
-      _isLoading = false;
       notifyListeners();
     } catch (e) {
       _isLoading = false;
@@ -125,13 +126,14 @@ class SearchProvider with ChangeNotifier {
   }
 
   Future<void> loadMoreContent(String category, String sourceId) async {
-    if (_isLoadingMoreMap["${category}_$sourceId"] == true) return;
+    // if (_isLoadingMoreMap["${category}_$sourceId"] == true) return;
 
     final sourceKey = "${category}_$sourceId";
-    if (!_hasMoreDataMap[sourceKey]!) return;
+    log("sourceKey is $sourceKey");
+    // if (!_hasMoreDataMap[sourceKey]!) return;
 
-    _isLoadingMoreMap[sourceKey] = true;
-    notifyListeners();
+    // _isLoadingMoreMap[sourceKey] = true;
+    // notifyListeners();
 
     try {
       final source = _sources.firstWhere((s) => s.searchUrl == sourceId);
@@ -146,14 +148,14 @@ class SearchProvider with ChangeNotifier {
         }).toList();
 
         _allCategoryResults[category]![sourceId]!.addAll(filteredVideos);
-        _currentPageMap[sourceKey] = nextPage;
+        // _currentPageMap[sourceKey] = nextPage;
       } else {
-        _hasMoreDataMap[sourceKey] = false;
+        // _hasMoreDataMap[sourceKey] = false;
       }
     } catch (e) {
       _errorMap[sourceKey] = 'Failed to load more content: $e';
     } finally {
-      _isLoadingMoreMap[sourceKey] = false;
+      // _isLoadingMoreMap[sourceKey] = false;
       notifyListeners();
     }
   }
