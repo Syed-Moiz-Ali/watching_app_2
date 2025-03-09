@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import '../../../models/content_source.dart';
 import '../../../models/scraper_config.dart';
@@ -38,22 +39,19 @@ class SxyPrn extends BaseScraper {
               attribute: 'src',
             ),
             watchingLinkSelector: ElementSelector(
-              customExtraction: (element) {
-                var scripts = element
-                    .querySelectorAll('script[type="application/ld+json"]');
-                var scriptContainingEmbedUrl = scripts.firstWhere(
-                  (element) => element.text.contains('embedUrl'),
-                );
-
-                var jsonString1 = scriptContainingEmbedUrl.text;
-                var jsonData = json.decode(jsonString1);
-
-                Map watchingLink = {};
-                Map params = {'auto': jsonData['contentUrl']};
-                watchingLink.addEntries(params.entries);
-                return Future.value(json.encode(watchingLink));
-              },
-            ),
+                customExtraction: (element) {
+                  Map watchingLink = {};
+                  var scripts = element
+                      .querySelectorAll('#vid_container_id')
+                      .first
+                      .outerHtml;
+                  log('scripts is $scripts');
+                  // watchingLink.addEntries(params.entries);
+                  return Future.value(json.encode(watchingLink));
+                },
+                // selector:
+                //     '#vid_container_id > .yps_player_wrap_wrap > .yps_player_wrap > video',
+                attribute: 'src'),
             keywordsSelector: ElementSelector(
               selector: 'meta[name="keywords"]',
               attribute: 'content',
@@ -62,7 +60,7 @@ class SxyPrn extends BaseScraper {
               selector: '.user_uploads > .video-list > .video-item',
             ),
             videoSelector: ElementSelector(
-              selector: 'main',
+              selector: '#wrapper_div',
             ),
             contentSelector: ElementSelector(
               selector: '#content_div > .main_content > div > .post_el_small',

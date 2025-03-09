@@ -20,6 +20,7 @@ class ContentItem {
   final String user;
   final String likes;
   final String comments;
+  final DateTime addedAt;
 
   ContentItem({
     required this.title,
@@ -41,6 +42,7 @@ class ContentItem {
     this.discription = '',
     this.chapterId = '',
     this.chapterImages = '',
+    required this.addedAt,
   });
 
   // **Implementing `copyWith` method**
@@ -85,6 +87,7 @@ class ContentItem {
       user: user ?? this.user,
       likes: likes ?? this.likes,
       comments: comments ?? this.comments,
+      addedAt: addedAt,
     );
   }
 }

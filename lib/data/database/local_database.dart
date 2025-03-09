@@ -288,6 +288,7 @@ class LocalDatabase {
         views: favorite[COLUMN_VIEWS] as String,
         source: source,
         scrapedAt: DateTime.parse(favorite[COLUMN_SCRAPED_AT] as String),
+        addedAt: DateTime.parse(favorite[COLUMN_ADDED_AT] as String),
       );
     }).toList());
   }
@@ -340,6 +341,7 @@ class LocalDatabase {
         views: favorite[COLUMN_VIEWS] as String,
         source: source,
         scrapedAt: DateTime.parse(favorite[COLUMN_SCRAPED_AT] as String),
+        addedAt: DateTime.parse(favorite[COLUMN_ADDED_AT] as String),
       );
     }).toList());
   }

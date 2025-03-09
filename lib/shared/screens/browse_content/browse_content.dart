@@ -37,21 +37,7 @@ class _BrowseContentState extends State<BrowseContent>
   void initState() {
     super.initState();
 
-    // Initialize particles with more variety
-    final random = Random();
-    particles = List.generate(
-      50, // Number of particles
-      (index) => ParticleModel(
-        x: random.nextDouble(),
-        y: random.nextDouble(),
-        radius: 1.0 + random.nextDouble() * 2.0,
-        opacity: 0.1 + random.nextDouble() * 0.4,
-        speed: 0.2 + random.nextDouble() * 0.8,
-        directionX: random.nextDouble() * 2 - 1, // Random between -1 and 1
-        directionY: random.nextDouble() * 2 - 1, // Random between -1 and 1
-        id: index,
-      ),
-    );
+    particles = generateParticles(100);
 
     // Initialize content cards
 
@@ -88,6 +74,37 @@ class _BrowseContentState extends State<BrowseContent>
     });
   }
 
+  List<ParticleModel> generateParticles(int count) {
+    final Random random = Random();
+    final List<ParticleModel> particles = [];
+
+    for (int i = 0; i < count; i++) {
+      // Generate a random light color for each particle
+      final Color color = HSLColor.fromAHSL(
+        1.0,
+        random.nextDouble() * 360, // Random hue
+        0.7 + random.nextDouble() * 0.3, // High saturation
+        0.7 + random.nextDouble() * 0.2, // High lightness
+      ).toColor();
+
+      particles.add(
+        ParticleModel(
+          x: random.nextDouble(),
+          y: random.nextDouble(),
+          radius: 1.5 + random.nextDouble() * 3.5, // Random size between 1.5-5
+          speed: 0.2 + random.nextDouble() * 0.8, // Random speed
+          directionX: -1 + random.nextDouble() * 2, // Random direction X
+          directionY: -1 + random.nextDouble() * 2, // Random direction Y
+          opacity: 0.4 + random.nextDouble() * 0.5, // Semi-transparent
+          id: i,
+          color: color, // Assign the random light color
+        ),
+      );
+    }
+
+    return particles;
+  }
+
   @override
   void dispose() {
     _backgroundAnimController.dispose();
@@ -110,9 +127,9 @@ class _BrowseContentState extends State<BrowseContent>
           child: CustomPaint(
             size: Size.infinite,
             painter: ParticlePainter(
-                particles: particles,
-                animation: _particleController,
-                color: AppColors.backgroundColorDark),
+              particles: particles,
+              animation: _particleController,
+            ),
           ),
         );
       },
@@ -140,8 +157,8 @@ class _BrowseContentState extends State<BrowseContent>
               physics: const BouncingScrollPhysics(),
               child: Center(
                 child: AnimatedSearchBar(
-                  primaryColor: AppColors.primaryColor,
-                  backgroundColor: AppColors.backgroundColorDark,
+                  primaryColor: AppColors.greyColor,
+                  backgroundColor: AppColors.transparent,
                   hintText: 'Search for anything...',
                   onSearch: (value) {
                     if (value.isNotEmpty) {
@@ -191,40 +208,56 @@ class ParticleModel {
   double x;
   double y;
   double radius;
-  double opacity;
   double speed;
-  double directionX; // Random value between -1.0 and 1.0
-  double directionY; // Random value between -1.0 and 1.0
-  int id; // Unique identifier for each particle
+  double directionX;
+  double directionY;
+  double opacity;
+  int id;
+  Color color; // Add color property to each particle
 
   ParticleModel({
     required this.x,
     required this.y,
     required this.radius,
-    required this.opacity,
     required this.speed,
     required this.directionX,
     required this.directionY,
+    required this.opacity,
     required this.id,
+    required this.color, // Store individual color
   });
 }
 
 class ParticlePainter extends CustomPainter {
   final List<ParticleModel> particles;
   final Animation<double> animation;
-  Color color;
+  final Random random = Random();
 
-  ParticlePainter(
-      {required this.particles, required this.animation, required this.color})
-      : super(repaint: animation);
+  // Base color is now optional since each particle has its own color
+  ParticlePainter({
+    required this.particles,
+    required this.animation,
+  }) : super(repaint: animation);
+
+  // Helper method to generate a random light color
+  Color generateRandomLightColor() {
+    // Create light colors by using high brightness/lightness values
+    return HSLColor.fromAHSL(
+      1.0,
+      random.nextDouble() * 360, // Random hue (0-360)
+      0.7 + random.nextDouble() * 0.3, // High saturation (0.7-1.0)
+      0.7 + random.nextDouble() * 0.2, // High lightness (0.7-0.9)
+    ).toColor();
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
     for (var particle in particles) {
-      final paint = Paint()..color = color.withOpacity(particle.opacity);
+      // Use the particle's own color with its opacity
+      final paint = Paint()
+        ..color = particle.color.withOpacity(particle.opacity);
 
       // Move particles in random directions with slower speed
-      // Use the particle's direction vector for movement
       particle.x =
           (particle.x + particle.directionX * particle.speed * 0.005) % 1.0;
       particle.y =
@@ -235,7 +268,6 @@ class ParticlePainter extends CustomPainter {
       if (particle.y < 0) particle.y = 1.0;
 
       // Add very subtle variation to direction over time for natural movement
-      // This creates gentle wandering without changing direction too suddenly
       particle.directionX +=
           (sin(animation.value * pi + particle.id * 0.5) * 0.001);
       particle.directionY +=
@@ -249,11 +281,21 @@ class ParticlePainter extends CustomPainter {
         particle.directionY /= magnitude;
       }
 
+      // Very subtle size pulsing effect based on animation value
+      final pulseFactor =
+          1.0 + sin(animation.value * 2 * pi + particle.id) * 0.1;
+
       canvas.drawCircle(
         Offset(particle.x * size.width, particle.y * size.height),
-        particle.radius,
+        particle.radius * pulseFactor,
         paint,
       );
+
+      // Occasionally change particle color with a small probability for gentle color shifting
+      if (random.nextDouble() < 0.001) {
+        // 0.1% chance per frame
+        particle.color = generateRandomLightColor();
+      }
     }
   }
 

@@ -27,6 +27,8 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
   late AnimationController _backgroundController;
   late AnimationController _cardsController;
   List<CategoryModel> _categories = [];
+  List<CategoryModel> _filteredCategories = []; // Filtered list
+
   final List<AnimationController> _hoverControllers = [];
   bool _isLoading = true;
   late AnimationController _shimmerController;
@@ -87,6 +89,9 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
     if (mounted) {
       setState(() {
         _categories = loadedCategories;
+        _filteredCategories =
+            List.from(loadedCategories); // Initially show all categories
+
         _isLoading = false;
       });
 
@@ -98,6 +103,23 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
         ));
       }
     }
+  }
+
+  void _filterCategories(String query) {
+    // String query = .text.toLowerCase();
+
+    setState(() {
+      if (query.isEmpty) {
+        _filteredCategories =
+            List.from(_categories); // ✅ Show all data when query is empty
+      } else {
+        _filteredCategories = _categories
+            .where((category) => category.title
+                .toLowerCase()
+                .contains(query)) // Case-insensitive search
+            .toList();
+      }
+    });
   }
 
   // Premium badge widget
@@ -292,7 +314,7 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
         child: AnimatedBuilder(
           animation: _hoverControllers[index],
           builder: (context, child) {
-            var category = _categories[index];
+            var category = _filteredCategories[index];
             // Enhanced hover effect with subtle lift and glow
             return Transform.scale(
               scale: 1.0 + (0.05 * _hoverControllers[index].value),
@@ -495,7 +517,7 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
         transitionDuration: const Duration(milliseconds: 800),
         pageBuilder: (context, animation, secondaryAnimation) {
           return EnhancedCategoryDetailScreen(
-            category: _categories[index],
+            category: _filteredCategories[index],
           );
         },
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -548,16 +570,21 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
         elevation: 0,
         // backgroundColor: Colors.transparent,
         title: 'Explore',
+        isShowSearchbar: true,
+        onChanged: (value) {
+          _filterCategories(value);
+          // searchVideos(value);
+        },
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search, size: 26),
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              // Search functionality
-            },
-          ),
-          _buildPremiumBadge(),
-          const SizedBox(width: 12),
+          // IconButton(
+          //   icon: const Icon(Icons.search, size: 26),
+          //   onPressed: () {
+          //     HapticFeedback.lightImpact();
+          //     // Search functionality
+          //   },
+          // ),
+          // const SizedBox(width: 12),
+          // _buildPremiumBadge(),
         ],
       ),
       body: Stack(
@@ -600,7 +627,7 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
                               mainAxisSpacing: 16,
                               childAspectRatio: 0.85,
                             ),
-                            itemCount: _categories.length,
+                            itemCount: _filteredCategories.length,
                             itemBuilder: (context, index) {
                               return _buildAnimatedCategoryCard(index);
                             },

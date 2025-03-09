@@ -1,17 +1,15 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:watching_app_2/core/global/globals.dart';
 
 import '../../presentation/provider/favorites_provider.dart';
-import 'package:path_provider/path_provider.dart'; // For accessing directories like Downloads
+// For accessing directories like Downloads
 
 class BackupService {
-  static const _storage = FlutterSecureStorage();
-
   BackupService();
 
   Future<void> createBackup() async {
@@ -85,8 +83,9 @@ class BackupService {
             .then((v) => v!.path), // Default to Downloads folder
       );
 
-      if (result == null || result.files.isEmpty)
+      if (result == null || result.files.isEmpty) {
         return; // Exit if no file is selected
+      }
 
       String backupPath = result.files.single.path!;
 
@@ -148,7 +147,9 @@ class BackupService {
         }
       }
     } catch (e) {
-      print('Error accessing Downloads directory: $e');
+      if (kDebugMode) {
+        print('Error accessing Downloads directory: $e');
+      }
     }
     return null; // Return null if Downloads directory cannot be accessed
   }

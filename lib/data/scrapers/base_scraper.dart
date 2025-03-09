@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
@@ -222,6 +220,7 @@ abstract class BaseScraper {
       views: await getAttributeValue(element: element, config.viewsSelector) ??
           'Unknown',
       scrapedAt: DateTime.now(),
+      addedAt: DateTime.now(),
       source: source,
       genre:
           await getAttributeValue(element: element, config.genreSelector) ?? '',

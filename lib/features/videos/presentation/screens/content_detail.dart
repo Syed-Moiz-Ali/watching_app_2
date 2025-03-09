@@ -4,14 +4,17 @@ import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/core/enums/enums.dart';
 import 'package:watching_app_2/core/global/globals.dart';
+import 'package:watching_app_2/data/database/local_database.dart';
 import 'package:watching_app_2/presentation/provider/source_provider.dart';
 import 'package:watching_app_2/presentation/provider/theme_provider.dart';
 import 'package:watching_app_2/presentation/provider/webview_provider.dart';
 import 'package:watching_app_2/data/models/content_item.dart';
 import 'package:watching_app_2/core/navigation/routes.dart';
+import 'package:watching_app_2/shared/screens/favorites/favorite_button.dart';
 import 'package:watching_app_2/shared/widgets/misc/gap.dart';
 import 'package:watching_app_2/shared/widgets/misc/image.dart';
 import 'package:watching_app_2/shared/widgets/buttons/primary_button.dart';
+import 'package:watching_app_2/shared/widgets/misc/padding.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 import '../../../../core/navigation/app_navigator.dart';
 import '../../../../presentation/provider/similar_content_provider.dart';
@@ -148,10 +151,12 @@ class _ContentDetailState extends State<ContentDetail>
                     onPressed: () => Navigator.pop(context),
                   ),
                   actions: [
-                    _buildAnimatedIconButton(
-                      icon: Icons.favorite_border,
-                      onPressed: () {},
-                    ),
+                    // _buildAnimatedIconButton(
+                    //   icon: Icons.favorite_border,
+                    //   onPressed: () {},
+                    // ),
+                    FavoriteButton(
+                        item: widget.item, contentType: ContentTypes.VIDEO),
                     _buildAnimatedIconButton(
                       icon: Icons.share,
                       onPressed: () {},

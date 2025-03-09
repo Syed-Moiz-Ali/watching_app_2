@@ -1,5 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -17,6 +19,8 @@ import '../../../presentation/provider/favorites_provider.dart';
 import '../../../core/navigation/routes.dart';
 import '../../widgets/appbars/app_bar.dart';
 import '../../../features/videos/presentation/widgets/video_grid_view.dart';
+import '../../widgets/misc/padding.dart';
+import 'filters_bottom_sheet.dart';
 
 class Favorites extends StatefulWidget {
   const Favorites({super.key});
@@ -153,6 +157,8 @@ class FavoritesTabView extends StatefulWidget {
 class _FavoritesTabViewState extends State<FavoritesTabView>
     with AutomaticKeepAliveClientMixin {
   int _currentPlayingIndex = -1;
+  List<ContentItem> favorites = []; // Original list
+  List<ContentItem> filteredFavorites = []; // Filtered list
 
   @override
   bool get wantKeepAlive => true;
@@ -160,105 +166,76 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    Theme.of(context);
 
     return Consumer<FavoritesProvider>(
       builder: (context, favoritesProvider, child) {
-        // Show loading indicator while initializing
-        if (favoritesProvider.isLoading) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const CircularProgressIndicator(),
-                SizedBox(height: 2.h),
-                const TextWidget(
-                  text: 'Loading your favorites...',
-                ),
-              ],
-            ),
-          );
-        }
+        return StreamBuilder<List<ContentItem>>(
+          stream: favoritesProvider.watchFavoritesByType(widget.contentType),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                  child: TextWidget(text: 'Error: ${snapshot.error}'));
+            }
 
-        // Use FutureBuilder to get favorites by type
-        return FutureBuilder<List<ContentItem>>(
-            future: favoritesProvider.getFavoritesByType(widget.contentType),
-            builder: (context, snapshot) {
-              // if (snapshot.connectionState == ConnectionState.waiting) {
-              //   return const Center(
-              //     child: CircularProgressIndicator(),
-              //   );
-              // }
+            if (snapshot.hasData) {
+              favorites = snapshot.data ?? [];
+              if (filteredFavorites.isEmpty) {
+                // Only update filteredFavorites if no filters are applied
+                filteredFavorites = List.from(favorites);
+              }
+            }
 
-              if (snapshot.hasError) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        size: 48,
-                        color: Colors.red[400],
-                      ),
-                      SizedBox(height: 2.h),
-                      const TextWidget(
-                        text: 'Oops! Something went wrong',
-                      ),
-                      SizedBox(height: 1.h),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: TextWidget(
-                          text: 'Error loading favorites: ${snapshot.error}',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      SizedBox(height: 3.h),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          setState(() {});
-                        },
-                        icon: const Icon(Icons.refresh),
-                        label: const TextWidget(text: 'Try Again'),
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 5.w, vertical: 1.5.h),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                      ),
-                    ],
+            if (filteredFavorites.isEmpty) {
+              return AnimatedEmptyState(contentType: widget.contentType);
+            }
+
+            return Scaffold(
+              body: VideoGridView(
+                videos: filteredFavorites, // ✅ Use filtered list
+                isGrid: widget.isGrid,
+                contentType: widget.contentType,
+                currentPlayingIndex: _currentPlayingIndex,
+                onHorizontalDragStart: (index) => setState(() {
+                  _currentPlayingIndex = index;
+                }),
+                onHorizontalDragEnd: (index) => setState(() {
+                  _currentPlayingIndex = index;
+                }),
+                onItemTap: (index) {
+                  NH.nameNavigateTo(AppRoutes.detail,
+                      arguments: {'item': filteredFavorites[index]});
+                },
+              ),
+              floatingActionButton: GestureDetector(
+                onTap: () {
+                  FiltersBottomSheet.show(
+                    context,
+                    contentType: widget.contentType,
+                    items: favorites, // ✅ Pass unfiltered list
+                    onFiltersApplied: (filteredItems) {
+                      setState(() {
+                        filteredFavorites = filteredItems; // ✅ Apply filters
+                      });
+                    },
+                  );
+                },
+                child: CustomPadding(
+                  bottomFactor: .1,
+                  child: Container(
+                    width: 13.w,
+                    height: 13.w,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: AppColors.backgroundColorDark,
+                    ),
+                    child: const Icon(Icons.menu,
+                        size: 28, color: AppColors.backgroundColorLight),
                   ),
-                );
-              }
-
-              final favorites = snapshot.data ?? [];
-
-              if (favorites.isEmpty) {
-                return AnimatedEmptyState(contentType: widget.contentType);
-              }
-
-              return AnimationConfiguration.synchronized(
-                duration: const Duration(milliseconds: 800),
-                child: VideoGridView(
-                  videos: favorites,
-                  isGrid: widget.isGrid,
-                  contentType: widget.contentType,
-                  currentPlayingIndex: _currentPlayingIndex,
-                  onHorizontalDragStart: (index) => setState(() {
-                    _currentPlayingIndex = index;
-                  }),
-                  onHorizontalDragEnd: (index) => setState(() {
-                    _currentPlayingIndex = index;
-                  }),
-                  onItemTap: (index) {
-                    // NH.navigateTo(DetailScreen(item: favorites[index]));
-                    NH.nameNavigateTo(AppRoutes.detail,
-                        arguments: {'item': favorites[index]});
-                  },
                 ),
-              );
-            });
+              ),
+            );
+          },
+        );
       },
     );
   }

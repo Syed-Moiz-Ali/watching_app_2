@@ -7,12 +7,14 @@ import 'package:watching_app_2/core/constants/colors.dart';
 class PremiumSearchBar extends StatefulWidget {
   final bool isShowSearchBar;
   final Function(String)? onSearch;
+  final Function(String)? onChanged;
   final VoidCallback? onClose;
 
   const PremiumSearchBar({
     super.key,
     required this.isShowSearchBar,
     this.onSearch,
+    this.onChanged,
     this.onClose,
   });
 
@@ -205,6 +207,11 @@ class _PremiumSearchBarState extends State<PremiumSearchBar>
           widget.onSearch!(_searchController.text);
           _focusNode.unfocus();
           _searchController.clear();
+        }
+      },
+      onChanged: (value) {
+        if (widget.onChanged != null) {
+          widget.onChanged!(value);
         }
       },
       style: TextStyle(

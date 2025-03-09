@@ -25,6 +25,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.automaticallyImplyLeading,
     this.isShowSearchbar = false,
     this.onSearch,
+    this.onChanged,
   });
 
   final List<Widget> actions;
@@ -39,6 +40,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final bool isShowSearchbar;
   final String title;
   final Function(String)? onSearch;
+  final Function(String)? onChanged;
 
   @override
   State<CustomAppBar> createState() => _CustomAppBarState();
@@ -193,6 +195,11 @@ class _CustomAppBarState extends State<CustomAppBar>
                                 if (widget.onSearch != null) {
                                   widget.onSearch!(query);
                                   _toggleSearch();
+                                }
+                              },
+                              onChanged: (query) {
+                                if (widget.onChanged != null) {
+                                  widget.onChanged!(query);
                                 }
                               }),
                         ),

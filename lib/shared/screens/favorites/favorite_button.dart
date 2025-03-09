@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:watching_app_2/core/constants/colors.dart';
 import 'remove_favorite_dialog.dart';
 import 'dart:math' as math;
 
@@ -20,7 +21,7 @@ class FavoriteButton extends StatefulWidget {
     required this.contentType,
     this.isGrid = false,
     this.initialFavorite = false,
-    this.primaryColor = const Color(0xFF6200EE),
+    this.primaryColor = AppColors.errorColor,
     this.secondaryColor = Colors.white,
     this.errorColor = const Color(0xFFE53935),
   });
@@ -259,106 +260,100 @@ class FavoriteButtonState extends State<FavoriteButton>
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      left: widget.isGrid ? 12 : 16,
-      bottom: widget.isGrid ? 12 : 16,
-      child: MouseRegion(
-        onEnter: (_) {
-          setState(() => _isHovered = true);
-          _scaleController.forward();
-        },
-        onExit: (_) {
-          setState(() => _isHovered = false);
-          _scaleController.reverse();
-        },
-        child: AnimatedBuilder(
-          animation: Listenable.merge([
-            _scaleAnimation,
-            _bounceAnimation,
-            _rotationAnimation,
-            _colorAnimation,
-            _particleAnimation
-          ]),
-          builder: (context, child) {
-            return Transform.scale(
-              scale: _scaleAnimation.value *
-                  (_bounceController.isAnimating
-                      ? _bounceAnimation.value
-                      : 1.0),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Particle effects
-                  if (_particleController.isAnimating && _isFavorite)
-                    ...buildParticles(),
+    return MouseRegion(
+      onEnter: (_) {
+        setState(() => _isHovered = true);
+        _scaleController.forward();
+      },
+      onExit: (_) {
+        setState(() => _isHovered = false);
+        _scaleController.reverse();
+      },
+      child: AnimatedBuilder(
+        animation: Listenable.merge([
+          _scaleAnimation,
+          _bounceAnimation,
+          _rotationAnimation,
+          _colorAnimation,
+          _particleAnimation
+        ]),
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value *
+                (_bounceController.isAnimating ? _bounceAnimation.value : 1.0),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Particle effects
+                if (_particleController.isAnimating && _isFavorite)
+                  ...buildParticles(),
 
-                  // Main button
-                  Transform.rotate(
-                    angle: _rotationAnimation.value,
-                    child: GestureDetector(
-                      onTap: _toggleFavorite,
-                      child: Container(
-                        padding: EdgeInsets.all(widget.isGrid ? 10 : 14),
-                        decoration: BoxDecoration(
-                          color: _isFavorite
-                              ? _backgroundColorAnimation.value
-                              : widget.secondaryColor.withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(120),
-                          boxShadow: [
-                            BoxShadow(
-                              color: _isFavorite
-                                  ? widget.primaryColor.withOpacity(0.4)
-                                  : Colors.black.withOpacity(0.2),
-                              blurRadius: 12,
-                              spreadRadius: _isHovered ? 3 : 2,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: _isProcessing
-                            ? SizedBox(
-                                width: widget.isGrid ? 18 : 24,
-                                height: widget.isGrid ? 20 : 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    _isFavorite
-                                        ? widget.secondaryColor
-                                        : widget.primaryColor,
-                                  ),
-                                ),
-                              )
-                            : AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 300),
-                                transitionBuilder: (Widget child,
-                                    Animation<double> animation) {
-                                  return ScaleTransition(
-                                    scale: animation,
-                                    child: FadeTransition(
-                                      opacity: animation,
-                                      child: child,
-                                    ),
-                                  );
-                                },
-                                child: Icon(
+                // Main button
+                Transform.rotate(
+                  angle: _rotationAnimation.value,
+                  child: GestureDetector(
+                    onTap: _toggleFavorite,
+                    child: Container(
+                      padding: EdgeInsets.all(widget.isGrid ? 10 : 14),
+                      decoration: BoxDecoration(
+                        color: _isFavorite
+                            ? _backgroundColorAnimation.value
+                            : widget.secondaryColor.withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(120),
+                        boxShadow: [
+                          BoxShadow(
+                            color: _isFavorite
+                                ? widget.primaryColor.withOpacity(0.4)
+                                : Colors.black.withOpacity(0.2),
+                            blurRadius: 12,
+                            spreadRadius: _isHovered ? 3 : 2,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: _isProcessing
+                          ? SizedBox(
+                              width: widget.isGrid ? 18 : 24,
+                              height: widget.isGrid ? 20 : 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                valueColor: AlwaysStoppedAnimation<Color>(
                                   _isFavorite
-                                      ? Icons.favorite_rounded
-                                      : Icons.favorite_border_rounded,
-                                  key: ValueKey<bool>(_isFavorite),
-                                  color: _isFavorite
-                                      ? _colorAnimation.value
+                                      ? widget.secondaryColor
                                       : widget.primaryColor,
-                                  size: widget.isGrid ? 20 : 24,
                                 ),
                               ),
-                      ),
+                            )
+                          : AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              transitionBuilder:
+                                  (Widget child, Animation<double> animation) {
+                                return ScaleTransition(
+                                  scale: animation,
+                                  child: FadeTransition(
+                                    opacity: animation,
+                                    child: child,
+                                  ),
+                                );
+                              },
+                              child: Icon(
+                                _isFavorite
+                                    ? Icons.favorite_rounded
+                                    : Icons.favorite_border_rounded,
+                                key: ValueKey<bool>(_isFavorite),
+                                color: _isFavorite
+                                    ? _colorAnimation.value
+                                    : widget.primaryColor,
+                                size: widget.isGrid ? 20 : 24,
+                              ),
+                            ),
                     ),
                   ),
-                ],
-              ),
-            );
-          },
-        ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

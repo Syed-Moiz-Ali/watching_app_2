@@ -196,11 +196,15 @@ class _VideoCardState extends State<VideoCard>
                     if (widget.item.source.isPreview == '1') _buildPlayButton(),
                     if (widget.item.duration != '0:00') _buildDurationBadge(),
                     _buildQualityBadge(),
-                    FavoriteButton(
-                      item: widget.item,
-                      contentType: widget.contentType,
-                      primaryColor: AppColors.errorColor,
-                      isGrid: widget.isGrid,
+                    Positioned(
+                      left: widget.isGrid ? 12 : 16,
+                      bottom: widget.isGrid ? 12 : 16,
+                      child: FavoriteButton(
+                        item: widget.item,
+                        contentType: widget.contentType,
+                        // primaryColor: AppColors.errorColor,
+                        isGrid: widget.isGrid,
+                      ),
                     ),
                   ],
                 ),

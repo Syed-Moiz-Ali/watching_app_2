@@ -1,9 +1,11 @@
+// ignore_for_file: unused_element
+
 import 'dart:convert';
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:sizer/sizer.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../../../data/models/content_item.dart';
@@ -13,7 +15,7 @@ import '../../../../shared/widgets/misc/image.dart';
 
 class MangaReaderScreen extends StatefulWidget {
   final ContentItem item;
-  const MangaReaderScreen({Key? key, required this.item}) : super(key: key);
+  const MangaReaderScreen({super.key, required this.item});
 
   @override
   State<MangaReaderScreen> createState() => _MangaReaderScreenState();
@@ -34,8 +36,7 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
   double _pageMargin = 0.0;
 
   // Reading progress tracking
-  int _lastReadPage = 0;
-  DateTime _startReadingTime = DateTime.now();
+  final DateTime _startReadingTime = DateTime.now();
 
   late AnimationController _animationController;
   final ScrollController _verticalScrollController = ScrollController();
@@ -89,7 +90,6 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
       _brightness = 1.0;
       _pageBackgroundColor = Colors.black;
       _pageMargin = 0.0;
-      _lastReadPage = 0;
     });
   }
 
@@ -104,10 +104,18 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
         pageCount > 0 ? (_currentPage + 1) / pageCount * 100 : 0;
 
     // In a real app, this would save to a database or shared preferences
-    print('Reading session stats:');
-    print('- Duration: ${readDuration.inMinutes} minutes');
-    print('- Progress: ${readPercentage.toStringAsFixed(1)}%');
-    print('- Last page: ${_currentPage + 1} of $pageCount');
+    if (kDebugMode) {
+      print('Reading session stats:');
+    }
+    if (kDebugMode) {
+      print('- Duration: ${readDuration.inMinutes} minutes');
+    }
+    if (kDebugMode) {
+      print('- Progress: ${readPercentage.toStringAsFixed(1)}%');
+    }
+    if (kDebugMode) {
+      print('- Last page: ${_currentPage + 1} of $pageCount');
+    }
   }
 
   void _toggleUI() {
@@ -348,7 +356,7 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
             }
 
             return AnimatedSwitcher(
-              duration: Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 300),
               child: Stack(
                 children: [
                   // Brightness overlay
@@ -531,48 +539,46 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
         final effectiveIndex = index;
         final imagePath = pages[effectiveIndex]['image'];
 
-        return Container(
-          child: Column(
-            children: [
-              // Optional page number indicator
-              // Padding(
-              //   padding: const EdgeInsets.only(bottom: 4),
-              //   child: Text(
-              //     'Page ${effectiveIndex + 1}',
-              //     style: TextStyle(
-              //       color: Colors.grey[400],
-              //       fontSize: 12,
-              //     ),
-              //   ),
-              // ),
+        return Column(
+          children: [
+            // Optional page number indicator
+            // Padding(
+            //   padding: const EdgeInsets.only(bottom: 4),
+            //   child: Text(
+            //     'Page ${effectiveIndex + 1}',
+            //     style: TextStyle(
+            //       color: Colors.grey[400],
+            //       fontSize: 12,
+            //     ),
+            //   ),
+            // ),
 
-              // Image
-              GestureDetector(
-                // onDoubleTap: () => _resetZoom(controller),
-                child: CustomImageWidget(
-                  imagePath: imagePath,
-                  fit: BoxFit.fitWidth,
-                  borderRadius: BorderRadius.zero,
-                  // loadingBuilder: (context, child, loadingProgress) {
-                  //   if (loadingProgress == null) return child;
-                  //   return SizedBox(
-                  //     height: MediaQuery.of(context).size.width * 1.5, // Aspect ratio placeholder
-                  //     child: Center(
-                  //       child: CircularProgressIndicator(
-                  //         value: loadingProgress.expectedTotalBytes != null
-                  //             ? loadingProgress.cumulativeBytesLoaded /
-                  //                 loadingProgress.expectedTotalBytes!
-                  //             : null,
-                  //         strokeWidth: 2,
-                  //         color: Colors.blue,
-                  //       ),
-                  //     ),
-                  //   );
-                  // },
-                ),
+            // Image
+            GestureDetector(
+              // onDoubleTap: () => _resetZoom(controller),
+              child: CustomImageWidget(
+                imagePath: imagePath,
+                fit: BoxFit.fitWidth,
+                borderRadius: BorderRadius.zero,
+                // loadingBuilder: (context, child, loadingProgress) {
+                //   if (loadingProgress == null) return child;
+                //   return SizedBox(
+                //     height: MediaQuery.of(context).size.width * 1.5, // Aspect ratio placeholder
+                //     child: Center(
+                //       child: CircularProgressIndicator(
+                //         value: loadingProgress.expectedTotalBytes != null
+                //             ? loadingProgress.cumulativeBytesLoaded /
+                //                 loadingProgress.expectedTotalBytes!
+                //             : null,
+                //         strokeWidth: 2,
+                //         color: Colors.blue,
+                //       ),
+                //     ),
+                //   );
+                // },
               ),
-            ],
-          ),
+            ),
+          ],
         ).animate().fadeIn(
             duration: 300.ms,
             delay: Duration(milliseconds: (50 * index % 3).toInt()));
@@ -632,16 +638,15 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              if (widget.item.title != null)
-                                Text(
-                                  widget.item.title!,
-                                  style: TextStyle(
-                                    color: Colors.grey[300],
-                                    fontSize: 12,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                              Text(
+                                widget.item.title,
+                                style: TextStyle(
+                                  color: Colors.grey[300],
+                                  fontSize: 12,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ],
                           ),
                         ),
@@ -1189,9 +1194,8 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _infoRow('Series', widget.item.title ?? 'Unknown'),
-              _infoRow(
-                  'Chapter', provider.chapterDetail!.chapterCount ?? 'N/A'),
+              _infoRow('Series', widget.item.title),
+              _infoRow('Chapter', provider.chapterDetail!.chapterCount),
               _infoRow('Pages', pageCount.toString()),
               _infoRow('Progress', '${progress.toStringAsFixed(1)}%'),
               _infoRow('Current Page', '${_currentPage + 1} of $pageCount'),
@@ -1219,7 +1223,7 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
           SizedBox(
             width: 80,
             child: Text(
-              label + ':',
+              '$label:',
               style: TextStyle(color: Colors.grey[400], fontSize: 14),
             ),
           ),
