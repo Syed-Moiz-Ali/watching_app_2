@@ -12,9 +12,9 @@
     "icon": "https://manhwa18.cc/images/manhwa18.png",
     "pageType": "page",
     "query": {
-      "latest": "webtoons/{page}?orderby=latest5689",
+      "latest": "webtoons/{page}?orderby=latest",
       "popular": "webtoons/{page}?orderby=trending",
-      "yuri": "webtoons/{page}?orderby=trending"
+      "rating": "webtoons/{page}?orderby=rating"
     }
   },
   {

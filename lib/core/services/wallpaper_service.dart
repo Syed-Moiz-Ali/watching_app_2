@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
+import '../global/globals.dart';
 import '../utils/file_utils.dart';
 import '../../data/models/content_item.dart';
 import 'permission_service.dart';
@@ -39,7 +40,7 @@ class WallpaperService {
       File file = File(filePath);
       if (!await file.exists()) {
         await dio.download(
-          item.thumbnailUrl,
+          SMA.formatImage(image: item.thumbnailUrl, baseUrl: item.source.url),
           filePath,
           onReceiveProgress: (received, total) {
             if (total != -1) {

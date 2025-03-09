@@ -48,11 +48,8 @@ class PMateHunter extends BaseScraper {
               selector: 'figure > a',
               attribute: 'href', // Extract content URL from 'href' attribute
             ),
-            similarContentSelector: ElementSelector(
-              selector: '.user_uploads > .video-list > .video-item',
-            ),
             contentSelector: ElementSelector(
-              selector: '#content > .list-gallery > li',
+              selector: 'body > li',
             ),
           ),
         );

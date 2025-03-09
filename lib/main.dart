@@ -56,6 +56,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:watching_app_2/presentation/provider/manga_detail_provider.dart';
 import 'package:watching_app_2/presentation/provider/navigation_provider.dart';
 import 'package:watching_app_2/presentation/provider/favorites_provider.dart';
 import 'package:watching_app_2/presentation/provider/search_provider.dart';
@@ -84,5 +85,6 @@ void main() {
     ChangeNotifierProvider(create: (_) => SimilarContentProvider()),
     ChangeNotifierProvider(create: (_) => NavigationProvider()),
     ChangeNotifierProvider(create: (_) => SearchProvider()),
+    ChangeNotifierProvider(create: (_) => MangaDetailProvider()),
   ], child: const SafeArea(child: MyApp())));
 }

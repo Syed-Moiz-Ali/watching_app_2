@@ -1,33 +1,25 @@
-import 'package:watching_app_2/data/models/content_source.dart';
+import 'content_source.dart';
 
 class ContentItem {
-  final String title; // Required: Title of the content (all modules)
-  final String duration; // Optional: Duration (videos, TikTok)
-  final String preview; // Optional: Preview image or video (TikTok, videos)
-  final String quality; // Optional: Quality (videos, wallpapers)
-  final String time; // Optional: Upload time (all modules)
-  final String thumbnailUrl; // Required: Thumbnail image URL (all modules)
-  final String contentUrl; // Required: URL to the content (all modules)
-  final String views; // Optional: View count (videos, TikTok)
-  final ContentSource source; // Required: Source of the content (all modules)
-  final DateTime scrapedAt; // Required: When the item was scraped (all modules)
-
-  // Manga-specific fields
-  final String genre; // Optional: Genre (manga)
-  final String status; // Optional: Status (manga, e.g., ongoing, completed)
-  final String chapterCount; // Optional: Number of chapters (manga)
-
-  // TikTok-specific fields
-  final String user; // Optional: Creator/username (TikTok)
-  final String likes; // Optional: Like count (TikTok)
-  final String comments; // Optional: Comment count (TikTok)
-
-  // // Video-specific fields
-  // final String? category; // Optional: Category (videos)
-
-  // // Wallpaper-specific fields
-  // final String? resolution; // Optional: Resolution (wallpapers)
-  // final String? size; // Optional: File size (wallpapers)
+  final String title;
+  final String duration;
+  final String preview;
+  final String quality;
+  final String time;
+  final String thumbnailUrl;
+  final String contentUrl;
+  final String views;
+  final ContentSource source;
+  final DateTime scrapedAt;
+  final String genre;
+  final String status;
+  final String chapterCount;
+  final String discription;
+  final String chapterId;
+  final String chapterImages;
+  final String user;
+  final String likes;
+  final String comments;
 
   ContentItem({
     required this.title,
@@ -46,8 +38,53 @@ class ContentItem {
     this.user = '',
     this.likes = '',
     this.comments = '',
-    // this.category,
-    // this.resolution,
-    // this.size,
+    this.discription = '',
+    this.chapterId = '',
+    this.chapterImages = '',
   });
+
+  // **Implementing `copyWith` method**
+  ContentItem copyWith({
+    String? title,
+    String? duration,
+    String? preview,
+    String? quality,
+    String? time,
+    String? thumbnailUrl,
+    String? contentUrl,
+    String? views,
+    ContentSource? source,
+    DateTime? scrapedAt,
+    String? genre,
+    String? status,
+    String? chapterCount,
+    String? discription,
+    String? chapterId,
+    String? chapterImages,
+    String? user,
+    String? likes,
+    String? comments,
+  }) {
+    return ContentItem(
+      title: title ?? this.title,
+      duration: duration ?? this.duration,
+      preview: preview ?? this.preview,
+      quality: quality ?? this.quality,
+      time: time ?? this.time,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+      contentUrl: contentUrl ?? this.contentUrl,
+      views: views ?? this.views,
+      source: source ?? this.source,
+      scrapedAt: scrapedAt ?? this.scrapedAt,
+      genre: genre ?? this.genre,
+      status: status ?? this.status,
+      chapterCount: chapterCount ?? this.chapterCount,
+      discription: discription ?? this.discription,
+      chapterId: chapterId ?? this.chapterId,
+      chapterImages: chapterImages ?? this.chapterImages,
+      user: user ?? this.user,
+      likes: likes ?? this.likes,
+      comments: comments ?? this.comments,
+    );
+  }
 }

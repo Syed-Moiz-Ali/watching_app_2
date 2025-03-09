@@ -108,11 +108,11 @@
     "isEmbed": "0",
     "icon": "https://cdn.pmatehunter.com/wp-content/themes/masonry/images/favicons/apple-touch-icon.png",
     "query": {
-      "archive": "archive/page/{page}/",
-      "trending": "updates/",
-      "newest": "updates/sort/newest/mpage/{page}/",
-      "popular": "updates/sort/popular/mpage/{page}/",
-      "pics": "updates/sort/filter/ord/popular/content/pix/quality/0/tags/0/mpage/{page}/"
+      "trending": "gridapi/?content=updates&sort=trending&mpage={page}",
+      "newest": "gridapi/?content=updates&sort=newest&mpage={page}",
+      "popular": "gridapi/?content=updates&sort=popular&mpage={page}",
+      "pics": "gridapi/?content=%7B%22content%22%3A%22pix%22%2C%22quality%22%3A%220%22%2C%22label%22%3A%220%22%2C%22ord%22%3A%22popular%22%7D&sort=filter&mpage={page}",
+      "pinboard": "gridapi/?content=pinboards&sort=popular&mpage={page}"
     }
   },
   {

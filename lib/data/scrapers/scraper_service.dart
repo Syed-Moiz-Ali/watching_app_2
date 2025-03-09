@@ -18,6 +18,14 @@ class ScraperService {
     return scraper.getContentByType(queryType, page);
   }
 
+  Future<List<ContentItem>> getDetails(String url) {
+    return scraper.getDetails(url);
+  }
+
+  Future<List<ContentItem>> getChapter(String url) {
+    return scraper.getChapter(url);
+  }
+
   Future<List<VideoSource>> getVideo(String url) {
     return scraper.getVideos(url);
   }

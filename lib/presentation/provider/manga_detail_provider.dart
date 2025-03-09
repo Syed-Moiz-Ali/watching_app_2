@@ -1,0 +1,55 @@
+import 'dart:developer';
+
+import 'package:flutter/material.dart';
+import 'package:watching_app_2/data/models/content_source.dart';
+
+import '../../core/global/globals.dart';
+import '../../data/models/content_item.dart';
+import '../../data/scrapers/scraper_service.dart';
+
+class MangaDetailProvider extends ChangeNotifier {
+  bool isLoading = false;
+  String? error;
+  ContentItem? mangaDetail;
+  ContentItem? chapterDetail;
+
+  Future<void> loadMangaDetails(ContentItem item) async {
+    ScraperService scraperService = ScraperService(item.source);
+    try {
+      isLoading = true;
+      error = null;
+      notifyListeners();
+
+      final details = await scraperService.getDetails(
+          SMA.formatImage(image: item.contentUrl, baseUrl: item.source.url));
+      log("thiis is details ${mangaDetail!.chapterCount}");
+      mangaDetail = details.first;
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      error = 'Failed to load manga details: $e';
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadChapterDetails(ContentItem item) async {
+    ScraperService scraperService = ScraperService(item.source);
+    try {
+      isLoading = true;
+      error = null;
+      notifyListeners();
+      log('chapter id is ${item.chapterId}');
+      final details = await scraperService.getChapter(
+          SMA.formatImage(image: item.chapterId, baseUrl: item.source.url));
+      log("thiis is chapterImages ${details.first.chapterImages}");
+      chapterDetail = details.first;
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      error = 'Failed to load manga details: $e';
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+}

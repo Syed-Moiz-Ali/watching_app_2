@@ -36,7 +36,7 @@
     </queries>
 
     <application
-        android:label="PornQueen"
+        android:label="BrowseX"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         

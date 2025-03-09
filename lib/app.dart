@@ -51,7 +51,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     var themeProvider = context.watch<ThemeProvider>();
     return ResponsiveSizer(builder: (context, orientation, screenType) {
       return MaterialApp(
-        title: 'Queen',
+        title: 'BrowseX',
         navigatorKey: SMA.navigationKey,
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme, // Light theme

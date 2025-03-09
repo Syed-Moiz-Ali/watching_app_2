@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:watching_app_2/core/global/globals.dart';
 import '../utils/file_utils.dart';
 import '../../data/models/content_item.dart';
 import 'permission_service.dart';
@@ -35,7 +36,7 @@ class DownloadService {
 
       // Download the file
       await dio.download(
-        item.thumbnailUrl,
+        SMA.formatImage(image: item.thumbnailUrl, baseUrl: item.source.url),
         filePath,
         onReceiveProgress: (received, total) {
           if (total != -1) {

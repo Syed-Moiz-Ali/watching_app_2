@@ -27,6 +27,20 @@ abstract class BaseScraper {
     return parseElements(contentElements);
   }
 
+  Future<List<ContentItem>> scrapeDetailContent(String html) {
+    final document = parse(html);
+    final contentElements =
+        document.querySelectorAll(config.detailSelector!.selector!);
+    return parseElements(contentElements);
+  }
+
+  Future<List<ContentItem>> scrapeChapterContent(String html) {
+    final document = parse(html);
+    final contentElements =
+        document.querySelectorAll(config.chapterDataSelector!.selector!);
+    return parseElements(contentElements);
+  }
+
   Future<List<ContentItem>> search(String query, int page) async {
     final url = source.getSearchUrl(query, page);
     try {
@@ -43,6 +57,14 @@ abstract class BaseScraper {
   Future<List<ContentItem>> getContentByType(String queryType, int page) async {
     final url = source.getQueryUrl(queryType, page);
     return await fetchCotentAndScrape(url);
+  }
+
+  Future<List<ContentItem>> getDetails(String url) async {
+    return await fetchDetailAndScrape(url);
+  }
+
+  Future<List<ContentItem>> getChapter(String url) async {
+    return await fetchChapterAndScrape(url);
   }
 
   // Optional methods with default implementations
@@ -66,6 +88,28 @@ abstract class BaseScraper {
       final response = await ApiClient.request(url: url);
       // log("reponse is ${response}");
       return scrapeContent(response);
+    } catch (e) {
+      SMA.logger.logError('Error fetching data from $url: $e');
+      return [];
+    }
+  }
+
+  Future<List<ContentItem>> fetchDetailAndScrape(String url) async {
+    try {
+      final response = await ApiClient.request(url: url);
+      // log("reponse is ${response}");
+      return scrapeDetailContent(response);
+    } catch (e) {
+      SMA.logger.logError('Error fetching data from $url: $e');
+      return [];
+    }
+  }
+
+  Future<List<ContentItem>> fetchChapterAndScrape(String url) async {
+    try {
+      final response = await ApiClient.request(url: url);
+      // log("reponse is ${response}");
+      return scrapeChapterContent(response);
     } catch (e) {
       SMA.logger.logError('Error fetching data from $url: $e');
       return [];
@@ -153,18 +197,6 @@ abstract class BaseScraper {
     }
   }
 
-  String? getText(var element, ElementSelector selector) {
-    try {
-      final elementTag = element.querySelector(selector.selector!);
-      return elementTag?.text.trim();
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error getting text from $selector: $e');
-      }
-      return null;
-    }
-  }
-
   // Scraping the content using selectors defined in config
   Future<ContentItem> parseElement(Element element) async {
     return ContentItem(
@@ -191,6 +223,27 @@ abstract class BaseScraper {
           'Unknown',
       scrapedAt: DateTime.now(),
       source: source,
+      genre:
+          await getAttributeValue(element: element, config.genreSelector) ?? '',
+      status:
+          await getAttributeValue(element: element, config.statusSelector) ??
+              '',
+      chapterCount: await getAttributeValue(
+              element: element, config.chapterCountSelector) ??
+          '',
+      chapterId:
+          await getAttributeValue(element: element, config.chapterIdSelector) ??
+              '',
+      chapterImages: await getAttributeValue(
+              element: element, config.chapterImageSelector) ??
+          '',
+      user:
+          await getAttributeValue(element: element, config.userSelector) ?? '',
+      likes:
+          await getAttributeValue(element: element, config.likesSelector) ?? '',
+      comments:
+          await getAttributeValue(element: element, config.commentsSelector) ??
+              '',
     );
   }
 

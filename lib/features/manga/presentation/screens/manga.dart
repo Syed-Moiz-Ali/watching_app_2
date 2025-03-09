@@ -11,6 +11,7 @@ import '../../../../shared/widgets/buttons/floating_action_button.dart';
 import '../../../../shared/widgets/loading/pagination_indicator.dart';
 import '../../../../shared/widgets/misc/text_widget.dart';
 import '../../../wallpapers/presentation/widgets/wallpaper_grid_view.dart';
+import 'manga_detail.dart';
 
 class Manga extends StatefulWidget {
   final ContentSource source;
@@ -197,12 +198,12 @@ class _MangaState extends State<Manga> {
                                 wallpapers: mangas,
                                 controller: _scrollController,
                                 onItemTap: (index) {
-                                  // NH.navigateTo(MinimalistWallpaperDetail(
-                                  //   item: wallpapers[
-                                  //       index], // Replace with actual image URL
-                                  // ));
-                                  NH.nameNavigateTo(AppRoutes.wallpaperDetail,
-                                      arguments: {'item': mangas[index]});
+                                  NH.navigateTo(MangaDetailScreen(
+                                    item: mangas[
+                                        index], // Replace with actual image URL
+                                  ));
+                                  // NH.nameNavigateTo(AppRoutes.wallpaperDetail,
+                                  //     arguments: {'item': mangas[index]});
                                 },
                               ),
                             ),
