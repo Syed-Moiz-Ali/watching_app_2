@@ -38,7 +38,7 @@
     <application
         android:label="BrowseX"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/icon">
         
         <activity
             android:name=".MainActivity"
