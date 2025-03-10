@@ -1,12 +1,11 @@
+// ignore_for_file: dead_code
+
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/data/models/content_item.dart';
-import 'package:watching_app_2/presentation/provider/favorites_provider.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
-import 'package:watching_app_2/shared/widgets/misc/gap.dart';
 import 'package:watching_app_2/shared/widgets/buttons/primary_button.dart';
 
 import '../../../data/database/local_database.dart';
@@ -64,8 +63,8 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet>
   List<String> get _availableSources {
     final Set<String> sources = {};
     for (var item in widget.items) {
-      if (item.source!.name.isNotEmpty) {
-        sources.add(item.source!.name);
+      if (item.source.name.isNotEmpty) {
+        sources.add(item.source.name);
       }
     }
     return sources.toList();
@@ -116,8 +115,8 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet>
     if (_dateRange != null) {
       filteredItems = filteredItems
           .where((item) =>
-              item.addedAt!.isAfter(_dateRange!.start) &&
-              item.addedAt!
+              item.addedAt.isAfter(_dateRange!.start) &&
+              item.addedAt
                   .isBefore(_dateRange!.end.add(const Duration(days: 1))))
           .toList();
     }
@@ -379,7 +378,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet>
             },
           ).animate().fadeIn(
               delay: Duration(milliseconds: 100 * sortOptions.indexOf(option)));
-        }).toList(),
+        }),
       ],
     );
   }
@@ -789,7 +788,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet>
                   delay: Duration(
                       milliseconds: 100 *
                           _additionalFilters.keys.toList().indexOf(entry.key)));
-        }).toList(),
+        }),
 
         SizedBox(height: 3.h),
 

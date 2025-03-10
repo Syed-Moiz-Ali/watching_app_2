@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -212,7 +213,9 @@ class LocalDatabase {
         whereArgs: [contentUrl],
       );
       final success = rowsAffected > 0;
-      print('Remove by content URL ${success ? 'succeeded' : 'failed'}');
+      if (kDebugMode) {
+        print('Remove by content URL ${success ? 'succeeded' : 'failed'}');
+      }
       return success;
     } catch (e) {
       throw Exception('Failed to remove by content URL: $e');

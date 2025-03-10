@@ -185,7 +185,7 @@ class _VideoCardState extends State<VideoCard>
                           baseUrl: widget.item.source.url,
                         ),
                         videoUrl: SMA.formatImage(
-                          image: widget.item.preview!,
+                          image: widget.item.preview,
                           baseUrl: widget.item.source.url,
                         ),
                         isShown: widget.isPlaying,
@@ -324,7 +324,7 @@ class _VideoCardState extends State<VideoCard>
             ),
             const SizedBox(width: 6),
             TextWidget(
-              text: widget.item.duration!,
+              text: widget.item.duration,
               fontSize: widget.isGrid ? 12.sp : 14.sp,
               color: Colors.white,
               fontWeight: FontWeight.w600,
@@ -365,7 +365,7 @@ class _VideoCardState extends State<VideoCard>
             ),
             const SizedBox(width: 6),
             TextWidget(
-              text: widget.item.quality!,
+              text: widget.item.quality,
               fontSize: widget.isGrid ? 12.sp : 14.sp,
               color: Colors.white,
               fontWeight: FontWeight.w600,

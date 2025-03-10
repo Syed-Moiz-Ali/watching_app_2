@@ -1,20 +1,20 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:watching_app_2/core/global/globals.dart';
 import 'package:watching_app_2/core/navigation/app_navigator.dart';
 import 'package:watching_app_2/data/models/content_item.dart';
-import 'package:watching_app_2/data/models/content_source.dart';
 import 'package:watching_app_2/features/manga/presentation/screens/chapter.dart';
 import 'package:watching_app_2/presentation/provider/manga_detail_provider.dart';
-import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 import 'package:shimmer/shimmer.dart';
 import 'dart:ui';
 
 class MangaDetailScreen extends StatefulWidget {
   final ContentItem item;
 
-  const MangaDetailScreen({Key? key, required this.item}) : super(key: key);
+  const MangaDetailScreen({super.key, required this.item});
 
   @override
   _MangaDetailScreenState createState() => _MangaDetailScreenState();
@@ -30,7 +30,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
   late Animation<Offset> _contentSlideAnimation;
   late ScrollController _scrollController;
   bool _isScrolled = false;
-  double _scrollThreshold = 80.0;
+  final double _scrollThreshold = 80.0;
 
   @override
   void initState() {
@@ -360,7 +360,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                                           Text(
                                             index < 3
                                                 ? "Updated recently"
-                                                : "Updated ${index} days ago",
+                                                : "Updated $index days ago",
                                             style: TextStyle(
                                               color:
                                                   Colors.white.withOpacity(0.7),
@@ -574,8 +574,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                           Transform.scale(
                             scale: _imageScaleAnimation.value,
                             child: Hero(
-                              tag:
-                                  'manga_${widget.item.contentUrl ?? widget.item.title}',
+                              tag: 'manga_${widget.item.contentUrl}',
                               child: Image.network(
                                 SMA.formatImage(
                                   image: widget.item.thumbnailUrl,
@@ -595,7 +594,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                                   Colors.black.withOpacity(0.9),
                                   Colors.black,
                                 ],
-                                stops: [0.0, 0.5, 0.85, 1.0],
+                                stops: const [0.0, 0.5, 0.85, 1.0],
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                               ),
@@ -689,8 +688,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                                       .map((genre) => _buildInfoTag(
                                             genre.trim(),
                                             color: Colors.purpleAccent,
-                                          ))
-                                      .toList(),
+                                          )),
                                 ],
                               ),
                               const SizedBox(height: 32),
@@ -712,8 +710,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                                     child: Padding(
                                       padding: const EdgeInsets.all(16.0),
                                       child: Text(
-                                        details.discription ??
-                                            "A captivating story of adventure and discovery. Follow the journey of our protagonist as they navigate through challenges and grow stronger with each chapter.",
+                                        details.discription,
                                         style: TextStyle(
                                           fontSize: 15,
                                           height: 1.5,

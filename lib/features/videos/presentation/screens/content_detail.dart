@@ -14,7 +14,6 @@ import 'package:watching_app_2/shared/screens/favorites/favorite_button.dart';
 import 'package:watching_app_2/shared/widgets/misc/gap.dart';
 import 'package:watching_app_2/shared/widgets/misc/image.dart';
 import 'package:watching_app_2/shared/widgets/buttons/primary_button.dart';
-import 'package:watching_app_2/shared/widgets/misc/padding.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 import '../../../../core/navigation/app_navigator.dart';
 import '../../../../presentation/provider/similar_content_provider.dart';
@@ -362,7 +361,7 @@ class _ContentDetailState extends State<ContentDetail>
         ),
         const SizedBox(width: 12),
         TextWidget(
-          text: widget.item.duration ?? '0:00',
+          text: widget.item.duration,
           color: AppColors.greyColor.withOpacity(.6),
           fontWeight: FontWeight.w500,
           fontSize: 17.sp,
@@ -383,13 +382,13 @@ class _ContentDetailState extends State<ContentDetail>
         _buildInfoCard(
           icon: Icons.high_quality,
           title: 'Quality',
-          value: widget.item.quality ?? 'HD',
+          value: widget.item.quality,
           color: Colors.purple,
         ),
         _buildInfoCard(
           icon: Icons.access_time,
           title: 'Time',
-          value: widget.item.time ?? '0:00',
+          value: widget.item.time,
           color: Colors.orange,
         ),
         _buildInfoCard(

@@ -37,7 +37,6 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
   // State variables
   bool _isDarkMode = false;
   bool _notificationsEnabled = true;
-  bool _autoBackupEnabled = true;
   bool _biometricAuthEnabled = false;
   final double _textSize = 1.0;
   int? _hoveredSectionIndex;
@@ -49,7 +48,6 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
 
   // Colors for theme
   late Color _primaryColor;
-  late Color _cardColor;
   late Color _iconColor;
   late Color _dividerColor;
 
@@ -163,8 +161,6 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
   void _updateThemeColors() {
     _primaryColor = AppColors.primaryColor;
 
-    _cardColor = AppColors.backgroundColorLight;
-
     _iconColor = AppColors.secondaryColor;
     _dividerColor = Colors.grey.shade300;
 
@@ -274,22 +270,6 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
   }
 
   PreferredSizeWidget _buildAppBar() {
-    final titleScale = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _pageEnterController,
-      curve: const Interval(0.2, 0.6, curve: Curves.elasticOut),
-    ));
-
-    final titleFade = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _pageEnterController,
-      curve: const Interval(0.1, 0.5, curve: Curves.easeOut),
-    ));
-
     return CustomAppBar(
       elevation: 0,
       // backgroundColor: Colors.transparent,

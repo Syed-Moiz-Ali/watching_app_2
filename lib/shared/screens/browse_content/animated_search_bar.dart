@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
@@ -48,6 +50,7 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
   late AnimationController _pulseAnimController;
   late Animation<double> _pulseAnimation;
   bool _showRecentSearches = false;
+  late StreamSubscription<bool> keyboardSubscription;
 
   @override
   void dispose() {
@@ -70,6 +73,20 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
     _searchFocusNode = FocusNode();
     _searchFocusNode.addListener(_handleFocusChange);
 
+    var keyboardVisibilityController = KeyboardVisibilityController();
+    // Query
+    if (kDebugMode) {
+      print(
+          'Keyboard visibility direct query: ${keyboardVisibilityController.isVisible}');
+    }
+
+    // Subscribe
+    keyboardSubscription =
+        keyboardVisibilityController.onChange.listen((bool visible) {
+      if (!visible) {
+        _searchFocusNode.unfocus();
+      }
+    });
     // Entry animation - smoother and more premium feel
     _searchBarAnimController = AnimationController(
       vsync: this,
@@ -200,7 +217,7 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
     )!;
 
     // Shimmer effect colors
-    final Color shimmerColor = AppColors.primaryColor;
+    const Color shimmerColor = AppColors.primaryColor;
 
     final Color borderColor = _isSearchFocused
         ? AppColors.primaryColor.withOpacity(0.8)
@@ -358,7 +375,7 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
                   ? gradient.createShader(bounds)
                   : LinearGradient(colors: [iconColor, iconColor])
                       .createShader(bounds),
-              child: Icon(
+              child: const Icon(
                 Icons.search_rounded,
                 color: Colors.white,
                 size: 24,

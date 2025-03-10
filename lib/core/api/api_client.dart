@@ -24,7 +24,12 @@ class ApiClient {
         'Request URL: ${uri.toString()}\n Request Type: $type \n Request Body: ${json.encode(body)}');
 
     req.headers.addAll(headers);
-    req.body = json.encode(body);
+
+    if (type.toUpperCase() == 'POST' ||
+        type.toUpperCase() == 'PUT' ||
+        type.toUpperCase() == 'PATCH') {
+      req.body = json.encode(body); // Add body only for POST, PUT, PATCH
+    }
 
     // Connectivity check
     var connectivityResult = await Connectivity().checkConnectivity();

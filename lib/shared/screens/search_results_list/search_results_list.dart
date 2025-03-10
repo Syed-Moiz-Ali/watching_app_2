@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sizer/sizer.dart';
-import 'package:watching_app_2/shared/widgets/misc/padding.dart';
-import 'package:watching_app_2/shared/widgets/buttons/primary_button.dart';
-import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 import '../../../presentation/provider/search_provider.dart';
 import '../../widgets/appbars/app_bar.dart';
 import '../../widgets/loading/pagination_indicator.dart';
-import 'progress_indicator.dart';
 import 'tabbed_content_view.dart';
 
 class SearchResultsList extends StatefulWidget {
@@ -70,75 +65,75 @@ class _SearchResultsListState extends State<SearchResultsList>
     }
   }
 
-  Widget _buildLoadingShimmer(SearchProvider provider) {
-    List<String> sourceNames = provider.sources
-        .where((source) => source.type == '1')
-        .map((source) => source.name)
-        .toList();
+  // Widget _buildLoadingShimmer(SearchProvider provider) {
+  //   List<String> sourceNames = provider.sources
+  //       .where((source) => source.type == '1')
+  //       .map((source) => source.name)
+  //       .toList();
 
-    return RealtimeProgressIndicator(
-      sourceNames: sourceNames,
-      activeSourceIndex: provider.activeSourceIndex,
-      isGrid: provider.isGrid,
-    );
-  }
+  //   return RealtimeProgressIndicator(
+  //     sourceNames: sourceNames,
+  //     activeSourceIndex: provider.activeSourceIndex,
+  //     isGrid: provider.isGrid,
+  //   );
+  // }
 
-  Widget _buildErrorView(String? errorMsg, SearchProvider provider) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.error_outline, size: 48, color: Colors.red[300]),
-          const SizedBox(height: 16),
-          CustomPadding(
-            horizontalFactor: .04,
-            child: TextWidget(
-              text: errorMsg ?? 'An unknown error occurred',
-              textAlign: TextAlign.center,
-              maxLine: 4,
-              color: Colors.red[300],
-            ),
-          ),
-          const SizedBox(height: 24),
-          PrimaryButton(
-            onTap: () => provider.loadSourcesAndSearch(
-                provider.currentCategory, provider.currentQuery),
-            text: 'Try Again',
-            width: .4,
-            fontSize: 17.sp,
-            borderRadius: 100.w,
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildErrorView(String? errorMsg, SearchProvider provider) {
+  //   return Center(
+  //     child: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         Icon(Icons.error_outline, size: 48, color: Colors.red[300]),
+  //         const SizedBox(height: 16),
+  //         CustomPadding(
+  //           horizontalFactor: .04,
+  //           child: TextWidget(
+  //             text: errorMsg ?? 'An unknown error occurred',
+  //             textAlign: TextAlign.center,
+  //             maxLine: 4,
+  //             color: Colors.red[300],
+  //           ),
+  //         ),
+  //         const SizedBox(height: 24),
+  //         PrimaryButton(
+  //           onTap: () => provider.loadSourcesAndSearch(
+  //               provider.currentCategory, provider.currentQuery),
+  //           text: 'Try Again',
+  //           width: .4,
+  //           fontSize: 17.sp,
+  //           borderRadius: 100.w,
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  Widget _buildNoResultsView(SearchProvider provider) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.search_off,
-            size: 80,
-            color: Colors.grey,
-          ),
-          const SizedBox(height: 16),
-          TextWidget(
-            text: 'No results found for "${provider.currentQuery}"',
-            fontSize: 17.sp,
-            fontWeight: FontWeight.bold,
-          ),
-          const SizedBox(height: 8),
-          TextWidget(
-            text: 'Try different keywords or check your spelling',
-            color: Colors.grey[600],
-            fontSize: 15.sp,
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildNoResultsView(SearchProvider provider) {
+  //   return Center(
+  //     child: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         const Icon(
+  //           Icons.search_off,
+  //           size: 80,
+  //           color: Colors.grey,
+  //         ),
+  //         const SizedBox(height: 16),
+  //         TextWidget(
+  //           text: 'No results found for "${provider.currentQuery}"',
+  //           fontSize: 17.sp,
+  //           fontWeight: FontWeight.bold,
+  //         ),
+  //         const SizedBox(height: 8),
+  //         TextWidget(
+  //           text: 'Try different keywords or check your spelling',
+  //           color: Colors.grey[600],
+  //           fontSize: 15.sp,
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildCategoryContent(SearchProvider provider) {
     final categoryResults =

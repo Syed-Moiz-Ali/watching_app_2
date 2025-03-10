@@ -11,14 +11,13 @@ import 'package:open_file/open_file.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
 
 import '../widgets/misc/text_widget.dart';
 
 class UpdateScreen extends StatefulWidget {
   final String updateUrl;
-  const UpdateScreen({Key? key, required this.updateUrl}) : super(key: key);
+  const UpdateScreen({super.key, required this.updateUrl});
 
   @override
   _UpdateScreenState createState() => _UpdateScreenState();
@@ -368,7 +367,7 @@ class _UpdateScreenState extends State<UpdateScreen>
                       _bgDarkColor,
                       _bgLightColor,
                     ],
-                    stops: [0.3, 0.9],
+                    stops: const [0.3, 0.9],
                   ),
                 ),
               );

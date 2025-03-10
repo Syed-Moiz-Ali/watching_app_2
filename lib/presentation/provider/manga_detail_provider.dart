@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:watching_app_2/data/models/content_source.dart';
 
 import '../../core/global/globals.dart';
 import '../../data/models/content_item.dart';

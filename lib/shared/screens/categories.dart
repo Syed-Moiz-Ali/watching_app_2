@@ -123,6 +123,7 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
   }
 
   // Premium badge widget
+  // ignore: unused_element
   Widget _buildPremiumBadge() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
@@ -159,49 +160,6 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
   }
 
   // Enhanced animated background
-  Widget _buildAnimatedBackground() {
-    return AnimatedBuilder(
-      animation: _backgroundController,
-      builder: (context, _) {
-        return Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: const [
-                Colors.black,
-                Color.fromARGB(255, 40, 40, 40),
-                Color.fromARGB(255, 25, 25, 25),
-              ],
-              stops: [
-                0.0,
-                _backgroundController.value * 0.5,
-                1.0,
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  // Overlay gradient for depth
-  Widget _buildOverlayGradient() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Colors.black.withOpacity(0.7),
-            Colors.transparent,
-            Colors.black.withOpacity(0.2),
-          ],
-          stops: const [0.0, 0.2, 0.85],
-        ),
-      ),
-    );
-  }
 
   // Shimmer loading effect
   Widget _buildShimmerLoading() {
@@ -575,17 +533,6 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
           _filterCategories(value);
           // searchVideos(value);
         },
-        actions: [
-          // IconButton(
-          //   icon: const Icon(Icons.search, size: 26),
-          //   onPressed: () {
-          //     HapticFeedback.lightImpact();
-          //     // Search functionality
-          //   },
-          // ),
-          // const SizedBox(width: 12),
-          // _buildPremiumBadge(),
-        ],
       ),
       body: Stack(
         children: [
@@ -777,66 +724,6 @@ class _EnhancedCategoryDetailScreenState
   }
 
   // Helper method to build review items
-  Widget _buildReviewItem(
-      String name, String avatar, String comment, double rating) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey[900]!.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                backgroundImage: NetworkImage(avatar),
-                radius: 20,
-              ),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextWidget(
-                    text: name,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      ...List.generate(5, (index) {
-                        return Icon(
-                          index < rating.floor()
-                              ? Icons.star
-                              : Icons.star_border,
-                          color: Colors.amber,
-                          size: 14,
-                        );
-                      }),
-                      const SizedBox(width: 4),
-                      TextWidget(
-                        text: rating.toString(),
-                        fontSize: 12.sp,
-                        color: Colors.white.withOpacity(0.7),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          TextWidget(
-            text: comment,
-            fontSize: 14.sp,
-            color: Colors.white.withOpacity(0.8),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

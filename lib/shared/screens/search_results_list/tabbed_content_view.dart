@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_use_of_protected_member
+
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -451,11 +453,6 @@ class _TabbedContentViewState extends State<TabbedContentView>
                     final scaleController = AnimationController(
                         duration: const Duration(milliseconds: 200),
                         vsync: this);
-                    final scaleAnimation =
-                        Tween<double>(begin: 1.0, end: 0.95).animate(
-                      CurvedAnimation(
-                          parent: scaleController, curve: Curves.easeInOut),
-                    );
 
                     scaleController.forward().then((_) {
                       scaleController.reverse().then((_) {
@@ -478,7 +475,7 @@ class _TabbedContentViewState extends State<TabbedContentView>
                     bottom: 20.sp,
                     left: 0,
                     right: 0,
-                    child: Center(
+                    child: const Center(
                       child: CircularProgressIndicator(),
                     ),
                   ),

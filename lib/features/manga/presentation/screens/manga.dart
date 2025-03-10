@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/enums/enums.dart';
 import '../../../../core/navigation/app_navigator.dart';
-import '../../../../core/navigation/routes.dart';
 import '../../../../data/models/content_item.dart';
 import '../../../../data/models/content_source.dart';
 import '../../../../data/scrapers/scraper_service.dart';

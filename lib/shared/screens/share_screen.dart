@@ -1,10 +1,12 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:uni_links/uni_links.dart';
 
 class DeepLinkHandler extends StatefulWidget {
-  const DeepLinkHandler({Key? key}) : super(key: key);
+  const DeepLinkHandler({super.key});
 
   @override
   _DeepLinkHandlerState createState() => _DeepLinkHandlerState();

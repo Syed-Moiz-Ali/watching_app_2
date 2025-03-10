@@ -1,7 +1,7 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import '../../core/global/globals.dart'; // For SMA.pref
-import '../themes/app_theme.dart';
-import '../themes/dark_theme.dart';
 
 class ThemeProvider extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system; // Default to system theme
@@ -64,7 +64,7 @@ class ThemeProvider extends ChangeNotifier {
   void _updateDarkThemeStatus() {
     if (_themeMode == ThemeMode.system) {
       _isDarkTheme =
-          WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
+          PlatformDispatcher.instance.platformBrightness == Brightness.dark;
     } else {
       _isDarkTheme = _themeMode == ThemeMode.dark;
     }

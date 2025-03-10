@@ -8,9 +8,7 @@ import 'package:watching_app_2/shared/widgets/misc/image.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 import 'package:watching_app_2/data/models/content_source.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
-
 import '../../../../presentation/provider/source_provider.dart';
-import '../../../../features/videos/presentation/screens/videos.dart';
 
 class SourceCard extends StatefulWidget {
   final ContentSource source;
@@ -26,6 +24,7 @@ class _SourceCardState extends State<SourceCard> with TickerProviderStateMixin {
   late final Animation<double> _scaleAnimation;
   late final Animation<double> _fadeAnimation;
   late final Animation<double> _rotateAnimation;
+  late FocusNode _focusNode;
 
   @override
   void initState() {
@@ -48,11 +47,14 @@ class _SourceCardState extends State<SourceCard> with TickerProviderStateMixin {
     );
 
     _controller.forward();
+
+    _focusNode = FocusNode();
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -77,86 +79,93 @@ class _SourceCardState extends State<SourceCard> with TickerProviderStateMixin {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: AppColors.greyColor),
-          // boxShadow: [AppColors.shadow]
         ),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: () {
-            var provider = context.read<SourceProvider>();
-            provider.selectedQuery = widget.source.query.entries.first.value;
-            provider.updateState();
-            if (widget.source.type == '1') {
-              NH.nameNavigateTo(AppRoutes.videoList,
-                  arguments: {"source": widget.source});
-              // NH.navigateTo(VideoListScreen(source: widget.source));
-            } else if (widget.source.type == '3') {
-              // NH.navigateTo(WallpapersList(source: widget.source));
-              NH.nameNavigateTo(AppRoutes.wallpapers,
-                  arguments: {"source": widget.source});
-            } else if (widget.source.type == '4') {
-              NH.navigateTo(Manga(source: widget.source));
+        child: Focus(
+          focusNode: _focusNode,
+          onFocusChange: (hasFocus) {
+            if (hasFocus) {
+              // Perform any action when the card is focused (like changing color)
             }
           },
-          child: Padding(
-            padding: const EdgeInsets.all(18),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    // color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(18),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: () {
+              var provider = context.read<SourceProvider>();
+              provider.selectedQuery = widget.source.query.entries.first.value;
+              provider.updateState();
+              if (widget.source.type == '1') {
+                NH.nameNavigateTo(AppRoutes.videoList,
+                    arguments: {"source": widget.source});
+              } else if (widget.source.type == '3') {
+                NH.nameNavigateTo(AppRoutes.wallpapers,
+                    arguments: {"source": widget.source});
+              } else if (widget.source.type == '4') {
+                NH.navigateTo(Manga(source: widget.source));
+              }
+            },
+            onFocusChange: (hasFocus) {
+              // This can help to modify UI when the item is focused on remote.
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: CustomImageWidget(
+                      imagePath: widget.source.icon,
+                      height: 50,
+                      width: 50,
+                      fit: BoxFit.contain,
+                    ),
                   ),
-                  child: CustomImageWidget(
-                    imagePath: widget.source.icon,
-                    height: 50,
-                    width: 50,
-                    fit: BoxFit.contain,
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextWidget(
+                          text: widget.source.name,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.sp,
+                        ),
+                        const SizedBox(height: 6),
+                        TextWidget(
+                          text: 'Type: ${widget.source.type}',
+                          fontSize: 14.sp,
+                          color: AppColors.greyColor,
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            if (widget.source.nsfw == '1')
+                              Icon(
+                                Icons.lock_outline,
+                                size: 18.sp,
+                                color: AppColors.errorColor,
+                              ),
+                            const SizedBox(width: 6),
+                            if (widget.source.nsfw == '1')
+                              TextWidget(
+                                text: 'NSFW',
+                                fontSize: 14.sp,
+                                color: AppColors.errorColor,
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextWidget(
-                        text: widget.source.name,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16.sp,
-                      ),
-                      const SizedBox(height: 6),
-                      TextWidget(
-                        text: 'Type: ${widget.source.type}',
-                        fontSize: 14.sp,
-                        color: AppColors.greyColor,
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          if (widget.source.nsfw == '1')
-                            Icon(
-                              Icons.lock_outline,
-                              size: 18.sp,
-                              color: AppColors.errorColor,
-                            ),
-                          const SizedBox(width: 6),
-                          if (widget.source.nsfw == '1')
-                            TextWidget(
-                              text: 'NSFW',
-                              fontSize: 14.sp,
-                              color: AppColors.errorColor,
-                            ),
-                        ],
-                      ),
-                    ],
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: 18.sp,
+                    color: Colors.grey[600],
                   ),
-                ),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  size: 18.sp,
-                  color: Colors.grey[600],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
