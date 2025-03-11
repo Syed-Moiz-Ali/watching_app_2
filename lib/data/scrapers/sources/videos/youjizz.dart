@@ -27,18 +27,18 @@ class YouJizz extends BaseScraper {
                 selector: '.video-item > .frame-wrapper > a',
                 attribute: 'data-clip', // Extract duration from text content
               ),
-              watchingLinkSelector: ElementSelector(
-                customExtraction: (element) {
-                  Map watchingLinks = {};
-                  var links = element
-                      .querySelector('video > source')
-                      ?.attributes['src'];
-                  Map params = {'auto': links};
-                  watchingLinks.addEntries(params.entries);
-                  // Return the encoded JSON string of watching links
-                  return Future.value(json.encode(watchingLinks));
-                },
-              ),
+              // watchingLinkSelector: ElementSelector(
+              //   customExtraction: (element) {
+              //     Map watchingLinks = {};
+              //     var links = element
+              //         .querySelector('video > source')
+              //         ?.attributes['src'];
+              //     Map params = {'auto': links};
+              //     watchingLinks.addEntries(params.entries);
+              //     // Return the encoded JSON string of watching links
+              //     return Future.value(json.encode(watchingLinks));
+              //   },
+              // ),
               keywordsSelector: ElementSelector(
                 selector: 'meta[name="keywords"]',
                 attribute: 'content', // Extract duration from text content

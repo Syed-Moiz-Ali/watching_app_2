@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
@@ -17,25 +19,24 @@ abstract class BaseScraper {
 
   BaseScraper(this.source, this.config);
 
-  // Required methods that must be implemented
   Future<List<ContentItem>> scrapeContent(String html) {
     final document = parse(html);
     final contentElements =
-        document.querySelectorAll(config.contentSelector!.selector!);
+        document.querySelectorAll(config.contentSelector?.selector ?? '');
     return parseElements(contentElements);
   }
 
   Future<List<ContentItem>> scrapeDetailContent(String html) {
     final document = parse(html);
     final contentElements =
-        document.querySelectorAll(config.detailSelector!.selector!);
+        document.querySelectorAll(config.detailSelector?.selector ?? '');
     return parseElements(contentElements);
   }
 
   Future<List<ContentItem>> scrapeChapterContent(String html) {
     final document = parse(html);
     final contentElements =
-        document.querySelectorAll(config.chapterDataSelector!.selector!);
+        document.querySelectorAll(config.chapterDataSelector?.selector ?? '');
     return parseElements(contentElements);
   }
 
@@ -65,16 +66,14 @@ abstract class BaseScraper {
     return await fetchChapterAndScrape(url);
   }
 
-  // Optional methods with default implementations
   Future<List<VideoSource>> scrapeVideos(String html) async {
     if (config.videoSelector != null) {
       final document = parse(html);
       final contentElements =
-          document.querySelectorAll(config.videoSelector!.selector!);
+          document.querySelectorAll(config.videoSelector!.selector ?? '');
       return await videoParseElement(document, contentElements.first);
-    } else {
-      return [];
     }
+    return [];
   }
 
   Future<List<VideoSource>> getVideos(String url) async {
@@ -84,7 +83,6 @@ abstract class BaseScraper {
   Future<List<ContentItem>> fetchCotentAndScrape(String url) async {
     try {
       final response = await ApiClient.request(url: url);
-      // log("reponse is ${response}");
       return scrapeContent(response);
     } catch (e) {
       SMA.logger.logError('Error fetching data from $url: $e');
@@ -95,7 +93,6 @@ abstract class BaseScraper {
   Future<List<ContentItem>> fetchDetailAndScrape(String url) async {
     try {
       final response = await ApiClient.request(url: url);
-      // log("reponse is ${response}");
       return scrapeDetailContent(response);
     } catch (e) {
       SMA.logger.logError('Error fetching data from $url: $e');
@@ -106,7 +103,6 @@ abstract class BaseScraper {
   Future<List<ContentItem>> fetchChapterAndScrape(String url) async {
     try {
       final response = await ApiClient.request(url: url);
-      // log("reponse is ${response}");
       return scrapeChapterContent(response);
     } catch (e) {
       SMA.logger.logError('Error fetching data from $url: $e');
@@ -117,8 +113,7 @@ abstract class BaseScraper {
   Future<List<VideoSource>> fetchVideoAndScrape(String url) async {
     try {
       final response = await ApiClient.request(url: url);
-
-      scrapeSimilarContent(response); // We call it here in base class.
+      await scrapeSimilarContent(response);
       return scrapeVideos(response);
     } catch (e) {
       SMA.logger.logError('Error fetching data from $url: $e');
@@ -132,14 +127,10 @@ abstract class BaseScraper {
     await similarContentProvider.setSimilarContents([]);
 
     final document = parse(html);
-    final similarContentElements =
-        document.querySelectorAll(config.similarContentSelector!.selector!);
+    final similarContentElements = document
+        .querySelectorAll(config.similarContentSelector?.selector ?? '');
 
-    // Assuming we handle similar content scraping here
     var similarContent = await parseElements(similarContentElements);
-
-    // Optionally, you could also update your `SimilarContentProvider` here,
-    // which could be done in one place across all scrapers
     await similarContentProvider.setSimilarContents(similarContent);
 
     return similarContent;
@@ -161,25 +152,24 @@ abstract class BaseScraper {
   Future<List<VideoSource>> videoParseElement(
       Document document, Element element) async {
     final List<VideoSource> items = [];
-
     try {
-      final item = await parseSingleVideoElement(
-          document, element); // Reuses parseElement from BaseScraper
+      final item = await parseSingleVideoElement(document, element);
       items.add(item);
     } catch (e) {
-      SMA.logger.logError('Error parsing element: $e');
+      SMA.logger.logError('Error parsing video element: $e');
     }
-
     return items;
   }
 
-  // Helper methods for all scrapers
   Future<String?> getAttributeValue(ElementSelector? selector,
       {Element? element, Document? document}) async {
     try {
       if (selector == null) return null;
-      if (selector.customExtraction != null) {
-        return await selector.customExtraction!(element!);
+      log("selector value is ${selector.customExtraction}");
+      if (selector.customExtraction != null &&
+          selector.customExtraction == true) {
+        return await extractCustomValue(selector,
+            element: element, document: document);
       }
       final elementTag = document != null
           ? document.querySelector(selector.selector ?? '')
@@ -195,7 +185,11 @@ abstract class BaseScraper {
     }
   }
 
-  // Scraping the content using selectors defined in config
+  Future<String?> extractCustomValue(ElementSelector selector,
+      {Element? element, Document? document}) async {
+    return null; // Overridden by specific scrapers
+  }
+
   Future<ContentItem> parseElement(Element element) async {
     return ContentItem(
       title: await getAttributeValue(element: element, config.titleSelector) ??

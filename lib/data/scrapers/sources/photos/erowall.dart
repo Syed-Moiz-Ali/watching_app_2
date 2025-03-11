@@ -14,17 +14,17 @@ class EroWall extends BaseScraper {
               attribute: 'alt', // Extract title from 'title' attribute
             ),
             thumbnailSelector: ElementSelector(
-              customExtraction: (Element element) {
-                String imageUrl = element
-                    .querySelector(' a > img')!
-                    .attributes['src']
-                    .toString()
-                    .replaceAll('thumb', 'original');
-                // }
-                // log('image is $imageUrl');
-                return Future.value(imageUrl.trim());
-              },
-            ),
+                // customExtraction: (Element element) {
+                //   String imageUrl = element
+                //       .querySelector(' a > img')!
+                //       .attributes['src']
+                //       .toString()
+                //       .replaceAll('thumb', 'original');
+                //   // }
+                //   // log('image is $imageUrl');
+                //   return Future.value(imageUrl.trim());
+                // },
+                ),
             contentUrlSelector: ElementSelector(
               selector: ' a',
               attribute: 'href', // Extract content URL from 'href' attribute

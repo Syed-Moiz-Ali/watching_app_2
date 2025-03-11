@@ -17,17 +17,18 @@ class HQPorner extends BaseScraper {
               thumbnailSelector: ElementSelector(
                   // selector: 'section > ',
                   // attribute: 'src', // Extract thumbnail from 'data-src'
-                  customExtraction: (Element element) {
-                var imageElement = element
-                    .querySelector('section > a > div')!
-                    .attributes['onmouseleave']!
-                    .split(',')
-                    .first
-                    .replaceAll('defaultImage(', '')
-                    .replaceAll('"', '');
+                  //     customExtraction: (Element element) {
+                  //   var imageElement = element
+                  //       .querySelector('section > a > div')!
+                  //       .attributes['onmouseleave']!
+                  //       .split(',')
+                  //       .first
+                  //       .replaceAll('defaultImage(', '')
+                  //       .replaceAll('"', '');
 
-                return Future.value(imageElement);
-              }),
+                  //   return Future.value(imageElement);
+                  // }
+                  ),
               contentUrlSelector: ElementSelector(
                 selector: 'section > a',
                 attribute: 'href', // Extract content URL from 'href' attribute
@@ -50,24 +51,24 @@ class HQPorner extends BaseScraper {
                 attribute:
                     'data-trailer_url', // Extract duration from text content
               ),
-              watchingLinkSelector: ElementSelector(
-                customExtraction: (element) {
-                  Map watchingLinks = {};
-                  var links = element.querySelector('script')?.text;
-                  RegExp regExp = RegExp(r"url: '.*\?i=(//.*?/video/.*?)'");
+              // watchingLinkSelector: ElementSelector(
+              //   customExtraction: (element) {
+              //     Map watchingLinks = {};
+              //     var links = element.querySelector('script')?.text;
+              //     RegExp regExp = RegExp(r"url: '.*\?i=(//.*?/video/.*?)'");
 
-                  // Find the first match in the script content
-                  RegExpMatch? match = regExp.firstMatch(links!);
-                  String? link = '';
-                  if (match != null) {
-                    link = 'https:${match.group(1)}';
-                  } else {}
-                  Map params = {'auto': link};
-                  watchingLinks.addEntries(params.entries);
-                  // Return the encoded JSON string of watching links
-                  return Future.value(json.encode(watchingLinks));
-                },
-              ),
+              //     // Find the first match in the script content
+              //     RegExpMatch? match = regExp.firstMatch(links!);
+              //     String? link = '';
+              //     if (match != null) {
+              //       link = 'https:${match.group(1)}';
+              //     } else {}
+              //     Map params = {'auto': link};
+              //     watchingLinks.addEntries(params.entries);
+              //     // Return the encoded JSON string of watching links
+              //     return Future.value(json.encode(watchingLinks));
+              //   },
+              // ),
               keywordsSelector: ElementSelector(
                 selector: 'meta[name="keywords"]',
                 attribute: 'content', // Extract duration from text content

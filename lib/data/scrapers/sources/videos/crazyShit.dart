@@ -27,21 +27,21 @@ class CrazyShit extends BaseScraper {
                 selector: '.meta > .stats >.views',
                 // attribute: 'text', // Extract time from text content
               ),
-              watchingLinkSelector: ElementSelector(
-                customExtraction: (element) {
-                  Map watchingLinks = {};
-                  var selector = element.querySelector('.media > .mediabox');
-                  var links = selector!
-                      .querySelector('video > source')
-                      ?.attributes['src'];
+              // watchingLinkSelector: ElementSelector(
+              //   customExtraction: (element) {
+              //     Map watchingLinks = {};
+              //     var selector = element.querySelector('.media > .mediabox');
+              //     var links = selector!
+              //         .querySelector('video > source')
+              //         ?.attributes['src'];
 
-                  Map params = {'auto': links};
-                  watchingLinks.addEntries(params.entries);
+              //     Map params = {'auto': links};
+              //     watchingLinks.addEntries(params.entries);
 
-                  // Return the encoded JSON string of watching links
-                  return Future.value(json.encode(watchingLinks));
-                },
-              ),
+              //     // Return the encoded JSON string of watching links
+              //     return Future.value(json.encode(watchingLinks));
+              //   },
+              // ),
               keywordsSelector: ElementSelector(
                 selector: 'meta[name="keywords"]',
                 attribute: 'content', // Extract duration from text content

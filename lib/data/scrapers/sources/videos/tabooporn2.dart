@@ -14,36 +14,36 @@ class Tabooporn2 extends BaseScraper {
                 attribute: 'title', // Extract title from 'title' attribute
               ),
               thumbnailSelector: ElementSelector(
-                customExtraction: (element) {
-                  var srcset = element
-                      .querySelector(
-                          'article > div > a > .g1-frame-inner > img')
-                      ?.attributes['srcset'];
-                  var imageUrl = '';
-                  if (srcset != null) {
-                    // Split the srcset attribute by comma to get individual sources
-                    var sources = srcset.split(', ');
-                    if (sources.isNotEmpty) {
-                      // Get the first source
-                      var firstSource = sources.first;
-                      // Split the first source by space to get the URL and size
-                      var parts = firstSource.split(' ');
-                      if (parts.length >= 2) {
-                        // The URL is the first part
-                        imageUrl = parts[0];
-                      }
-                    }
-                  } else {
-                    imageUrl = element
-                            .querySelector(
-                                'article > div > a > .g1-frame-inner > img')
-                            ?.attributes['data-src'] ??
-                        '';
-                  }
-                  // log('image is $imageUrl');
-                  return Future.value(imageUrl.trim());
-                },
-              ),
+                  // customExtraction: (element) {
+                  //   var srcset = element
+                  //       .querySelector(
+                  //           'article > div > a > .g1-frame-inner > img')
+                  //       ?.attributes['srcset'];
+                  //   var imageUrl = '';
+                  //   if (srcset != null) {
+                  //     // Split the srcset attribute by comma to get individual sources
+                  //     var sources = srcset.split(', ');
+                  //     if (sources.isNotEmpty) {
+                  //       // Get the first source
+                  //       var firstSource = sources.first;
+                  //       // Split the first source by space to get the URL and size
+                  //       var parts = firstSource.split(' ');
+                  //       if (parts.length >= 2) {
+                  //         // The URL is the first part
+                  //         imageUrl = parts[0];
+                  //       }
+                  //     }
+                  //   } else {
+                  //     imageUrl = element
+                  //             .querySelector(
+                  //                 'article > div > a > .g1-frame-inner > img')
+                  //             ?.attributes['data-src'] ??
+                  //         '';
+                  //   }
+                  //   // log('image is $imageUrl');
+                  //   return Future.value(imageUrl.trim());
+                  // },
+                  ),
               contentUrlSelector: ElementSelector(
                 selector: 'article > div > a ',
                 attribute: 'href', // Extract content URL from 'href' attribute
@@ -65,18 +65,18 @@ class Tabooporn2 extends BaseScraper {
                 attribute:
                     'data-trailer_url', // Extract duration from text content
               ),
-              watchingLinkSelector: ElementSelector(
-                customExtraction: (element) {
-                  Map watchingLinks = {};
-                  var links = element
-                      .querySelector('video > source')
-                      ?.attributes['src'];
-                  Map params = {'auto': links};
-                  watchingLinks.addEntries(params.entries);
-                  // Return the encoded JSON string of watching links
-                  return Future.value(json.encode(watchingLinks));
-                },
-              ),
+              // watchingLinkSelector: ElementSelector(
+              //   customExtraction: (element) {
+              //     Map watchingLinks = {};
+              //     var links = element
+              //         .querySelector('video > source')
+              //         ?.attributes['src'];
+              //     Map params = {'auto': links};
+              //     watchingLinks.addEntries(params.entries);
+              //     // Return the encoded JSON string of watching links
+              //     return Future.value(json.encode(watchingLinks));
+              //   },
+              // ),
               keywordsSelector: ElementSelector(
                 selector: 'meta[name="keywords"]',
                 attribute: 'content', // Extract duration from text content

@@ -38,20 +38,20 @@ class SxyPrn extends BaseScraper {
                   '.js-pop  > .vid_container >   .post_vid_thumb >  video',
               attribute: 'src',
             ),
-            watchingLinkSelector: ElementSelector(
-                customExtraction: (element) {
-                  Map watchingLink = {};
-                  var scripts = element
-                      .querySelectorAll('#vid_container_id')
-                      .first
-                      .outerHtml;
-                  log('scripts is $scripts');
-                  // watchingLink.addEntries(params.entries);
-                  return Future.value(json.encode(watchingLink));
-                },
-                // selector:
-                //     '#vid_container_id > .yps_player_wrap_wrap > .yps_player_wrap > video',
-                attribute: 'src'),
+            // watchingLinkSelector: ElementSelector(
+            //     customExtraction: (element) {
+            //       Map watchingLink = {};
+            //       var scripts = element
+            //           .querySelectorAll('#vid_container_id')
+            //           .first
+            //           .outerHtml;
+            //       log('scripts is $scripts');
+            //       // watchingLink.addEntries(params.entries);
+            //       return Future.value(json.encode(watchingLink));
+            //     },
+            //     // selector:
+            //     //     '#vid_container_id > .yps_player_wrap_wrap > .yps_player_wrap > video',
+            //     attribute: 'src'),
             keywordsSelector: ElementSelector(
               selector: 'meta[name="keywords"]',
               attribute: 'content',

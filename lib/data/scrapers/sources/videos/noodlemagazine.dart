@@ -38,50 +38,50 @@ class NoodleMagazine extends BaseScraper {
                 attribute:
                     'data-trailer_url', // Extract duration from text content
               ),
-              watchingLinkSelector: ElementSelector(
-                customExtraction: (element) {
-                  Map<String, dynamic> watchingLinks = {};
+              // watchingLinkSelector: ElementSelector(
+              //   customExtraction: (element) {
+              //     Map<String, dynamic> watchingLinks = {};
 
-                  final scriptTags = element.getElementsByTagName('script');
+              //     final scriptTags = element.getElementsByTagName('script');
 
-                  for (var script in scriptTags) {
-                    final scriptContent = script.outerHtml;
+              //     for (var script in scriptTags) {
+              //       final scriptContent = script.outerHtml;
 
-                    if (scriptContent.contains('window.playlist')) {
-                      // Extract JSON-like data from the script
-                      final jsonPattern = RegExp(
-                          r'window\.playlist\s*=\s*(\{.*?\});',
-                          dotAll: true);
-                      final jsonMatch = jsonPattern.firstMatch(scriptContent);
+              //       if (scriptContent.contains('window.playlist')) {
+              //         // Extract JSON-like data from the script
+              //         final jsonPattern = RegExp(
+              //             r'window\.playlist\s*=\s*(\{.*?\});',
+              //             dotAll: true);
+              //         final jsonMatch = jsonPattern.firstMatch(scriptContent);
 
-                      if (jsonMatch != null) {
-                        final jsonString = jsonMatch.group(1)!;
+              //         if (jsonMatch != null) {
+              //           final jsonString = jsonMatch.group(1)!;
 
-                        try {
-                          // Try to parse the JSON string to validate its structure
-                          final jsonData = json.decode(jsonString);
-                          // If valid, return the JSON string or process it as needed
-                          var sources = jsonData['sources'];
+              //           try {
+              //             // Try to parse the JSON string to validate its structure
+              //             final jsonData = json.decode(jsonString);
+              //             // If valid, return the JSON string or process it as needed
+              //             var sources = jsonData['sources'];
 
-                          final sourceList = List.from(sources);
+              //             final sourceList = List.from(sources);
 
-                          for (var source in sourceList) {
-                            final label = source['label'].toString();
-                            final file = source['file'].toString();
+              //             for (var source in sourceList) {
+              //               final label = source['label'].toString();
+              //               final file = source['file'].toString();
 
-                            watchingLinks['${label}p'] = file;
-                          }
-                        } catch (e) {
-                          // Handle JSON parsing error
-                        }
-                      }
-                    }
-                  }
+              //               watchingLinks['${label}p'] = file;
+              //             }
+              //           } catch (e) {
+              //             // Handle JSON parsing error
+              //           }
+              //         }
+              //       }
+              //     }
 
-                  // Return the encoded JSON string of watching links
-                  return Future.value(json.encode(watchingLinks));
-                },
-              ),
+              //     // Return the encoded JSON string of watching links
+              //     return Future.value(json.encode(watchingLinks));
+              //   },
+              // ),
               keywordsSelector: ElementSelector(
                 selector: 'meta[name="keywords"]',
                 attribute: 'content', // Extract duration from text content

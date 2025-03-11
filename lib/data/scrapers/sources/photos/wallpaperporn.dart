@@ -14,18 +14,18 @@ class WallpaperPorn extends BaseScraper {
               attribute: 'alt', // Extract title from 'title' attribute
             ),
             thumbnailSelector: ElementSelector(
-              customExtraction: (Element element) {
-                var imageUrl = element
-                    .querySelector(' a > img')
-                    ?.attributes['src']
-                    .toString()
-                    .replaceAll('thumbnail/md', '1920x1080')
-                    .replaceAll('thumbnail/lg', '1920x1080');
+                // customExtraction: (Element element) {
+                //   var imageUrl = element
+                //       .querySelector(' a > img')
+                //       ?.attributes['src']
+                //       .toString()
+                //       .replaceAll('thumbnail/md', '1920x1080')
+                //       .replaceAll('thumbnail/lg', '1920x1080');
 
-                // log('image is $imageUrl');
-                return Future.value(imageUrl!.trim());
-              },
-            ),
+                //   // log('image is $imageUrl');
+                //   return Future.value(imageUrl!.trim());
+                // },
+                ),
             contentUrlSelector: ElementSelector(
               selector: ' a',
               attribute: 'href', // Extract content URL from 'href' attribute

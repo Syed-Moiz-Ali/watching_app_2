@@ -28,36 +28,36 @@ class Baddies extends BaseScraper {
                 selector: '.bx-item   >  a > div >  img',
                 attribute: 'data-preview', // Extract duration from text content
               ),
-              watchingLinkSelector: ElementSelector(
-                customExtraction: (element) {
-                  Map watchingLinks = {};
-                  // log('the link of this is ${element.querySelector('#video_html5_api')!.outerHtml}');
+              // watchingLinkSelector: ElementSelector(
+              //   customExtraction: (element) {
+              //     Map watchingLinks = {};
+              //     // log('the link of this is ${element.querySelector('#video_html5_api')!.outerHtml}');
 
-                  List<Element> scriptTags = element.querySelectorAll('script');
+              //     List<Element> scriptTags = element.querySelectorAll('script');
 
-                  // Find the script tag containing '<![CDATA[' in its content
-                  Element? cdataScriptTag = scriptTags.firstWhere(
-                    (scriptTag) => scriptTag.text.contains('<![CDATA['),
-                    // orElse: () => null,
-                  );
-                  String jsContent = cdataScriptTag.text;
+              //     // Find the script tag containing '<![CDATA[' in its content
+              //     Element? cdataScriptTag = scriptTags.firstWhere(
+              //       (scriptTag) => scriptTag.text.contains('<![CDATA['),
+              //       // orElse: () => null,
+              //     );
+              //     String jsContent = cdataScriptTag.text;
 
-                  // Define regular expressions to extract key-value pairs from the JavaScript content
-                  RegExp videoUrlRegex = RegExp(r"video_id: '([^']+)'");
+              //     // Define regular expressions to extract key-value pairs from the JavaScript content
+              //     RegExp videoUrlRegex = RegExp(r"video_id: '([^']+)'");
 
-                  // Find the first match for video_url
-                  RegExpMatch? match = videoUrlRegex.firstMatch(jsContent);
+              //     // Find the first match for video_url
+              //     RegExpMatch? match = videoUrlRegex.firstMatch(jsContent);
 
-                  // Return the video_url if found, otherwise return null
-                  if (match != null) {
-                    var dataMap = match.group(1)!.replaceAll('function/0/', '');
-                    Map params = {'auto': 'https://baddies.xxx/embed/$dataMap'};
-                    watchingLinks.addEntries(params.entries);
-                  } else {}
-                  // Return the encoded JSON string of watching links
-                  return Future.value(json.encode(watchingLinks));
-                },
-              ),
+              //     // Return the video_url if found, otherwise return null
+              //     if (match != null) {
+              //       var dataMap = match.group(1)!.replaceAll('function/0/', '');
+              //       Map params = {'auto': 'https://baddies.xxx/embed/$dataMap'};
+              //       watchingLinks.addEntries(params.entries);
+              //     } else {}
+              //     // Return the encoded JSON string of watching links
+              //     return Future.value(json.encode(watchingLinks));
+              //   },
+              // ),
               keywordsSelector: ElementSelector(
                 selector: 'meta[name="keywords"]',
                 attribute: 'content', // Extract duration from text content

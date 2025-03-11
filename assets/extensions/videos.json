@@ -17,7 +17,51 @@
     "name": "spankbang",
     "icon": "https://assets.sb-cd.com/static/mobile/Images/logo_v5@2x.png",
     "NSFW": "1",
-    "isPreview": "1"
+    "isPreview": "1",
+    "config": {
+        "title_selector": {
+          "selector": ".thumb",
+          "attribute": "title"
+        },
+        "thumbnail_selector": {
+          "selector": ".thumb > picture > img",
+          "attribute": "data-src"
+        },
+        "content_url_selector": {
+          "selector": ".thumb",
+          "attribute": "href"
+        },
+        "quality_selector": {
+          "selector": ".thumb > .h"
+        },
+        "time_selector": {
+          "selector": ".thumb > .l"
+        },
+        "duration_selector": {
+          "selector": ".thumb > .l"
+        },
+        "preview_selector": {
+          "selector": ".thumb > picture > img",
+          "attribute": "data-preview"
+        },
+        "watching_link_selector": {
+          "custom_extraction": true
+        },
+        "keywords_selector": {
+          "selector": "meta[name=\"keywords\"]",
+          "attribute": "content"
+        },
+        "similar_content_selector": {
+          "selector": ".user_uploads > .video-list > .video-item"
+        },
+        "video_selector": {
+          "selector": "main"
+        },
+        "content_selector": {
+          "selector": ".video-list > .video-item"
+        }
+      },
+      "enabled": true
   },
 
   {
