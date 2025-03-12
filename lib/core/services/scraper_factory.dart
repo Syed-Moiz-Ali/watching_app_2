@@ -1,7 +1,6 @@
 import '../../data/models/scraper_config.dart';
 import '../../data/scrapers/sources/manga/kissmanga.dart';
 import '../../data/scrapers/sources/manga/manhwa18.dart';
-import '../../data/scrapers/sources/photos/elitebabe.dart';
 import '../../data/scrapers/sources/photos/erowall.dart';
 import '../../data/scrapers/sources/photos/peakpx.dart';
 import '../../data/scrapers/sources/photos/pmatehunter.dart';
@@ -54,7 +53,7 @@ class ScraperFactory {
 
     //wallpapers
     'pmatehunter': (source) => PMateHunter(source),
-    'elitebabes': (source) => EliteBabe(source),
+    'elitebabes': (source) => PMateHunter(source),
     'erowall': (source) => EroWall(source),
     'peakpx': (source) => PeakPx(source),
     'pxfuel': (source) => PeakPx(source),

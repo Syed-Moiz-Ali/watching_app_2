@@ -29,7 +29,28 @@
     "pageType": "page=",
     "query": {
       "all": "?page={page}"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "figure > a >  img",
+        "attribute": "alt"
+      },
+      "thumbnail_selector": {
+        "custom_extraction": true
+      },
+      "content_url_selector": {
+        "selector": "figure > a",
+        "attribute": "href"
+      },
+
+      "similar_content_selector": {
+        "selector": ".user_uploads > .video-list > .video-item"
+      },
+      "content_selector": {
+        "selector": "ul  > li[itemprop=\"associatedMedia\"]"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://www.pxfuel.com/",
@@ -45,7 +66,28 @@
     "pageType": "page=",
     "query": {
       "all": "?page={page}"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "figure > a >  img",
+        "attribute": "alt"
+      },
+      "thumbnail_selector": {
+        "custom_extraction": true
+      },
+      "content_url_selector": {
+        "selector": "figure > a",
+        "attribute": "href"
+      },
+
+      "similar_content_selector": {
+        "selector": ".user_uploads > .video-list > .video-item"
+      },
+      "content_selector": {
+        "selector": "ul  > li[itemprop=\"associatedMedia\"]"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://www.wallpaperbetter.com/",
@@ -61,7 +103,28 @@
     "pageType": "page=",
     "query": {
       "all": "?page={page}"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "figure > a >  img",
+        "attribute": "alt"
+      },
+      "thumbnail_selector": {
+        "custom_extraction": true
+      },
+      "content_url_selector": {
+        "selector": "figure > a",
+        "attribute": "href"
+      },
+
+      "similar_content_selector": {
+        "selector": ".user_uploads > .video-list > .video-item"
+      },
+      "content_selector": {
+        "selector": "ul  > li[itemprop=\"associatedMedia\"]"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://wallpaper.mob.org/",
@@ -77,7 +140,25 @@
     "pageType": "page=",
     "query": {
       "all": "best/{page}/"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "div > a >  img",
+        "attribute": "alt"
+      },
+      "thumbnail_selector": {
+        "custom_extraction": true
+      },
+      "content_url_selector": {
+        "selector": "div > a",
+        "attribute": "href"
+      },
+
+      "content_selector": {
+        "selector": ".container-2  > .image-gallery-items > .image-gallery-items__item"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://www.worldsex.com/",
@@ -113,7 +194,25 @@
       "popular": "gridapi/?content=updates&sort=popular&mpage={page}",
       "pics": "gridapi/?content=%7B%22content%22%3A%22pix%22%2C%22quality%22%3A%220%22%2C%22label%22%3A%220%22%2C%22ord%22%3A%22popular%22%7D&sort=filter&mpage={page}",
       "pinboard": "gridapi/?content=pinboards&sort=popular&mpage={page}"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "figure > a >  img",
+        "attribute": "alt"
+      },
+      "thumbnail_selector": {
+        "custom_extraction": true
+      },
+      "content_url_selector": {
+        "selector": "figure > a",
+        "attribute": "href"
+      },
+
+      "content_selector": {
+        "selector": "body > li"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://www.elitebabes.com/gridapi/?content=updates",
@@ -127,12 +226,30 @@
     "isEmbed": "0",
     "icon": "https://cdn.elitebabes.com/wp-content/themes/masonry/images/favicons/apple-touch-icon.png",
     "query": {
-      
       "trending": "&sort=trending&mpage={page}",
       "newest": "&sort=newest&mpage={page}",
       "popular": "&sort=popular&mpage={page}"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "figure > a >  img",
+        "attribute": "alt"
+      },
+      "thumbnail_selector": {
+        "custom_extraction": true
+      },
+      "content_url_selector": {
+        "selector": "figure > a",
+        "attribute": "href"
+      },
+
+      "content_selector": {
+        "selector": "body > li"
+      }
+    },
+    "enabled": true
   },
+
   {
     "url": "https://erowall.com/",
     "type": "3",
@@ -145,14 +262,30 @@
     "isEmbed": "0",
     "icon": "https://erowall.com/favicon.ico",
     "query": {
-      
-     
       "newest": "dat/page/{page}",
       "popular": "views/page/{page}",
       "downloads": "down/page/{page}"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "a >  img",
+        "attribute": "alt"
+      },
+      "thumbnail_selector": {
+        "custom_extraction": true
+      },
+      "content_url_selector": {
+        "selector": "a",
+        "attribute": "href"
+      },
+
+      "content_selector": {
+        "selector": ".wrapper > .content > .wpmini"
+      }
+    },
+    "enabled": true
   },
-  
+
   {
     "url": "https://wallpaperporn.com/",
     "type": "3",
@@ -165,13 +298,29 @@
     "isEmbed": "0",
     "icon": "https://wallpaperporn.com/Free%20Porn%20Wallpaper.png",
     "query": {
-      
-     
       "newest": "wallpapers/browse/{page}?order=publish-date-newest&resolution=all",
       "popular": "wallpapers/browse/{page}?order=liked&resolution=all",
       "views": "wallpapers/browse/${page}?order=top-hits&resolution=all",
       "downloads": "wallpapers/browse/{page}?order=top-downloads&resolution=all"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "a >  img",
+        "attribute": "alt"
+      },
+      "thumbnail_selector": {
+        "custom_extraction": true
+      },
+      "content_url_selector": {
+        "selector": "a",
+        "attribute": "href"
+      },
+
+      "content_selector": {
+        "selector": ".row > .col-sm-6"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://www.pornpics.com/",

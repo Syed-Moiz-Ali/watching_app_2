@@ -2,72 +2,51 @@ import 'package:html/dom.dart';
 
 import 'dart:convert';
 
+import '../../../../core/global/globals.dart';
 import '../../../models/content_source.dart';
 import '../../../models/scraper_config.dart';
 import '../../base_scraper.dart';
 
 class Baddies extends BaseScraper {
-  Baddies(ContentSource source)
-      : super(
-          source,
-          ScraperConfig(
-              titleSelector: ElementSelector(
-                  selector: '.bx-item   >  a > div >  img  ', attribute: 'alt'),
-              thumbnailSelector: ElementSelector(
-                  selector: '.bx-item   >  a > div >  img',
-                  attribute: 'data-webp'),
-              contentUrlSelector: ElementSelector(
-                selector: '.bx-item   >  a  ',
-                attribute: 'href', // Extract content URL from 'href' attribute
-              ),
-              durationSelector: ElementSelector(
-                selector: '.bx-item   >  a > div > .bx-item-duration',
-                // attribute: 'text', // Extract duration from text content
-              ),
-              previewSelector: ElementSelector(
-                selector: '.bx-item   >  a > div >  img',
-                attribute: 'data-preview', // Extract duration from text content
-              ),
-              // watchingLinkSelector: ElementSelector(
-              //   customExtraction: (element) {
-              //     Map watchingLinks = {};
-              //     // log('the link of this is ${element.querySelector('#video_html5_api')!.outerHtml}');
+  Baddies(ContentSource source) : super(source, source.config!);
 
-              //     List<Element> scriptTags = element.querySelectorAll('script');
+  @override
+  Future<String?> extractCustomValue(ElementSelector selector,
+      {Element? element, Document? document}) async {
+    // log("this is scraper class in this and selector is ${selector == config.watchingLinkSelector && document != null}");
+    if (selector == config.watchingLinkSelector) {
+      try {
+        Map watchingLinks = {};
+        // log('the link of this is ${element.querySelector('#video_html5_api')!.outerHtml}');
 
-              //     // Find the script tag containing '<![CDATA[' in its content
-              //     Element? cdataScriptTag = scriptTags.firstWhere(
-              //       (scriptTag) => scriptTag.text.contains('<![CDATA['),
-              //       // orElse: () => null,
-              //     );
-              //     String jsContent = cdataScriptTag.text;
+        List<Element> scriptTags = element!.querySelectorAll('script');
 
-              //     // Define regular expressions to extract key-value pairs from the JavaScript content
-              //     RegExp videoUrlRegex = RegExp(r"video_id: '([^']+)'");
-
-              //     // Find the first match for video_url
-              //     RegExpMatch? match = videoUrlRegex.firstMatch(jsContent);
-
-              //     // Return the video_url if found, otherwise return null
-              //     if (match != null) {
-              //       var dataMap = match.group(1)!.replaceAll('function/0/', '');
-              //       Map params = {'auto': 'https://baddies.xxx/embed/$dataMap'};
-              //       watchingLinks.addEntries(params.entries);
-              //     } else {}
-              //     // Return the encoded JSON string of watching links
-              //     return Future.value(json.encode(watchingLinks));
-              //   },
-              // ),
-              keywordsSelector: ElementSelector(
-                selector: 'meta[name="keywords"]',
-                attribute: 'content', // Extract duration from text content
-              ),
-              contentSelector:
-                  ElementSelector(selector: '.bx-list-items > .row > .col'),
-              videoSelector: ElementSelector(
-                  selector: '.bx-video > .player > .player-holder'),
-              similarContentSelector: ElementSelector(
-                  selector:
-                      '.bx-list-videos > #list_videos_similar_videos > .box > #list_videos_similar_videos_items > .row > .col')),
+        // Find the script tag containing '<![CDATA[' in its content
+        Element? cdataScriptTag = scriptTags.firstWhere(
+          (scriptTag) => scriptTag.text.contains('<![CDATA['),
+          // orElse: () => null,
         );
+        String jsContent = cdataScriptTag.text;
+
+        // Define regular expressions to extract key-value pairs from the JavaScript content
+        RegExp videoUrlRegex = RegExp(r"video_id: '([^']+)'");
+
+        // Find the first match for video_url
+        RegExpMatch? match = videoUrlRegex.firstMatch(jsContent);
+
+        // Return the video_url if found, otherwise return null
+        if (match != null) {
+          var dataMap = match.group(1)!.replaceAll('function/0/', '');
+          Map params = {'auto': 'https://baddies.xxx/embed/$dataMap'};
+          watchingLinks.addEntries(params.entries);
+        } else {}
+        // Return the encoded JSON string of watching links
+        return Future.value(json.encode(watchingLinks));
+      } catch (e) {
+        SMA.logger.logError('Error extracting watching link: $e');
+        return '';
+      }
+    }
+    return null;
+  }
 }

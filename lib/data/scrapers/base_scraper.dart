@@ -165,7 +165,6 @@ abstract class BaseScraper {
       {Element? element, Document? document}) async {
     try {
       if (selector == null) return null;
-      log("selector value is ${selector.customExtraction}");
       if (selector.customExtraction != null &&
           selector.customExtraction == true) {
         return await extractCustomValue(selector,
