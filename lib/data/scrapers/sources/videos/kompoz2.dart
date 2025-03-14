@@ -1,90 +1,31 @@
-import 'package:html/dom.dart' as html;
+import 'dart:convert';
+import 'dart:developer';
+import 'package:html/dom.dart';
 
-// import '../../helper/get_from_element.dart';
+import '../../../../core/global/globals.dart';
+import '../../../models/content_source.dart';
+import '../../../models/scraper_config.dart';
+import '../../base_scraper.dart';
 
-class Kompoz2 {
-  dynamic getProperty(dynamic element, String propertyName) {
-    // print('propertyName is $propertyName');
-    // print('element is $element');
-    if (element is html.Element) {
-      switch (propertyName) {
-        case 'image':
-          return element
-                  .querySelector('.preview-ins > a > .preview-img  > img')
-                  ?.attributes['src'] ??
-              '';
-        case 'id':
-          return element
-                  .querySelector('.preview-ins > a')
-                  ?.attributes['href'] ??
-              '';
-        case 'title':
-          return element
-                  .querySelector('.preview-ins > a > .preview-img  > img')
-                  ?.attributes['alt'] ??
-              '';
-        case 'duration':
-          return element
-                  .querySelector('.preview-ins >  .meta-dur-date  > ul')
-                  ?.text ??
-              '';
-        case 'preview':
-          return '';
-        case 'quality':
-          return element.querySelector('.is-hd') != null
-              ? element.querySelector('.is-hd')!.text
-              : 'HD';
-        case 'time':
-          return element
-                  .querySelector('.preview-ins > .meta-like-views > ul')
-                  ?.text ??
-              '';
-        default:
-          return '';
-      }
-    } else {
-      switch (propertyName) {
-        case 'selector':
-          return element.querySelectorAll('.previews-block> .preview');
-        default:
-          return '';
+class Kompoz2 extends BaseScraper {
+  Kompoz2(ContentSource source) : super(source, source.config!);
+
+  @override
+  Future<String?> extractCustomValue(ElementSelector selector,
+      {Element? element, Document? document}) async {
+    if (selector == config.watchingLinkSelector) {
+      try {
+        Map watchingLink = {};
+        var links = element!.querySelector('video > source')?.attributes['src'];
+
+        Map params = {'auto': links};
+        watchingLink.addEntries(params.entries);
+        return Future.value(json.encode(watchingLink));
+      } catch (e) {
+        SMA.logger.logError('Error extracting watching link: $e');
+        return '';
       }
     }
-  }
-
-  dynamic getVideos(dynamic element, String propertyName) {
-    if (element is html.Element) {
-      Map watchingLink = {};
-      var links = element.querySelector('video > source')?.attributes['src'];
-
-      Map params = {'auto': links};
-      watchingLink.addEntries(params.entries);
-
-      switch (propertyName) {
-        case 'watchingLink':
-          return watchingLink;
-
-        default:
-          return '';
-      }
-    } else {
-      switch (propertyName) {
-        case 'selector':
-          return element.querySelectorAll('.mediabox');
-        case 'keywords':
-          return element
-              .querySelector('meta[name="keywords"]')
-              ?.attributes['content'];
-        case 'metaVideoUrl':
-          var links = element
-              .querySelector('meta[property="og:video:url"]')
-              ?.attributes['content'];
-          Map params = {'auto': links};
-
-          return params;
-        default:
-          return '';
-      }
-    }
+    return null;
   }
 }

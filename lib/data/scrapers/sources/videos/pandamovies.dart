@@ -1,45 +1,30 @@
 // import 'package:html/dom.dart' as html;
 
-// class BigFuck {
+// class PandaMovies {
 //   dynamic getProperty(dynamic element, String propertyName) {
 //     if (element is html.Element) {
 //       switch (propertyName) {
 //         case 'image':
+//           // print('image is ${element.querySelector('a >  img')!.outerHtml}');
 //           return element
-//                   .querySelector('.b-thumb-item__inner  > a >  img')
-//                   ?.attributes['src'] ??
+//                   .querySelector('a >  img')
+//                   ?.attributes['data-lazy-src'] ??
 //               '';
 //         case 'id':
-//           return element
-//                   .querySelector(' .b-thumb-item__inner  > a')
-//                   ?.attributes['href'] ??
-//               '';
+//           return element.querySelector('a')?.attributes['href'] ?? '';
 //         case 'title':
-//           return element
-//                   .querySelector('.b-thumb-item__inner  > .b-thumb-item__title')
-//                   ?.text ??
-//               '';
+//           return element.querySelector('a > img')?.attributes['alt'] ?? '';
 //         case 'duration':
 //           return element
-//                   .querySelector('.b-thumb-item__inner  > a > .thumb-badge')
+//                   .querySelector('a >.mli-info1')
 //                   ?.text
 //                   .replaceAll('HD', '')
 //                   .trim() ??
 //               '';
 //         case 'preview':
-//           return element
-//                   .querySelector('.b-thumb-item__inner  > a ')
-//                   ?.attributes['data-preview'] ??
-//               '';
+//           return '';
 //         case 'quality':
-//           return element.querySelector(
-//                       '.inner-wrapper > .video-thumb > a > .video-time > .quality') !=
-//                   null
-//               ? element
-//                   .querySelector(
-//                       '.inner-wrapper > .video-thumb > a > .video-time > .quality')!
-//                   .text
-//               : 'HD';
+//           return 'HD';
 //         case 'time':
 //           return "";
 //         default:
@@ -48,7 +33,8 @@
 //     } else {
 //       switch (propertyName) {
 //         case 'selector':
-//           return element.querySelectorAll('#galleries > .b-thumb-item');
+//           return element.querySelectorAll(
+//               '.movies-list-wrap > .movies-list-full > .ml-item');
 //         default:
 //           return '';
 //       }
@@ -58,10 +44,21 @@
 //   dynamic getVideos(dynamic element, String propertyName) {
 //     if (element is html.Element) {
 //       Map watchingLink = {};
-//       // log('the link of this is ${element.querySelector('#video_html5_api')!.outerHtml}');
-//       var links = element.querySelector('#video > source')?.attributes['src'];
-//       Map params = {'auto': links};
+
+//       var links = element.querySelectorAll('.Rtable1  > .Rtable1-cell > a ');
+
+//       Map params = {'auto': links.first.attributes['href']};
 //       watchingLink.addEntries(params.entries);
+//       //  for (var element in links) {
+//       //   var key = element.attributes['title'];
+
+//       //   Map params = {
+//       //     key.toString().trim(): element.attributes['href'].toString()
+//       //   };
+//       //   watchingLink.addAll(params);
+//       // }
+//       // Map params = {'auto': links};
+//       // watchingLink.addEntries(params.entries);
 
 //       // final streamDataJson = match.group(1)?.replaceAll("'", '"') ?? '';
 //       // final streamUrls = Map<String, dynamic>.from(streamDataJson);
@@ -80,7 +77,7 @@
 //     } else {
 //       switch (propertyName) {
 //         case 'selector':
-//           return element.querySelectorAll('main');
+//           return element.querySelectorAll('#main');
 //         case 'keywords':
 //           return element
 //               .querySelector('meta[name="keywords"]')
@@ -95,13 +92,13 @@
 import 'dart:convert';
 import 'package:html/dom.dart';
 
-import '../../../../core/global/globals.dart';
+import '../../../../../core/global/globals.dart';
 import '../../../models/content_source.dart';
 import '../../../models/scraper_config.dart';
 import '../../base_scraper.dart';
 
-class Bigfuck extends BaseScraper {
-  Bigfuck(ContentSource source) : super(source, source.config!);
+class Pandamovies extends BaseScraper {
+  Pandamovies(ContentSource source) : super(source, source.config!);
 
   @override
   Future<String?> extractCustomValue(ElementSelector selector,
@@ -110,10 +107,10 @@ class Bigfuck extends BaseScraper {
     if (selector == config.watchingLinkSelector) {
       try {
         Map watchingLink = {};
-        // log('the link of this is ${element.querySelector('#video_html5_api')!.outerHtml}');
-        var links =
-            element!.querySelector('#video > source')?.attributes['src'];
-        Map params = {'auto': links};
+
+        var links = element!.querySelectorAll('.Rtable1  > .Rtable1-cell > a ');
+
+        Map params = {'auto': links.first.attributes['href']};
         watchingLink.addEntries(params.entries);
         return Future.value(json.encode(watchingLink));
       } catch (e) {

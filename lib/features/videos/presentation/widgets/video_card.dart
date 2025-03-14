@@ -324,7 +324,7 @@ class _VideoCardState extends State<VideoCard>
             ),
             const SizedBox(width: 6),
             TextWidget(
-              text: widget.item.duration,
+              text: widget.item.duration.replaceAll("HD", ""),
               fontSize: widget.isGrid ? 12.sp : 14.sp,
               color: Colors.white,
               fontWeight: FontWeight.w600,

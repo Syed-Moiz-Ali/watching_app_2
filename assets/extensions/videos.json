@@ -51,11 +51,9 @@
         "selector": "meta[name=\"keywords\"]",
         "attribute": "content"
       },
-      "similar_content_selector": {
-        "selector": ".user_uploads > .video-list > .video-item"
-      },
+
       "video_selector": {
-        "selector": "main"
+        "selector": "#wrapper_div"
       },
       "content_selector": {
         "selector": ".video-list > .video-item"
@@ -778,7 +776,43 @@
       "top rated videos": "top-rated-videos/?page={page}",
       "most-viewed-videos": "most-viewed-videos/?page={page}",
       "longest-videos": "longest-videos/?page={page}"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": ".preview-ins > a > .preview-img  > img",
+        "attribute": "alt"
+      },
+      "thumbnail_selector": {
+        "selector": ".preview-ins > a > .preview-img  > img",
+        "attribute": "src"
+      },
+      "content_url_selector": {
+        "selector": ".preview-ins > a",
+        "attribute": "href"
+      },
+
+      "duration_selector": {
+        "selector": ".preview-ins >  .meta-dur-date  > ul"
+      },
+      "time_selector": { "selector": ".preview-ins > .meta-like-views > ul" },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": ".mediabox"
+      },
+
+      "content_selector": {
+        "selector": ".previews-block> .preview"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://collectionofbestporn.com/",
@@ -797,7 +831,48 @@
       "top rated videos": "top-rated/page/{page}",
       "most-viewed-videos": "most-viewed/page/{page}",
       "longest-videos": "longest/page/{page}"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": ".inner-wrapper > .video-thumb > a > .image > img",
+        "attribute": "title"
+      },
+      "thumbnail_selector": {
+        "selector": ".inner-wrapper > .video-thumb > a > .image > img",
+        "attribute": "src"
+      },
+      "content_url_selector": {
+        "selector": ".inner-wrapper > .video-thumb > a",
+        "attribute": "href"
+      },
+
+      "duration_selector": {
+        "selector": ".inner-wrapper > .video-thumb > a > .video-time > .time"
+      },
+      "time_selector": {
+        "selector": ".inner-wrapper > .video-thumb > a > .video-time > .time"
+      },
+      "quality_selector": {
+        "selector": ".inner-wrapper > .video-thumb > a > .video-time > .quality"
+      },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": ".main-video"
+      },
+
+      "content_selector": {
+        "selector": ".video-list > .video-item"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://eroticmv.com/",
@@ -815,7 +890,42 @@
       "latest": "category/decades/page/{page}/?archive_query=latest&alphabet_filter",
       "top rated videos": "category/decades/page/{page}/?archive_query=highest_rated&alphabet_filter",
       "most-viewed-videos": "category/decades/page/{page}/?archive_query=view&alphabet_filter"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": ".post-item-wrap > .blog-pic >.blog-pic-wrap > a",
+        "attribute": "title"
+      },
+      "thumbnail_selector": {
+        "custom_extraction": true
+      },
+      "content_url_selector": {
+        "selector": ".post-item-wrap > .blog-pic >.blog-pic-wrap > a",
+        "attribute": "href"
+      },
+
+      "duration_selector": {
+        "selector": ".preview-ins >  .meta-dur-date  > ul"
+      },
+      "time_selector": { "selector": ".preview-ins > .meta-like-views > ul" },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": "html"
+      },
+
+      "content_selector": {
+        "selector": ".previews-block> .preview"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://www.brazz.org/",
@@ -835,7 +945,41 @@
       "most viewed videos": "page/{page}/?filter=most-viewed",
       "most popular videos": "page/{page}/?filter=popular",
       "longest videos": "page/{page}/?filter=longest"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "a > .entry-header > span"
+      },
+      "thumbnail_selector": {
+        "selector": "a > .post-thumbnail > .post-thumbnail-container > img",
+        "attribute": "data-src"
+      },
+      "content_url_selector": {
+        "selector": "a",
+        "attribute": "href"
+      },
+
+      "duration_selector": {
+        "selector": "a > .post-thumbnail > .duration"
+      },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": ".mediabox"
+      },
+
+      "content_selector": {
+        "selector": ".videos-list > article"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://pornobae.com/",
@@ -855,7 +999,41 @@
       "most viewed videos": "page/{page}/?filter=most-viewed",
       "most popular videos": "page/{page}/?filter=popular",
       "longest videos": "page/{page}/?filter=longest"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "a > .entry-header > span"
+      },
+      "thumbnail_selector": {
+        "selector": "a > .post-thumbnail > .post-thumbnail-container > img",
+        "attribute": "data-src"
+      },
+      "content_url_selector": {
+        "selector": "a",
+        "attribute": "href"
+      },
+
+      "duration_selector": {
+        "selector": "a > .post-thumbnail > .duration"
+      },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": ".mediabox"
+      },
+
+      "content_selector": {
+        "selector": ".videos-list > article"
+      }
+    },
+    "enabled": true
   },
 
   {
@@ -875,7 +1053,45 @@
       "trending": "trends/{page}/",
       "best videos": "best/{page}/",
       "most popular": "most-popular/{page}/"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": ".b-thumb-item__inner  > .b-thumb-item__title"
+      },
+      "thumbnail_selector": {
+        "selector": ".b-thumb-item__inner  > a >  img",
+        "attribute": "src"
+      },
+      "content_url_selector": {
+        "selector": ".b-thumb-item__inner  > a",
+        "attribute": "href"
+      },
+
+      "duration_selector": {
+        "selector": ".b-thumb-item__inner  > a > .thumb-badge"
+      },
+      "preview_selector": {
+        "selector": ".b-thumb-item__inner  > a",
+        "attribute": "data-preview"
+      },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": "main"
+      },
+
+      "content_selector": {
+        "selector": "#galleries > .b-thumb-item"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://xtapes.to/",
@@ -895,7 +1111,41 @@
       "random videos": "page/{page}/?filtre=random",
       "longest": "page/{page}/?filtre=duree",
       "top rated": "page/{page}/?filtre=rate"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "a > span"
+      },
+      "thumbnail_selector": {
+        "selector": "img",
+        "attribute": "src"
+      },
+      "content_url_selector": {
+        "selector": " a",
+        "attribute": "href"
+      },
+
+      "duration_selector": {
+        "selector": "l.isting-infos  > .time-infos"
+      },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": "#video-code"
+      },
+
+      "content_selector": {
+        "selector": ".listing-videos > li"
+      }
+    },
+    "enabled": true
   },
 
   {
@@ -915,7 +1165,44 @@
       "popular": "1b/latest-porn-videos/page/{page}/?filter=popular",
       "longest": "1b/latest-porn-videos/page/{page}/?filter=longest",
       "random": "1b/latest-porn-videos/page/{page}/?filter=random"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "a > .entry-header > span"
+      },
+      "thumbnail_selector": {
+        "selector": "a > .post-thumbnail > .post-thumbnail-container  > img",
+        "attribute": "data-src"
+      },
+      "content_url_selector": {
+        "selector": " a",
+        "attribute": "href"
+      },
+
+      "duration_selector": {
+        "selector": "a > .post-thumbnail > .duration"
+      },
+      "quality_selector": {
+        "selector": "div > .video_thumb_wrap  > a > .duration >.tm_video_duration > .video_quality"
+      },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": "#main"
+      },
+
+      "content_selector": {
+        "selector": "#main > div > article"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://slutvids.net/",
@@ -936,7 +1223,44 @@
       "latest": "?filter=latest",
       "longest": "?filter=longest",
       "random": "?filter=random"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "a > .entry-header > span"
+      },
+      "thumbnail_selector": {
+        "selector": "a > .post-thumbnail > .post-thumbnail-container  > img",
+        "attribute": "data-src"
+      },
+      "content_url_selector": {
+        "selector": " a",
+        "attribute": "href"
+      },
+
+      "duration_selector": {
+        "selector": "a > .post-thumbnail > .duration"
+      },
+      "quality_selector": {
+        "selector": "div > .video_thumb_wrap  > a > .duration >.tm_video_duration > .video_quality"
+      },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": "#main"
+      },
+
+      "content_selector": {
+        "selector": "#main > div > article"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://milfnut.com/",
@@ -955,7 +1279,44 @@
       "latest": "?filter=latest",
       "longest": "?filter=longest",
       "random": "?filter=random"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "a > .entry-header > span"
+      },
+      "thumbnail_selector": {
+        "selector": "a > .post-thumbnail > .post-thumbnail-container  > img",
+        "attribute": "data-src"
+      },
+      "content_url_selector": {
+        "selector": " a",
+        "attribute": "href"
+      },
+
+      "duration_selector": {
+        "selector": "a > .post-thumbnail > .duration"
+      },
+      "quality_selector": {
+        "selector": "div > .video_thumb_wrap  > a > .duration >.tm_video_duration > .video_quality"
+      },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": "#main"
+      },
+
+      "content_selector": {
+        "selector": "#main > div > article"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://trannyvideosxxx.net/",
@@ -980,7 +1341,41 @@
       "longest dvd": "tag/dvd/page/{page}/?filter=longest",
       "popular dvd": "tag/dvd/page/{page}/?filter=popular",
       "random dvd": "tag/dvd/page/{page}/?filter=random"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "a > .entry-header > span"
+      },
+      "thumbnail_selector": {
+        "selector": "a > .post-thumbnail > .inner-border > img",
+        "attribute": "data-src"
+      },
+      "content_url_selector": {
+        "selector": " a",
+        "attribute": "href"
+      },
+
+      "duration_selector": {
+        "selector": "a > .post-thumbnail > .duration"
+      },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": "#main"
+      },
+
+      "content_selector": {
+        "selector": "#main > div > article"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://www.whoreshub.com/",
@@ -998,7 +1393,46 @@
       "latest": "latest-updates/{page}/",
       "most popular": "most-popular/{page}/",
       "top rated": "top-rated/{page}/"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": ".box > a",
+        "attribute": "title"
+      },
+      "thumbnail_selector": {
+        "selector": ".box > a > .thumb-img >  img",
+        "attribute": "data-src"
+      },
+      "content_url_selector": {
+        "selector": " a",
+        "attribute": "href"
+      },
+
+      "duration_selector": {
+        "selector": ".box > a > .thumb-img > .duration"
+      },
+      "preview_selector": {
+        "selector": ".box > a > .thumb-img >  img",
+        "attribute": "data-preview"
+      },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": "main"
+      },
+
+      "content_selector": {
+        "selector": ".content > .section > .container> .block-thumbs >.thumbs > .thumb"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://www.sxyprn.com/",
@@ -1024,7 +1458,51 @@
       "top rated (Week)": "popular/top-viewed.html/{page}?p=week",
       "top rated (Day)": "popular/top-viewed.html/{page}?p=day",
       "orgasm": "orgasm/{page}"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": ".js-pop",
+        "attribute": "aria-label"
+      },
+      "thumbnail_selector": {
+        "selector": ".js-pop > .vid_container >   .post_vid_thumb > img",
+        "attribute": "data-src"
+      },
+      "content_url_selector": {
+        "selector": " .js-pop",
+        "attribute": "href"
+      },
+      "quality_selector": {
+        "selector": ".js-pop  > .vid_container >   .post_vid_thumb > .shd_small"
+      },
+      "time_selector": {
+        "selector": ".post_control >.post_time > .post_control_time"
+      },
+      "duration_selector": {
+        "selector": ".js-pop  > .vid_container >   .post_vid_thumb >.duration_small"
+      },
+      "preview_selector": {
+        "selector": ".js-pop  > .vid_container >   .post_vid_thumb >  video",
+        "attribute": "src"
+      },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": "#wrapper_div"
+      },
+
+      "content_selector": {
+        "selector": "#content_div > .main_content > div > .post_el_small"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://www.definebabe.com/",
@@ -1042,7 +1520,38 @@
     "query": {
       "latest": "videos/page{page}/",
       "popular": "videos/by-rate/page{page}/"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "a >  img",
+        "attribute": "alt"
+      },
+      "thumbnail_selector": {
+        "selector": "a >  img",
+        "attribute": "src"
+      },
+      "content_url_selector": {
+        "selector": "a",
+        "attribute": "href"
+      },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": "main"
+      },
+
+      "content_selector": {
+        "selector": "main > .main-container  > section > .models-items > .models-items__col"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://porntop.com/",
@@ -1061,7 +1570,43 @@
       "most popular": "pm/?p={page}",
       "top rated": "bm/?p={page}",
       "longest": "d/?p={page}"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "a > .img > img",
+        "attribute": "alt"
+      },
+      "thumbnail_selector": {
+        "selector": "a > .img > img",
+        "attribute": "data-original"
+      },
+      "content_url_selector": {
+        "selector": "a",
+        "attribute": "href"
+      },
+      "duration_selector": { "selector": "a > .img >  .duration" },
+      "preview_selector": {
+        "selector": "a > .img > img",
+        "attribute": "data-preview"
+      },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": "html"
+      },
+
+      "content_selector": {
+        "selector": ".list-videos > .margin-fix > .item"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://bdsm.one/",
@@ -1081,26 +1626,42 @@
       "latest": "p{page}/",
       "most viewed": "views/p{page}/",
       "favorited": "favorited/p{page}/"
-    }
-  },
-  {
-    "url": "https://mangoporn.net/",
-    "searchUrl": "https://porntop.com/search/{search}/?p={page}",
-    "type": "1",
-    "decodeType": "1",
-    "NSFW": "1",
-    "getType": "1",
-    "isPreview": "0",
-    "isEmbed": "1",
-    "name": "mangoporn",
-    "icon": "https://i0.wp.com/mangoporn.net/wp-content/uploads/2024/07/cropped-mangoporn-favicon.png?fit=192%2C192",
-    "pageType": "p=",
-    "query": {
-      "latest": "movies/page/{page}",
-      "most popular": "pm/?p={page}",
-      "top rated": "bm/?p={page}",
-      "longest": "d/?p={page}"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "a  > .video-title > span"
+      },
+      "thumbnail_selector": {
+        "selector": "a >  .thumb > img",
+        "attribute": "src"
+      },
+      "content_url_selector": {
+        "selector": "a",
+        "attribute": "href"
+      },
+      "duration_selector": { "selector": "a >  .thumb > .btime" },
+      "preview_selector": {
+        "selector": "a >  .thumb > img",
+        "attribute": "data-preview"
+      },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": "#videoContainer"
+      },
+
+      "content_selector": {
+        "selector": ".wrap  > #content > .thumbs > .thumbs-container > .th"
+      }
+    },
+    "enabled": true
   },
 
   {
@@ -1117,7 +1678,39 @@
     "pageType": "page/",
     "query": {
       "latest": "movies/page/{page}"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "a >  img",
+        "attribute": "alt"
+      },
+      "thumbnail_selector": {
+        "selector": "a >  img",
+        "attribute": "data-lazy-src"
+      },
+      "content_url_selector": {
+        "selector": "a",
+        "attribute": "href"
+      },
+      "duration_selector": { "selector": "a >.mli-info1" },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": "#main"
+      },
+
+      "content_selector": {
+        "selector": ".movies-list-wrap > .movies-list-full > .ml-item"
+      }
+    },
+    "enabled": true
   },
 
   {
@@ -1142,7 +1735,38 @@
       "snapchat": "category/snapchat/page/{page}/",
       "tiktok": "category/tiktok/page/{page}/",
       "webcam": "category/webcam/page/{page}/"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "header > .entry-title > a"
+      },
+      "thumbnail_selector": {
+        "selector": "header > a > img ",
+        "attribute": "data-src"
+      },
+      "content_url_selector": {
+        "selector": "header > a",
+        "attribute": "href"
+      },
+      "time_selector": { "selector": "header > .entry-meta > .entry-time" },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": "#genesis-content"
+      },
+
+      "content_selector": {
+        "selector": "#genesis-content >  article"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://taboohome.com/",
@@ -1161,7 +1785,39 @@
       "mom son": "thvideocat/mom-son-porn/page/{page}",
       "brother sister": "thvideocat/brother-sister-porn/page/{page}",
       "father daughter": "thvideocat/father-daughter-porn/page/{page}"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": ".video-block > .infos",
+        "attribute": "title"
+      },
+      "thumbnail_selector": {
+        "selector": ".video-block > .thumb >  img ",
+        "attribute": "data-src"
+      },
+      "content_url_selector": {
+        "selector": ".video-block > .infos",
+        "attribute": "href"
+      },
+      "duration_selector": { "selector": ".video-block > .thumb > .duration" },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": ".video-wrapper"
+      },
+
+      "content_selector": {
+        "selector": ".row > .col-xl-2"
+      }
+    },
+    "enabled": true
   },
 
   {
@@ -1181,7 +1837,39 @@
       "popular": "best-videos/{page}/",
       "top rated": "top-rated/{page}/",
       "most viewd": "most-viewed/{page}/"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": ".mbimg > .mbcontent > a > img",
+        "attribute": "alt"
+      },
+      "thumbnail_selector": {
+        "selector": ".mbimg > .mbcontent > a  > img",
+        "attribute": "data-src"
+      },
+      "content_url_selector": {
+        "selector": ".mbimg > .mbcontent > a",
+        "attribute": "href"
+      },
+      "duration_selector": { "selector": ".mbunder > .mbstats >.mbtim" },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": ".video-wrapper"
+      },
+
+      "content_selector": {
+        "selector": "#vidresults > .mb"
+      }
+    },
+    "enabled": true
   },
 
   {
@@ -1218,6 +1906,43 @@
       "onlyfans popular": "category/onlyfans/page/{page}/?filter=popular",
       "onlyfans longest": "category/onlyfans/page/{page}/?filter=longest",
       "onlyfans random": "category/onlyfans/page/{page}/?filter=random"
-    }
+    },
+    "config": {
+      "title_selector": {
+        "selector": "a > .entry-header > span"
+      },
+      "thumbnail_selector": {
+        "selector": "a > .post-thumbnail > .post-thumbnail-container  > img",
+        "attribute": "data-src"
+      },
+      "content_url_selector": {
+        "selector": " a",
+        "attribute": "href"
+      },
+
+      "duration_selector": {
+        "selector": "a > .post-thumbnail > .duration"
+      },
+      "quality_selector": {
+        "selector": "div > .video_thumb_wrap  > a > .duration >.tm_video_duration > .video_quality"
+      },
+
+      "watching_link_selector": {
+        "custom_extraction": true
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": "#main"
+      },
+
+      "content_selector": {
+        "selector": "#main > div > article"
+      }
+    },
+    "enabled": true
   }
 ]

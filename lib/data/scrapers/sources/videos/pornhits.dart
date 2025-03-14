@@ -3,10 +3,10 @@ import 'dart:developer';
 
 import 'package:html/dom.dart';
 
-import '../../../core/global/globals.dart';
-import '../../models/content_source.dart';
-import '../../models/scraper_config.dart';
-import '../base_scraper.dart';
+import '../../../../core/global/globals.dart';
+import '../../../models/content_source.dart';
+import '../../../models/scraper_config.dart';
+import '../../base_scraper.dart';
 
 // class PornHits extends BaseScraper {
 //   PornHits(ContentSource source)

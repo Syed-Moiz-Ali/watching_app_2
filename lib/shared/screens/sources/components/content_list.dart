@@ -22,13 +22,14 @@ class ContentList extends StatelessWidget {
         ),
       );
     }
-
+    final sortedSources = List<ContentSource>.from(sources)
+      ..sort((a, b) => a.name.compareTo(b.name));
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ListView.builder(
-        itemCount: sources.length,
+        itemCount: sortedSources.length,
         itemBuilder: (context, index) {
-          final source = sources[index];
+          final source = sortedSources[index];
           return SourceCard(source: source);
         },
       ),

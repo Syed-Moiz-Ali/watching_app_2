@@ -1,11 +1,8 @@
-import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:provider/provider.dart';
 import 'package:watching_app_2/data/models/video_source.dart';
-
 import '../../core/api/api_client.dart';
 import '../../core/global/globals.dart';
 import '../models/content_item.dart';
@@ -13,137 +10,71 @@ import '../models/content_source.dart';
 import '../models/scraper_config.dart';
 import '../../presentation/provider/similar_content_provider.dart';
 
+/// Abstract base class for content scraping operations
 abstract class BaseScraper {
   final ContentSource source;
   final ScraperConfig config;
 
   BaseScraper(this.source, this.config);
 
-  Future<List<ContentItem>> scrapeContent(String html) {
-    final document = parse(html);
-    final contentElements =
-        document.querySelectorAll(config.contentSelector?.selector ?? '');
-    return parseElements(contentElements);
-  }
+  // Content Scraping Methods
+  Future<List<ContentItem>> scrapeContent(String html) =>
+      _scrape(html, config.contentSelector, parseElements);
 
-  Future<List<ContentItem>> scrapeDetailContent(String html) {
-    final document = parse(html);
-    final contentElements =
-        document.querySelectorAll(config.detailSelector?.selector ?? '');
-    return parseElements(contentElements);
-  }
+  Future<List<ContentItem>> scrapeDetailContent(String html) =>
+      _scrape(html, config.detailSelector, parseElements);
 
-  Future<List<ContentItem>> scrapeChapterContent(String html) {
-    final document = parse(html);
-    final contentElements =
-        document.querySelectorAll(config.chapterDataSelector?.selector ?? '');
-    return parseElements(contentElements);
-  }
-
-  Future<List<ContentItem>> search(String query, int page) async {
-    final url = source.getSearchUrl(query, page);
-    try {
-      final response = await ApiClient.request(url: url);
-      return scrapeContent(response);
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error searching: $e');
-      }
-      return [];
-    }
-  }
-
-  Future<List<ContentItem>> getContentByType(String queryType, int page) async {
-    final url = source.getQueryUrl(queryType, page);
-    return await fetchCotentAndScrape(url);
-  }
-
-  Future<List<ContentItem>> getDetails(String url) async {
-    return await fetchDetailAndScrape(url);
-  }
-
-  Future<List<ContentItem>> getChapter(String url) async {
-    return await fetchChapterAndScrape(url);
-  }
+  Future<List<ContentItem>> scrapeChapterContent(String html) =>
+      _scrape(html, config.chapterDataSelector, parseElements);
 
   Future<List<VideoSource>> scrapeVideos(String html) async {
-    if (config.videoSelector != null) {
-      final document = parse(html);
-      final contentElements =
-          document.querySelectorAll(config.videoSelector!.selector ?? '');
-      return await videoParseElement(document, contentElements.first);
-    }
-    return [];
-  }
-
-  Future<List<VideoSource>> getVideos(String url) async {
-    return await fetchVideoAndScrape(url);
-  }
-
-  Future<List<ContentItem>> fetchCotentAndScrape(String url) async {
-    try {
-      final response = await ApiClient.request(url: url);
-      return scrapeContent(response);
-    } catch (e) {
-      SMA.logger.logError('Error fetching data from $url: $e');
-      return [];
-    }
-  }
-
-  Future<List<ContentItem>> fetchDetailAndScrape(String url) async {
-    try {
-      final response = await ApiClient.request(url: url);
-      return scrapeDetailContent(response);
-    } catch (e) {
-      SMA.logger.logError('Error fetching data from $url: $e');
-      return [];
-    }
-  }
-
-  Future<List<ContentItem>> fetchChapterAndScrape(String url) async {
-    try {
-      final response = await ApiClient.request(url: url);
-      return scrapeChapterContent(response);
-    } catch (e) {
-      SMA.logger.logError('Error fetching data from $url: $e');
-      return [];
-    }
-  }
-
-  Future<List<VideoSource>> fetchVideoAndScrape(String url) async {
-    try {
-      final response = await ApiClient.request(url: url);
-      await scrapeSimilarContent(response);
-      return scrapeVideos(response);
-    } catch (e) {
-      SMA.logger.logError('Error fetching data from $url: $e');
-      return [];
-    }
+    if (config.videoSelector == null) return [];
+    final document = parse(html);
+    final elements =
+        document.querySelectorAll(config.videoSelector!.selector ?? '');
+    return elements.isNotEmpty
+        ? videoParseElement(document, elements.first)
+        : [];
   }
 
   Future<List<ContentItem>> scrapeSimilarContent(String html) async {
-    var similarContentProvider =
-        SMA.navigationKey.currentContext!.read<SimilarContentProvider>();
-    await similarContentProvider.setSimilarContents([]);
+    final provider = _getSimilarContentProvider();
+    await provider.setSimilarContents([]);
 
-    final document = parse(html);
-    final similarContentElements = document
-        .querySelectorAll(config.similarContentSelector?.selector ?? '');
-
-    var similarContent = await parseElements(similarContentElements);
-    await similarContentProvider.setSimilarContents(similarContent);
-
-    return similarContent;
+    return _scrape(html, config.similarContentSelector, (elements) async {
+      final items = await parseElements(elements);
+      await provider.setSimilarContents(items);
+      return items;
+    });
   }
 
+  // Fetch Methods
+  Future<List<ContentItem>> search(String query, int page) =>
+      _fetchAndScrape(source.getSearchUrl(query, page), scrapeContent);
+
+  Future<List<ContentItem>> getContentByType(String queryType, int page) =>
+      _fetchAndScrape(source.getQueryUrl(queryType, page), scrapeContent);
+
+  Future<List<ContentItem>> getDetails(String url) =>
+      _fetchAndScrape(url, scrapeDetailContent);
+
+  Future<List<ContentItem>> getChapter(String url) =>
+      _fetchAndScrape(url, scrapeChapterContent);
+
+  Future<List<VideoSource>> getVideos(String url) =>
+      _fetchAndScrape(url, (html) async {
+        await scrapeSimilarContent(html);
+        return scrapeVideos(html);
+      });
+
+  // Parsing Methods
   Future<List<ContentItem>> parseElements(List<Element> elements) async {
-    final List<ContentItem> items = [];
-    for (var element in elements) {
+    final items = <ContentItem>[];
+    for (final element in elements) {
       try {
-        final item = await parseElement(element);
-        items.add(item);
+        items.add(await _parseContentItem(element));
       } catch (e) {
-        SMA.logger.logError('Error parsing element: $e');
+        _logError('Error parsing element: $e');
       }
     }
     return items;
@@ -151,105 +82,145 @@ abstract class BaseScraper {
 
   Future<List<VideoSource>> videoParseElement(
       Document document, Element element) async {
-    final List<VideoSource> items = [];
     try {
-      final item = await parseSingleVideoElement(document, element);
-      items.add(item);
+      return [await _parseVideoSource(document, element)];
     } catch (e) {
-      SMA.logger.logError('Error parsing video element: $e');
+      _logError('Error parsing video element: $e');
+      return [];
     }
-    return items;
   }
 
-  Future<String?> getAttributeValue(ElementSelector? selector,
-      {Element? element, Document? document}) async {
+  // Utility Methods
+  Future<String?> getAttributeValue(
+    ElementSelector? selector, {
+    Element? element,
+    Document? document,
+  }) async {
+    if (selector == null) return null;
+
     try {
-      if (selector == null) return null;
-      if (selector.customExtraction != null &&
-          selector.customExtraction == true) {
+      if (selector.customExtraction == true) {
         return await extractCustomValue(selector,
             element: element, document: document);
       }
-      final elementTag = document != null
-          ? document.querySelector(selector.selector ?? '')
-          : element!.querySelector(selector.selector ?? '');
+
+      final target = document?.querySelector(selector.selector ?? '') ??
+          element?.querySelector(selector.selector ?? '');
       return selector.attribute != null
-          ? elementTag?.attributes[selector.attribute]
-          : elementTag?.text;
+          ? target?.attributes[selector.attribute]!.trim()
+          : target?.text.trim();
     } catch (e) {
-      if (kDebugMode) {
-        print('Error getting attribute from ${selector!.selector}: $e');
-      }
+      _logDebug('Error getting attribute from ${selector.selector}: $e');
       return null;
     }
   }
 
-  Future<String?> extractCustomValue(ElementSelector selector,
-      {Element? element, Document? document}) async {
-    return null; // Overridden by specific scrapers
+  Future<String?> extractCustomValue(
+    ElementSelector selector, {
+    Element? element,
+    Document? document,
+  }) async =>
+      null; // To be overridden by specific scrapers
+
+  // Private Helper Methods
+  Future<T> _fetchAndScrape<T>(
+      String url, Future<T> Function(String) scraper) async {
+    try {
+      final response = await ApiClient.request(url: url);
+      return await scraper(response);
+    } catch (e) {
+      _logError('Error fetching data from $url: $e');
+      return _defaultResult<T>();
+    }
   }
 
-  Future<ContentItem> parseElement(Element element) async {
+  Future<List<T>> _scrape<T>(
+    String html,
+    ElementSelector? selector,
+    Future<List<T>> Function(List<Element>) parser,
+  ) async {
+    final document = parse(html);
+    final elements = document.querySelectorAll(selector?.selector ?? '');
+    return elements.isEmpty ? [] : await parser(elements);
+  }
+
+  Future<ContentItem> _parseContentItem(Element element) async {
     return ContentItem(
-      title: await getAttributeValue(element: element, config.titleSelector) ??
+      title: await getAttributeValue(config.titleSelector, element: element) ??
           'Unknown',
       thumbnailUrl:
-          await getAttributeValue(element: element, config.thumbnailSelector) ??
+          await getAttributeValue(config.thumbnailSelector, element: element) ??
               '',
-      contentUrl: await getAttributeValue(
-              element: element, config.contentUrlSelector) ??
+      contentUrl: await getAttributeValue(config.contentUrlSelector,
+              element: element) ??
           '',
       duration:
-          await getAttributeValue(element: element, config.durationSelector) ??
+          await getAttributeValue(config.durationSelector, element: element) ??
               '0:00',
       preview:
-          await getAttributeValue(element: element, config.previewSelector) ??
+          await getAttributeValue(config.previewSelector, element: element) ??
               '',
       quality:
-          await getAttributeValue(element: element, config.qualitySelector) ??
+          await getAttributeValue(config.qualitySelector, element: element) ??
               'HD',
-      time: await getAttributeValue(element: element, config.timeSelector) ??
+      time: await getAttributeValue(config.timeSelector, element: element) ??
           'Unknown',
-      views: await getAttributeValue(element: element, config.viewsSelector) ??
+      views: await getAttributeValue(config.viewsSelector, element: element) ??
           'Unknown',
       scrapedAt: DateTime.now(),
       addedAt: DateTime.now(),
       source: source,
       genre:
-          await getAttributeValue(element: element, config.genreSelector) ?? '',
+          await getAttributeValue(config.genreSelector, element: element) ?? '',
       status:
-          await getAttributeValue(element: element, config.statusSelector) ??
+          await getAttributeValue(config.statusSelector, element: element) ??
               '',
-      chapterCount: await getAttributeValue(
-              element: element, config.chapterCountSelector) ??
+      chapterCount: await getAttributeValue(config.chapterCountSelector,
+              element: element) ??
           '',
       chapterId:
-          await getAttributeValue(element: element, config.chapterIdSelector) ??
+          await getAttributeValue(config.chapterIdSelector, element: element) ??
               '',
-      chapterImages: await getAttributeValue(
-              element: element, config.chapterImageSelector) ??
+      chapterImages: await getAttributeValue(config.chapterImageSelector,
+              element: element) ??
           '',
       user:
-          await getAttributeValue(element: element, config.userSelector) ?? '',
+          await getAttributeValue(config.userSelector, element: element) ?? '',
       likes:
-          await getAttributeValue(element: element, config.likesSelector) ?? '',
+          await getAttributeValue(config.likesSelector, element: element) ?? '',
       comments:
-          await getAttributeValue(element: element, config.commentsSelector) ??
+          await getAttributeValue(config.commentsSelector, element: element) ??
               '',
     );
   }
 
-  Future<VideoSource> parseSingleVideoElement(
+  Future<VideoSource> _parseVideoSource(
       Document document, Element element) async {
     return VideoSource(
       scrapedAt: DateTime.now(),
       source: source,
-      watchingLink: await getAttributeValue(
-              element: element, config.watchingLinkSelector) ??
+      watchingLink: await getAttributeValue(config.watchingLinkSelector,
+              element: element) ??
           '',
-      keywords: await getAttributeValue(
-              document: document, config.keywordsSelector) ??
+      keywords: await getAttributeValue(config.keywordsSelector,
+              document: document) ??
           '',
     );
+  }
+
+  SimilarContentProvider _getSimilarContentProvider() {
+    return SMA.navigationKey.currentContext!.read<SimilarContentProvider>();
+  }
+
+  void _logError(String message) => SMA.logger.logError(message);
+  void _logDebug(String message) {
+    if (kDebugMode) print(message);
+  }
+
+  T _defaultResult<T>() {
+    if (T is List<ContentItem> || T is List<VideoSource>) {
+      return <dynamic>[] as T;
+    }
+    return null as T;
   }
 }
