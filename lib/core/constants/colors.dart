@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 class AppColors {
   // Primary Colors
   static const Color primaryColor =
-      Color(0xFF0A0A0A); // Dark grey (nearly black) for primary actions
+      Color(0xFFb91c1c); // Dark grey (nearly black) for primary actions
+  // static const Color primaryColor =
+  //     Color(0xFF0A0A0A); // Dark grey (nearly black) for primary actions
   static const Color primaryDark =
       Color(0xFF424242); // Lighter grey for dark mode primary
   static const Color secondaryColor =
-      Color(0xFF81D4FA); // Light blue for secondary elements
+      Color(0xFFb91c1c); // Light blue for secondary elements
   static const Color secondaryDark =
-      Color(0xFF4FC3F7); // Slightly darker blue for dark mode secondary
+      Color(0xFFb91c1c); // Slightly darker blue for dark mode secondary
 
   // Neutral Colors
   static const Color backgroundColorLight =

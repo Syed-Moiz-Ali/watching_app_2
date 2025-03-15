@@ -113,15 +113,19 @@ class _VideoCardState extends State<VideoCard>
           onHorizontalDragEnd: (_) => widget.onHorizontalDragEnd(),
           child: Container(
             decoration: BoxDecoration(
+              border: Border.all(
+                color: AppColors.primaryColor.withOpacity(0.1),
+                width: 1,
+              ),
               borderRadius: BorderRadius.circular(widget.isGrid ? 20 : 28),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primaryColor
-                      .withOpacity(_isHovered ? 0.2 : 0.1),
-                  blurRadius: 100,
-                  offset: const Offset(0, 1),
-                ),
-              ],
+              // boxShadow: [
+              //   BoxShadow(
+              //     color: AppColors.primaryColor
+              //         .withOpacity(_isHovered ? 0.2 : 0.1),
+              //     blurRadius: 100,
+              //     offset: const Offset(0, 1),
+              //   ),
+              // ],
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(widget.isGrid ? 20 : 28),
@@ -130,12 +134,9 @@ class _VideoCardState extends State<VideoCard>
                 child: Container(
                   padding: EdgeInsets.all(widget.isGrid ? 5.sp : 5.sp),
                   decoration: BoxDecoration(
-                    color: AppColors.backgroundColorLight.withOpacity(0.05),
-                    border: Border.all(
-                      color: AppColors.backgroundColorLight.withOpacity(0.1),
-                      width: 1,
-                    ),
-                  ),
+                      // color: AppColors.backgroundColorLight.withOpacity(0.05),
+
+                      ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -422,7 +423,7 @@ class _VideoCardState extends State<VideoCard>
         color: Colors.grey.withOpacity(0.15),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.greyColor.withOpacity(0.3),
+          color: AppColors.primaryColor.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -432,14 +433,14 @@ class _VideoCardState extends State<VideoCard>
           Icon(
             Icons.play_circle_outline_rounded,
             size: widget.isGrid ? 14 : 16,
-            color: Colors.grey[800],
+            color: AppColors.primaryColor.withOpacity(.8),
           ),
           const CustomGap(widthFactor: .005),
           TextWidget(
             text: widget.item.source.name,
             fontSize: widget.isGrid ? 12.sp : 14.sp,
             fontWeight: FontWeight.w600,
-            color: Colors.grey[800],
+            color: AppColors.primaryColor.withOpacity(.8),
           ),
         ],
       ),
@@ -456,7 +457,7 @@ class _VideoCardState extends State<VideoCard>
         color: Colors.grey.withOpacity(0.15),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Colors.grey.withOpacity(0.3),
+          color: AppColors.primaryColor.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -466,13 +467,13 @@ class _VideoCardState extends State<VideoCard>
           Icon(
             Icons.access_time_rounded,
             size: widget.isGrid ? 14 : 16,
-            color: Colors.grey[800],
+            color: AppColors.primaryColor.withOpacity(.8),
           ),
           const CustomGap(widthFactor: .005),
           TextWidget(
             text: widget.item.time,
             fontSize: widget.isGrid ? 12.sp : 14.sp,
-            color: Colors.grey[800],
+            color: AppColors.primaryColor.withOpacity(.8),
             fontWeight: FontWeight.w600,
           ),
         ],

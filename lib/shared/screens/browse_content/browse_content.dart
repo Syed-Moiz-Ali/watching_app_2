@@ -79,12 +79,12 @@ class _BrowseContentState extends State<BrowseContent>
     final List<ParticleModel> particles = [];
 
     for (int i = 0; i < count; i++) {
-      // Generate a random light color for each particle
+      // Generate a random red shade
       final Color color = HSLColor.fromAHSL(
         1.0,
-        random.nextDouble() * 360, // Random hue
-        0.7 + random.nextDouble() * 0.3, // High saturation
-        0.7 + random.nextDouble() * 0.2, // High lightness
+        0.0, // Fixed hue for red
+        0.7 + random.nextDouble() * 0.3, // Random saturation (70% - 100%)
+        0.5 + random.nextDouble() * 0.3, // Random lightness (50% - 80%)
       ).toColor();
 
       particles.add(
@@ -97,7 +97,7 @@ class _BrowseContentState extends State<BrowseContent>
           directionY: -1 + random.nextDouble() * 2, // Random direction Y
           opacity: 0.4 + random.nextDouble() * 0.5, // Semi-transparent
           id: i,
-          color: color, // Assign the random light color
+          color: color, // Assign the random red shade
         ),
       );
     }

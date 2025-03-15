@@ -4,8 +4,10 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import 'package:sizer/sizer.dart';
+import 'package:watching_app_2/shared/widgets/misc/padding.dart';
 
 import '../../../core/constants/colors.dart';
+import '../../widgets/misc/text_widget.dart';
 
 class AnimatedEmptyState extends StatefulWidget {
   final String contentType;
@@ -103,17 +105,20 @@ class _AnimatedEmptyStateState extends State<AnimatedEmptyState>
           curve: Curves.easeOut,
           child: Container(
             constraints: BoxConstraints(maxWidth: 80.w),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildAnimatedIcon(),
-                SizedBox(height: 4.h),
-                _buildTitle(),
-                SizedBox(height: 1.5.h),
-                _buildSubtitle(),
-                SizedBox(height: 5.h),
-                _buildExploreButton(),
-              ],
+            child: CustomPadding(
+              horizontalFactor: .03,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildAnimatedIcon(),
+                  SizedBox(height: 4.h),
+                  _buildTitle(),
+                  SizedBox(height: 1.5.h),
+                  _buildSubtitle(),
+                  SizedBox(height: 5.h),
+                  _buildExploreButton(),
+                ],
+              ),
             ),
           ),
         ),
@@ -214,14 +219,11 @@ class _AnimatedEmptyStateState extends State<AnimatedEmptyState>
       tag: 'empty_state_title_${widget.contentType}',
       child: Material(
         color: Colors.transparent,
-        child: Text(
-          'No ${widget.contentType} favorites yet',
-          style: TextStyle(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.5,
-            color: Theme.of(context).textTheme.titleLarge?.color,
-          ),
+        child: TextWidget(
+          text: 'No ${widget.contentType} favorites yet',
+          fontSize: 20.sp,
+          fontWeight: FontWeight.w700,
+          color: Theme.of(context).textTheme.titleLarge?.color,
           textAlign: TextAlign.center,
         ),
       ),
@@ -235,16 +237,12 @@ class _AnimatedEmptyStateState extends State<AnimatedEmptyState>
   }
 
   Widget _buildSubtitle() {
-    return Text(
-      'Browse content and heart your favorites to see them here!',
-      style: TextStyle(
-        fontSize: 16.sp,
-        fontWeight: FontWeight.w400,
-        color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
-        height: 1.4,
-      ),
+    return TextWidget(
+      text: 'Browse content and heart your favorites to see them here!',
+      fontWeight: FontWeight.w400,
+      color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
       textAlign: TextAlign.center,
-      maxLines: 4,
+      maxLine: 4,
     ).animate().fadeIn(duration: 600.ms, delay: 500.ms).slideY(
           begin: 0.2,
           end: 0,
@@ -291,14 +289,11 @@ class _AnimatedEmptyStateState extends State<AnimatedEmptyState>
               size: 22.sp,
             ),
             SizedBox(width: 3.w),
-            Text(
-              'Explore Now',
-              style: TextStyle(
-                fontSize: 17.sp,
-                fontWeight: FontWeight.w600,
-                color: AppColors.backgroundColorLight,
-                letterSpacing: 0.5,
-              ),
+            TextWidget(
+              text: 'Explore Now',
+              fontSize: 17.sp,
+              fontWeight: FontWeight.w600,
+              color: AppColors.backgroundColorLight,
             ),
           ],
         ),

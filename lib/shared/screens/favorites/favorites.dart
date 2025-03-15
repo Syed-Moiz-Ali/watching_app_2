@@ -15,9 +15,11 @@ import '../../../core/navigation/app_navigator.dart';
 import '../../../data/models/tab_model.dart';
 import '../../../presentation/provider/favorites_provider.dart';
 import '../../../core/navigation/routes.dart';
+import '../../../presentation/provider/navigation_provider.dart';
 import '../../widgets/appbars/app_bar.dart';
 import '../../../features/videos/presentation/widgets/video_grid_view.dart';
 import '../../widgets/misc/padding.dart';
+import 'empty_favorites.dart';
 import 'filters_bottom_sheet.dart';
 
 class Favorites extends StatefulWidget {
@@ -184,7 +186,13 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
             }
 
             if (filteredFavorites.isEmpty) {
-              return AnimatedEmptyState(contentType: widget.contentType);
+              return AnimatedEmptyState(
+                contentType: widget.contentType,
+                onExplore: () {
+                  final navProvider = context.read<NavigationProvider>();
+                  navProvider.setIndex(2);
+                },
+              );
             }
 
             return Scaffold(
@@ -235,85 +243,6 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
           },
         );
       },
-    );
-  }
-}
-
-class AnimatedEmptyState extends StatelessWidget {
-  final String contentType;
-
-  const AnimatedEmptyState({super.key, required this.contentType});
-
-  @override
-  Widget build(BuildContext context) {
-    Theme.of(context);
-
-    return AnimationConfiguration.synchronized(
-      duration: const Duration(milliseconds: 800),
-      child: SlideAnimation(
-        verticalOffset: 50.0,
-        child: FadeInAnimation(
-          child: Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10.w),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 20,
-                          spreadRadius: 5,
-                        ),
-                      ],
-                    ),
-                    child: const Icon(Icons.favorite_border_rounded,
-                        size: 64, color: AppColors.primaryColor),
-                  ),
-                  SizedBox(height: 4.h),
-                  TextWidget(
-                    text: 'No $contentType favorites yet',
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  SizedBox(height: 1.h),
-                  TextWidget(
-                    text:
-                        'Browse content and heart your favorites to see them here!',
-                    textAlign: TextAlign.center,
-                    maxLine: 4,
-                    fontSize: 15.sp,
-                  ),
-                  SizedBox(height: 4.h),
-                  PrimaryButton(
-                    width: .4,
-                    borderRadius: 10.h,
-                    onTap: () {
-                      // Navigate to explore/browse page
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.explore,
-                            color: AppColors.backgroundColorLight),
-                        const CustomGap(widthFactor: .02),
-                        TextWidget(
-                            text: 'Explore',
-                            fontSize: 18.sp,
-                            color: AppColors.backgroundColorLight),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
