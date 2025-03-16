@@ -15,8 +15,6 @@ class DeepLinkHandler extends StatefulWidget {
 class _DeepLinkHandlerState extends State<DeepLinkHandler>
     with WidgetsBindingObserver {
   StreamSubscription? _linkSubscription;
-
-  // Deep link data states
   String _rawLink = 'No link received yet';
   String _path = 'No path detected';
   String _id = 'No ID found';
@@ -30,9 +28,6 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
-    // Initialize deep link handling with a slight delay to ensure
-    // the app is fully loaded
     Future.delayed(const Duration(milliseconds: 200), () {
       initDeepLinks();
     });
@@ -47,22 +42,16 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // When app resumes from background, check for new deep links
     if (state == AppLifecycleState.resumed) {
       _checkInitialLink();
     }
   }
 
-  // Initialize deep link handling
   Future<void> initDeepLinks() async {
-    // First handle case where app is started from a deep link
     try {
       await _checkInitialLink();
-
-      // Listen for incoming links while app is running
       _linkSubscription = linkStream.listen(_handleIncomingLink,
           onError: _handleLinkError, cancelOnError: false);
-
       setState(() {
         _isInitialized = true;
       });
@@ -75,7 +64,6 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
     }
   }
 
-  // Check if app was opened with a deep link
   Future<void> _checkInitialLink() async {
     try {
       final initialLink = await getInitialLink();
@@ -93,7 +81,6 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
     }
   }
 
-  // Process incoming deep links
   void _handleIncomingLink(String? link) {
     if (link == null) return;
 
@@ -106,27 +93,18 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
 
       try {
         final uri = Uri.parse(link);
-
         debugPrint('Deep link URI components:');
         debugPrint('  Scheme: ${uri.scheme}');
         debugPrint('  Host: ${uri.host}');
         debugPrint('  Path: ${uri.path}');
         debugPrint('  Query params: ${uri.queryParameters}');
 
-        // Extract the path (remove initial slash if present)
         _path = uri.path.startsWith('/') ? uri.path.substring(1) : uri.path;
-
-        // For empty path cases (when the URI is just scheme://host)
         if (_path.isEmpty && uri.host.isNotEmpty) {
           _path = uri.host;
         }
-
-        // Extract the ID from query parameters
         _id = uri.queryParameters['id'] ?? 'No ID found';
-
-        // Store all query parameters
         _queryParams = Map<String, String>.from(uri.queryParameters);
-
         _hasDeepLinkData = true;
       } catch (e) {
         _errorMessage = 'Failed to parse deep link: $e';
@@ -135,7 +113,6 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
     });
   }
 
-  // Handle deep link errors
   void _handleLinkError(Object error) {
     debugPrint('Deep link error: $error');
     setState(() {
@@ -143,10 +120,8 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
     });
   }
 
-  // Share a test deep link
   void _shareTestLink() async {
-    final String contentId =
-        '${DateTime.now().millisecondsSinceEpoch}'; // Use timestamp for unique ID
+    final String contentId = '${DateTime.now().millisecondsSinceEpoch}';
     final String appDeepLink =
         'yourapp://details?id=$contentId&source=share&time=${DateTime.now().toString()}';
     final String webFallbackUrl =
@@ -186,7 +161,6 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Status card
               Card(
                 elevation: 4,
                 color: _isInitialized ? Colors.green[50] : Colors.red[50],
@@ -225,10 +199,7 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
                   ),
                 ),
               ),
-
               const SizedBox(height: 16),
-
-              // Deep link data display
               Expanded(
                 child: Card(
                   elevation: 4,
@@ -246,8 +217,6 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
                             ),
                           ),
                           const Divider(),
-
-                          // Data section
                           if (_hasDeepLinkData) ...[
                             _buildDataRow('Last received',
                                 _lastLinkReceived?.toString() ?? 'Unknown'),
@@ -282,10 +251,7 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
                   ),
                 ),
               ),
-
               const SizedBox(height: 16),
-
-              // Test buttons
               ElevatedButton.icon(
                 icon: const Icon(Icons.share),
                 label: const Text('Share Test Deep Link'),
@@ -294,9 +260,7 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
               ),
-
               const SizedBox(height: 8),
-
               OutlinedButton.icon(
                 icon: const Icon(Icons.clear),
                 label: const Text('Clear Data'),
@@ -318,7 +282,6 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
     );
   }
 
-  // Helper to build data row widgets
   Widget _buildDataRow(String label, String value, {bool highlight = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),

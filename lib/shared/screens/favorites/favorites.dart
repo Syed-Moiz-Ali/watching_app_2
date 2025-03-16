@@ -6,10 +6,9 @@ import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/data/models/content_item.dart';
 import 'package:watching_app_2/data/database/local_database.dart';
-import 'package:watching_app_2/shared/widgets/misc/gap.dart';
+
 import 'package:watching_app_2/shared/widgets/misc/tabbar.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:watching_app_2/shared/widgets/buttons/primary_button.dart';
+
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 import '../../../core/navigation/app_navigator.dart';
 import '../../../data/models/tab_model.dart';

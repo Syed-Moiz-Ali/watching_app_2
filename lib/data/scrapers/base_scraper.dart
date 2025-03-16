@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
@@ -28,6 +30,7 @@ abstract class BaseScraper {
       _scrape(html, config.chapterDataSelector, parseElements);
 
   Future<List<VideoSource>> scrapeVideos(String html) async {
+    log("this is videoSelector and ${config.videoSelector!.selector}");
     if (config.videoSelector == null) return [];
     final document = parse(html);
     final elements =
@@ -40,6 +43,10 @@ abstract class BaseScraper {
   Future<List<ContentItem>> scrapeSimilarContent(String html) async {
     final provider = _getSimilarContentProvider();
     await provider.setSimilarContents([]);
+
+    if (config.similarContentSelector?.selector?.isEmpty ?? true) {
+      return [];
+    }
 
     return _scrape(html, config.similarContentSelector, (elements) async {
       final items = await parseElements(elements);
@@ -218,9 +225,18 @@ abstract class BaseScraper {
   }
 
   T _defaultResult<T>() {
-    if (T is List<ContentItem> || T is List<VideoSource>) {
-      return <dynamic>[] as T;
+    if (T == List<ContentItem>) {
+      return <ContentItem>[] as T;
     }
-    return null as T;
+    if (T == List<VideoSource>) {
+      return <VideoSource>[] as T;
+    }
+    return switch (T) {
+      const (String) => '' as T,
+      const (int) => 0 as T,
+      const (double) => 0.0 as T,
+      const (bool) => false as T,
+      _ => throw UnimplementedError('No default value for type $T'),
+    };
   }
 }

@@ -70,6 +70,7 @@ import 'core/services/service_locator.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   // Animate back from fullscreen

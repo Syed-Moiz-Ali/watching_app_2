@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:html/dom.dart';
 
 import '../../../../core/global/globals.dart';
@@ -12,8 +13,8 @@ class Spankbang extends BaseScraper {
   @override
   Future<String?> extractCustomValue(ElementSelector selector,
       {Element? element, Document? document}) async {
-    // log("this is scraper class in this and selector is ${selector == config.watchingLinkSelector && document != null}");
     if (selector == config.watchingLinkSelector) {
+      log("this is scraper class in this and selector is ${selector == config.watchingLinkSelector && document != null}");
       try {
         var scripts =
             element!.querySelectorAll('script[type="application/ld+json"]');

@@ -53,7 +53,7 @@
       },
 
       "video_selector": {
-        "selector": "#wrapper_div"
+        "selector": "main"
       },
       "content_selector": {
         "selector": ".video-list > .video-item"
