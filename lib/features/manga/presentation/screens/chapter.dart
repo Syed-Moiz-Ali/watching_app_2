@@ -482,7 +482,7 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
             // onDoubleTap: () => _resetZoom(controller),
             child: Hero(
               tag: 'manga_page_${pages[index]['image']}',
-              child: CustomImageWidget(
+              child: ImageWidget(
                 imagePath: pages[index]['image'],
                 fit: BoxFit.contain,
                 // loadingBuilder: (context, child, loadingProgress) {
@@ -556,7 +556,7 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
             // Image
             GestureDetector(
               // onDoubleTap: () => _resetZoom(controller),
-              child: CustomImageWidget(
+              child: ImageWidget(
                 imagePath: imagePath,
                 fit: BoxFit.fitWidth,
                 borderRadius: BorderRadius.zero,

@@ -243,13 +243,14 @@ class _AnimatedEmptyStateState extends State<AnimatedEmptyState>
       color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
       textAlign: TextAlign.center,
       maxLine: 4,
-    ).animate().fadeIn(duration: 600.ms, delay: 500.ms).slideY(
-          begin: 0.2,
-          end: 0,
-          duration: 600.ms,
-          curve: Curves.easeOutQuint,
-          delay: 500.ms,
-        );
+    );
+    // .animate().fadeIn(duration: 600.ms, delay: 500.ms).slideY(
+    //       begin: 0.2,
+    //       end: 0,
+    //       duration: 600.ms,
+    //       curve: Curves.easeOutQuint,
+    //       delay: 500.ms,
+    //     );
   }
 
   Widget _buildExploreButton() {

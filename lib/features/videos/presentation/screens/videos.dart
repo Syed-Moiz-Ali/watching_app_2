@@ -5,6 +5,7 @@ import 'package:watching_app_2/core/enums/enums.dart';
 import 'package:watching_app_2/core/navigation/app_navigator.dart';
 import 'package:watching_app_2/core/navigation/routes.dart';
 import 'package:watching_app_2/shared/widgets/appbars/app_bar.dart';
+import 'package:watching_app_2/shared/widgets/loading/loading_indicator.dart';
 
 import '../../../../core/constants/colors.dart';
 import '../../../../data/models/content_item.dart';
@@ -190,9 +191,9 @@ class _VideosState extends State<Videos> {
         children: [
           isLoading
               ? const Center(
-                  child: PaginationLoadingIndicator(
-                    loadingText: "Loading videos...",
-                  ),
+                  child: CustomLoadingIndicator(
+                      // loadingText: "Loading videos...",
+                      ),
                 )
               : error != null
                   ? Center(child: Text(error!))

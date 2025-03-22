@@ -50,7 +50,8 @@ class _SourcesState extends State<Sources> with TickerProviderStateMixin {
 
     for (String category in contentTypes) {
       final loadedSources = await sourceManager.loadSources(category);
-      allSources[category] = loadedSources;
+      allSources[category] =
+          loadedSources.where((s) => s.enabled == true).toList();
     }
 
     if (mounted) {

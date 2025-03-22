@@ -221,8 +221,8 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
 
     final Color borderColor = _isSearchFocused
         ? AppColors.primaryColor.withOpacity(0.8)
-        : Color.lerp(AppColors.primaryColor, widget.primaryColor, 0.15)!
-            .withOpacity(0.3);
+        : Color.lerp(AppColors.primaryColor, widget.primaryColor, .1)!
+            .withOpacity(0.5);
 
     return Container(
       margin: EdgeInsets.symmetric(
@@ -239,7 +239,7 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
         ),
         border: Border.all(
           color: borderColor,
-          width: _isSearchFocused ? 2.0 : 1.0,
+          width: _isSearchFocused ? 2.0 : 1.3,
         ),
         boxShadow: [
           // BoxShadow(
@@ -294,7 +294,9 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
                 decoration: InputDecoration(
                   hintText: widget.hintText,
                   hintStyle: TextStyle(
-                    color: widget.textColor.withOpacity(0.5),
+                    color: _isSearchFocused
+                        ? widget.textColor
+                        : widget.textColor.withOpacity(.5),
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
                     letterSpacing: 0.1,

@@ -3,284 +3,267 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
+import 'package:watching_app_2/data/models/content_item.dart';
 import 'package:watching_app_2/data/models/video_source.dart';
 import 'package:watching_app_2/data/scrapers/scraper_service.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:watching_app_2/core/global/globals.dart';
-import '../../data/models/content_item.dart';
+
+import '../../core/global/globals.dart';
 
 class WebviewProvider with ChangeNotifier {
-  WebViewController webViewController = WebViewController();
-  bool isWebViewInitialized = false;
+  late WebViewController _webViewController;
+  bool _isWebViewInitialized = false;
+  List<VideoSource> _videos = [];
+  String? _firstVideoUrl;
+  bool _isLoading = true;
+  String? _error;
 
-  List<VideoSource> videos = [];
-  String? firstVideoUrl;
-  bool isLoading = true;
-  String? error;
+  // Public getters
+  WebViewController get webViewController => _webViewController;
+  List<VideoSource> get videos => _videos;
+  String? get firstVideoUrl => _firstVideoUrl;
+  bool get isLoading => _isLoading;
+  String? get error => _error;
 
+  WebviewProvider() {
+    _webViewController = WebViewController();
+  }
+
+  /// Loads video content for the given [item] and initializes the WebView.
   Future<void> loadVideos(ContentItem item) async {
-    log("WebViewProvider: Starting to load videos for ${item.contentUrl}");
-    ScraperService scraperService = ScraperService(item.source);
+    _log('Starting to load videos for ${item.contentUrl}');
+    disposeWebView(); // Reset state before loading new content
+
+    final scraperService = ScraperService(item.source);
+    _setLoadingState(true);
+
     try {
-      isLoading = true;
-      error = null;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        notifyListeners();
-      });
+      final formattedUrl = _formatContentUrl(item.source.url, item.contentUrl);
+      _videos = await scraperService.getVideo(formattedUrl);
+      _log('Found ${_videos.length} videos');
 
-      log("WebViewProvider: Fetching videos using scraper service");
-      final newVideos = await scraperService.getVideo(
-        SMA.formatImage(baseUrl: item.source.url, image: item.contentUrl),
-      );
-
-      videos = newVideos;
-      isLoading = false;
-      log("WebViewProvider: Found ${videos.length} videos");
-
-      if (videos.isNotEmpty) {
-        final watchingLinks = videos.first.watchingLink;
-        final Map<String, dynamic> watchingLinksMap = jsonDecode(watchingLinks);
-        firstVideoUrl = watchingLinksMap.values.first;
-        log("WebViewProvider: First video URL: $firstVideoUrl");
+      if (_videos.isNotEmpty) {
+        _firstVideoUrl = _extractFirstVideoUrl(_videos.first.watchingLink);
+        _log('First video URL: $_firstVideoUrl');
+        if (_firstVideoUrl != null) {
+          await _initializeWebView(_firstVideoUrl!);
+        }
       } else {
-        log("WebViewProvider: No videos found");
+        _log('No videos found');
       }
-
-      if (firstVideoUrl != null) {
-        log("WebViewProvider: Initializing WebView with URL");
-        _initializeWebView(firstVideoUrl!);
-      }
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        notifyListeners();
-      });
+      _setLoadingState(false);
     } catch (e) {
-      error = 'Failed to load videos: $e';
-      isLoading = false;
-      log("WebViewProvider ERROR: $error", error: e);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        notifyListeners();
-      });
+      _handleError('Failed to load videos: $e', e);
     }
   }
 
-  void _initializeWebView(String videoUrl) {
-    log("WebViewProvider: Initializing WebView. Currently initialized: $isWebViewInitialized");
-
-    if (isWebViewInitialized) {
-      log("WebViewProvider: WebView already initialized. Disposing first...");
+  /// Initializes the WebView with the provided [videoUrl].
+  Future<void> _initializeWebView(String videoUrl) async {
+    _log('Initializing WebView with URL: $videoUrl');
+    if (_isWebViewInitialized) {
+      _log('WebView already initialized. Reinitializing...');
       disposeWebView();
-      webViewController = WebViewController();
+      _webViewController = WebViewController();
     }
 
-    log("WebViewProvider: Setting up new WebViewController for URL: $videoUrl");
-    webViewController = WebViewController()
-      ..setBackgroundColor(AppColors.backgroundColorLight)
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..enableZoom(false)
-      ..addJavaScriptChannel(
-        'VideoHandler',
-        onMessageReceived: (JavaScriptMessage message) {
-          log("WebViewProvider: Received message from JS channel: ${message.message}");
-          if (message.message == 'fullscreenEnter') {
-            log("WebViewProvider: Entering fullscreen mode");
-            _setLandscapeOrientation();
-          } else if (message.message == 'fullscreenExit') {
-            log("WebViewProvider: Exiting fullscreen mode");
-            _setPortraitOrientation();
-          }
-        },
-      )
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageStarted: (String url) {
-            log("WebViewProvider: Page load started: $url");
-            isLoading = true;
-          },
-          onPageFinished: (String url) {
-            log("WebViewProvider: Page load finished: $url");
-            isLoading = false;
-
-            log("WebViewProvider: Injecting JavaScript handlers");
-            webViewController.runJavaScript('''
-            // Pause all videos initially
-            document.querySelectorAll("video").forEach(video => {
-              video.pause();
-              
-              // Add click event listeners for play/pause
-              video.addEventListener('play', function() {
-                VideoHandler.postMessage('video');
-              });
-              
-              // Track fullscreen changes for videos
-              video.addEventListener('fullscreenchange', function() {
-                if (document.fullscreenElement) {
-                  VideoHandler.postMessage('fullscreenEnter');
-                } else {
-                  VideoHandler.postMessage('fullscreenExit');
-                }
-              });
-              
-              // For webkit browsers (iOS)
-              video.addEventListener('webkitfullscreenchange', function() {
-                if (document.webkitFullscreenElement) {
-                  VideoHandler.postMessage('fullscreenEnter');
-                } else {
-                  VideoHandler.postMessage('fullscreenExit');
-                }
-              });
-            });
-            
-            // Handle iframes (like YouTube) fullscreen events
-            document.querySelectorAll("iframe").forEach(iframe => {
-              iframe.addEventListener('fullscreenchange', function() {
-                if (document.fullscreenElement) {
-                  VideoHandler.postMessage('fullscreenEnter');
-                } else {
-                  VideoHandler.postMessage('fullscreenExit');
-                }
-              });
-              
-              // For webkit browsers
-              iframe.addEventListener('webkitfullscreenchange', function() {
-                if (document.webkitFullscreenElement) {
-                  VideoHandler.postMessage('fullscreenEnter');
-                } else {
-                  VideoHandler.postMessage('fullscreenExit');
-                }
-              });
-            });
-            
-            // Add fullscreen API interception
-            const originalRequestFullscreen = Element.prototype.requestFullscreen;
-            Element.prototype.requestFullscreen = function() {
-              VideoHandler.postMessage('fullscreenEnter');
-              return originalRequestFullscreen.apply(this, arguments);
-            };
-            
-            document.addEventListener('fullscreenchange', function() {
-              if (!document.fullscreenElement) {
-                VideoHandler.postMessage('fullscreenExit');
-              }
-            });
-            
-            console.log("WebView JS: Event listeners initialized");
-          ''').then((_) {
-              log("WebViewProvider: JavaScript injection successful");
-            }).catchError((e) {
-              log("WebViewProvider ERROR: Failed to inject JavaScript: $e",
-                  error: e);
-            });
-          },
-          onNavigationRequest: (NavigationRequest request) {
-            log("WebViewProvider: Navigation request to: ${request.url}");
-            if (request.url.startsWith('https://www.youtube.com/')) {
-              log("WebViewProvider: Blocking YouTube navigation");
-              return NavigationDecision.prevent;
-            }
-            return NavigationDecision.navigate;
-          },
-          onWebResourceError: (WebResourceError error) {
-            log("WebViewProvider ERROR: WebView resource error: ${error.description}",
-                error: error);
-          },
-        ),
-      );
-
-    log("WebViewProvider: Loading URL in WebView: $videoUrl");
-    webViewController.loadRequest(Uri.parse(videoUrl)).then((_) {
-      log("WebViewProvider: URL load request sent successfully");
-    }).catchError((e) {
-      log("WebViewProvider ERROR: Failed to load URL: $e", error: e);
+    _configureWebViewController(videoUrl);
+    await _webViewController.loadRequest(Uri.parse(videoUrl)).catchError((e) {
+      _log('Failed to load URL: $e', error: e);
     });
 
-    isWebViewInitialized = true;
-    log("WebViewProvider: WebView initialization complete. isWebViewInitialized = $isWebViewInitialized");
+    _isWebViewInitialized = true;
+    _log('WebView initialization complete');
     notifyListeners();
   }
 
+  /// Configures the WebViewController with settings and JavaScript handlers.
+  void _configureWebViewController(String videoUrl) {
+    _webViewController
+      ..setBackgroundColor(AppColors.backgroundColorLight)
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..enableZoom(false)
+      ..addJavaScriptChannel('VideoHandler',
+          onMessageReceived: _handleJsMessage)
+      ..setNavigationDelegate(_buildNavigationDelegate());
+
+    _log('WebViewController configured for: $videoUrl');
+  }
+
+  /// Builds the NavigationDelegate for WebView navigation handling.
+  NavigationDelegate _buildNavigationDelegate() {
+    return NavigationDelegate(
+      onPageStarted: (url) {
+        _log('Page load started: $url');
+        _setLoadingState(true);
+      },
+      onPageFinished: (url) {
+        _log('Page load finished: $url');
+        _setLoadingState(false);
+        _injectJavaScript();
+      },
+      onNavigationRequest: (request) {
+        _log('Navigation request to: ${request.url}');
+        if (request.url.startsWith('https://www.youtube.com/')) {
+          _log('Blocking YouTube navigation');
+          return NavigationDecision.prevent;
+        }
+        return NavigationDecision.navigate;
+      },
+      onWebResourceError: (error) {
+        _log('WebView resource error: ${error.description}', error: error);
+      },
+    );
+  }
+
+  /// Handles messages from the JavaScript channel.
+  void _handleJsMessage(JavaScriptMessage message) {
+    _log('Received JS message: ${message.message}');
+    switch (message.message) {
+      case 'fullscreenEnter':
+        _setLandscapeOrientation();
+        break;
+      case 'fullscreenExit':
+        _setPortraitOrientation();
+        break;
+      case 'video':
+        _log('Video playback started');
+        break;
+    }
+  }
+
+  /// Injects JavaScript to handle video events and fullscreen changes.
+  void _injectJavaScript() {
+    const jsCode = '''
+      document.querySelectorAll("video").forEach(video => {
+        video.pause();
+        video.addEventListener('play', () => VideoHandler.postMessage('video'));
+        video.addEventListener('fullscreenchange', () => {
+          document.fullscreenElement ? VideoHandler.postMessage('fullscreenEnter') : VideoHandler.postMessage('fullscreenExit');
+        });
+        video.addEventListener('webkitfullscreenchange', () => {
+          document.webkitFullscreenElement ? VideoHandler.postMessage('fullscreenEnter') : VideoHandler.postMessage('fullscreenExit');
+        });
+      });
+      document.querySelectorAll("iframe").forEach(iframe => {
+        iframe.addEventListener('fullscreenchange', () => {
+          document.fullscreenElement ? VideoHandler.postMessage('fullscreenEnter') : VideoHandler.postMessage('fullscreenExit');
+        });
+        iframe.addEventListener('webkitfullscreenchange', () => {
+          document.webkitFullscreenElement ? VideoHandler.postMessage('fullscreenEnter') : VideoHandler.postMessage('fullscreenExit');
+        });
+      });
+      console.log("WebView JS: Event listeners initialized");
+    ''';
+    _webViewController.runJavaScript(jsCode).then((_) {
+      _log('JavaScript injection successful');
+    }).catchError((e) {
+      _log('Failed to inject JavaScript: $e', error: e);
+    });
+  }
+
+  /// Sets the device to landscape orientation with immersive mode.
   void _setLandscapeOrientation() {
-    log("WebViewProvider: Setting landscape orientation");
+    _log('Setting landscape orientation');
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
-
-    // Animate to fullscreen
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    log("WebViewProvider: Landscape orientation and immersive mode set");
   }
 
+  /// Resets the device to portrait orientation with edge-to-edge mode.
   void _setPortraitOrientation() {
-    log("WebViewProvider: Setting portrait orientation");
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]);
-
-    // Animate back from fullscreen
+    _log('Setting portrait orientation');
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    log("WebViewProvider: Portrait orientation and edge-to-edge mode set");
   }
 
+  /// Disposes of the WebView and cleans up resources.
   void disposeWebView() {
-    log("WebViewProvider: Disposing WebView. Current state - initialized: $isWebViewInitialized");
-    if (!isWebViewInitialized) {
-      log("WebViewProvider: WebView not initialized, nothing to dispose");
+    if (!_isWebViewInitialized) {
+      _log('WebView not initialized, nothing to dispose');
       return;
     }
 
-    log("WebViewProvider: Resetting orientation to portrait");
+    _log('Disposing WebView');
     _setPortraitOrientation();
+    _cleanupJavaScript();
+    _isWebViewInitialized = false;
+    notifyListeners();
+  }
 
-    log("WebViewProvider: Cleaning up JavaScript event listeners");
-    webViewController.runJavaScript('''
+  /// Cleans up JavaScript event listeners in the WebView.
+  void _cleanupJavaScript() {
+    const cleanupJs = '''
       try {
-        // Remove event listeners from videos
         document.querySelectorAll("video").forEach(video => {
           video.pause();
           video.removeEventListener('play', null);
           video.removeEventListener('fullscreenchange', null);
           video.removeEventListener('webkitfullscreenchange', null);
         });
-        
-        // Remove event listeners from iframes
         document.querySelectorAll("iframe").forEach(iframe => {
           iframe.removeEventListener('fullscreenchange', null);
           iframe.removeEventListener('webkitfullscreenchange', null);
         });
-        
         console.log("WebView JS: Event listeners removed");
         return true;
       } catch(e) {
         console.error("WebView JS ERROR: " + e.toString());
         return false;
       }
-    ''').then((_) {
-      log("WebViewProvider: JavaScript cleanup completed");
-    }).catchError((error) {
-      log("WebViewProvider ERROR: Error cleaning up JavaScript: $error",
-          error: error);
+    ''';
+    _webViewController.runJavaScript(cleanupJs).then((_) {
+      _log('JavaScript cleanup completed');
+    }).catchError((e) {
+      _log('Error cleaning up JavaScript: $e', error: e);
     });
+  }
 
-    isWebViewInitialized = false;
-    log("WebViewProvider: WebView disposal complete. isWebViewInitialized = $isWebViewInitialized");
-    notifyListeners();
+  /// Formats the content URL using the base URL and content URL.
+  String _formatContentUrl(String baseUrl, String contentUrl) {
+    return SMA.formatImage(
+        baseUrl: baseUrl,
+        image: contentUrl); // Assuming SMA is a global utility
+  }
+
+  /// Extracts the first video URL from the watching link JSON.
+  String? _extractFirstVideoUrl(String watchingLink) {
+    final watchingLinksMap = jsonDecode(watchingLink) as Map<String, dynamic>;
+    return watchingLinksMap.values.first as String?;
+  }
+
+  /// Updates the loading state and notifies listeners.
+  void _setLoadingState(bool value) {
+    _isLoading = value;
+    _error = null;
+    WidgetsBinding.instance.addPostFrameCallback((_) => notifyListeners());
+  }
+
+  /// Handles errors by setting the error state and logging.
+  void _handleError(String message, dynamic e) {
+    _error = message;
+    _isLoading = false;
+    _log('ERROR: $message', error: e);
+    WidgetsBinding.instance.addPostFrameCallback((_) => notifyListeners());
+  }
+
+  /// Logs messages with optional error details.
+  void _log(String message, {dynamic error}) {
+    if (error != null) {
+      log('WebviewProvider - $message', error: error);
+    } else {
+      log('WebviewProvider - $message');
+    }
   }
 
   @override
   void dispose() {
-    log("WebViewProvider: Full provider disposal triggered");
-    if (isWebViewInitialized) {
-      log("WebViewProvider: WebView is initialized, disposing WebView first");
-      disposeWebView();
-    }
-
-    log("WebViewProvider: Clearing videos and URL references");
-    videos.clear();
-    firstVideoUrl = null;
-
-    log("WebViewProvider: Calling super.dispose()");
+    _log('Full provider disposal triggered');
+    disposeWebView();
+    _videos.clear();
+    _firstVideoUrl = null;
     super.dispose();
-    log("WebViewProvider: Provider fully disposed");
+    _log('Provider fully disposed');
   }
 }

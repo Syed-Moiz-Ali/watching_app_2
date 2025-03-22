@@ -199,7 +199,7 @@ class _SimilarContentCardState extends State<SimilarContentCard>
                     width: double.infinity,
                     child: Hero(
                       tag: 'content-${widget.content.contentUrl}',
-                      child: CustomImageWidget(
+                      child: ImageWidget(
                         borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(12)),
                         imagePath: SMA.formatImage(

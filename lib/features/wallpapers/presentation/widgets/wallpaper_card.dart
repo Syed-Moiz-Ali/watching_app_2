@@ -226,7 +226,7 @@ class _WallpaperCardState extends State<WallpaperCard>
   Widget _buildWallpaperImage() {
     return Hero(
       tag: 'wallpaper-${widget.item.thumbnailUrl}',
-      child: CustomImageWidget(
+      child: ImageWidget(
         imagePath: SMA.formatImage(
             image: widget.item.thumbnailUrl.toString(),
             baseUrl: widget.item.source.url),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:watching_app_2/data/models/content_source.dart';
+import 'package:watching_app_2/shared/widgets/misc/padding.dart';
 
 import 'source_card.dart';
 
@@ -24,8 +25,9 @@ class ContentList extends StatelessWidget {
     }
     final sortedSources = List<ContentSource>.from(sources)
       ..sort((a, b) => a.name.compareTo(b.name));
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    return CustomPadding(
+      horizontalFactor: .02,
+      // bottomFactor: .1,
       child: ListView.builder(
         itemCount: sortedSources.length,
         itemBuilder: (context, index) {

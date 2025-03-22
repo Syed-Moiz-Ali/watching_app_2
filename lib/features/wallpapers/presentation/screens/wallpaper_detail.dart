@@ -595,7 +595,7 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
         ).createShader(rect);
       },
       blendMode: BlendMode.srcATop,
-      child: CustomImageWidget(
+      child: ImageWidget(
         imagePath: SMA.formatImage(
           image: widget.item.thumbnailUrl,
           baseUrl: widget.item.source.url,

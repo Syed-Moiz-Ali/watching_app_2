@@ -209,7 +209,7 @@ class _ContentDetailState extends State<ContentDetail>
                                 ).createShader(rect);
                               },
                               blendMode: BlendMode.dstIn,
-                              child: CustomImageWidget(
+                              child: ImageWidget(
                                 imagePath: SMA.formatImage(
                                     image: widget.item.thumbnailUrl,
                                     baseUrl: widget.item.source.url),
@@ -459,6 +459,7 @@ class _ContentDetailState extends State<ContentDetail>
                 TextWidget(
                   text: value,
                   fontSize: 17.sp,
+                  maxLine: 1,
                   fontWeight: FontWeight.w600,
                 ),
               ],

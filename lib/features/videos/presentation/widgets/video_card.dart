@@ -118,14 +118,6 @@ class _VideoCardState extends State<VideoCard>
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(widget.isGrid ? 20 : 28),
-              // boxShadow: [
-              //   BoxShadow(
-              //     color: AppColors.primaryColor
-              //         .withOpacity(_isHovered ? 0.2 : 0.1),
-              //     blurRadius: 100,
-              //     offset: const Offset(0, 1),
-              //   ),
-              // ],
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(widget.isGrid ? 20 : 28),
@@ -133,10 +125,7 @@ class _VideoCardState extends State<VideoCard>
                 filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                 child: Container(
                   padding: EdgeInsets.all(widget.isGrid ? 5.sp : 5.sp),
-                  decoration: BoxDecoration(
-                      // color: AppColors.backgroundColorLight.withOpacity(0.05),
-
-                      ),
+                  decoration: BoxDecoration(),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -225,7 +214,7 @@ class _VideoCardState extends State<VideoCard>
       builder: (context, value, child) {
         return Transform.scale(
           scale: value,
-          child: CustomImageWidget(
+          child: ImageWidget(
             imagePath: SMA.formatImage(
               image: widget.item.thumbnailUrl,
               baseUrl: widget.item.source.url,

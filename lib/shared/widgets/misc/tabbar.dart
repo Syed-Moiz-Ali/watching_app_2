@@ -96,7 +96,7 @@ class CustomTabBar extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (tabContent.icon is String) ...[
-                        CustomImageWidget(
+                        ImageWidget(
                           imagePath: tabContent.icon,
                           width: 20,
                           height: 20,

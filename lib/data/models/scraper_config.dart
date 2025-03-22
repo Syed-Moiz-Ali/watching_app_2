@@ -78,8 +78,6 @@
 //   });
 // }
 
-import 'package:html/dom.dart';
-
 class ElementSelector {
   final String? selector;
   final String? attribute;

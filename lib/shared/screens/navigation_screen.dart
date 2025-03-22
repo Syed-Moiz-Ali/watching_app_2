@@ -10,7 +10,7 @@ import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 
 import 'browse_content/browse_content.dart';
 
-import 'categories.dart';
+import 'categories/categories.dart';
 import 'favorites/favorites.dart';
 import 'settings.dart';
 import 'sources/sources.dart';

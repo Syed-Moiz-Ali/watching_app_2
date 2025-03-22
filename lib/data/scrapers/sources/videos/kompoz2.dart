@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:html/dom.dart';
 
 import '../../../../core/global/globals.dart';

@@ -55,14 +55,6 @@ class CustomIconWidget extends StatelessWidget {
                   );
                 },
               )
-            // CustomImageWidget(
-            //     imageUrl: imageUrl!,
-            //     width: width,
-            //     height: height,
-            //     fit: fit,
-            //     color: color,
-            //     colorBlendMode: colorBlendMode,
-            //   )
             : Icon(
                 iconData,
                 color: color,

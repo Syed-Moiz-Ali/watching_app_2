@@ -168,7 +168,7 @@ class _TabbedContentViewState extends State<TabbedContentView>
       child: Opacity(
         opacity: .4,
         child: results[0].thumbnailUrl.isNotEmpty
-            ? CustomImageWidget(
+            ? ImageWidget(
                 imagePath: SMA.formatImage(
                     image: results[0].thumbnailUrl,
                     baseUrl: results[0].source.url),

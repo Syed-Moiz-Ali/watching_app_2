@@ -142,7 +142,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget>
     } else {
       return Stack(
         children: [
-          CustomImageWidget(
+          ImageWidget(
             imagePath: widget.imageUrl,
             fit: BoxFit.cover,
           ),
