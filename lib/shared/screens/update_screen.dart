@@ -53,11 +53,11 @@ class _UpdateScreenState extends State<UpdateScreen>
   double _cardRotationY = 0;
 
   // Colors - Luxurious color scheme
-  final Color _bgDarkColor = AppColors.primaryColor;
+  final Color _bgDarkColor = AppColors.disabledColor;
   final Color _bgLightColor = const Color(0xFF1E1E1E);
-  final Color _accentColor = AppColors.accentColor; // Luxurious gold
+  final Color _accentColor = AppColors.primaryColor; // Luxurious gold
   final Color _accentSecondaryColor =
-      AppColors.accentColor.withOpacity(.6); // Deeper gold
+      AppColors.primaryColor.withOpacity(.8); // Deeper gold
   final Color _textWhiteColor = const Color(0xFFF5F5F5);
   final Color _textGreyColor = const Color(0xFFAAAAAA);
   final Color _glassBgColor = const Color(0x24FFFFFF);
@@ -480,7 +480,7 @@ class _UpdateScreenState extends State<UpdateScreen>
                                           child: _buildUpdateDescription(),
                                         ),
 
-                                        const SizedBox(height: 30),
+                                        const SizedBox(height: 25),
 
                                         // Progress indicator or Update button
                                         if (_progress > 0 && _progress < 100)
@@ -558,7 +558,7 @@ class _UpdateScreenState extends State<UpdateScreen>
                 height: 90,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.black.withOpacity(0.2),
+                  color: _textWhiteColor.withOpacity(0.2),
                   border: Border.all(
                     color: _accentColor.withOpacity(0.4),
                     width: 1.5,
@@ -634,9 +634,9 @@ class _UpdateScreenState extends State<UpdateScreen>
               ),
             ],
           ),
-          child: const Icon(
+          child: Icon(
             Icons.check,
-            color: Colors.black,
+            color: _textWhiteColor,
             size: 24,
           ),
         );
@@ -729,7 +729,7 @@ class _UpdateScreenState extends State<UpdateScreen>
                               _progress >= 100
                                   ? Icons.check_circle_outline
                                   : Icons.download_rounded,
-                              color: Colors.black,
+                              color: _textWhiteColor,
                               size: 20,
                             ),
                           );
@@ -739,7 +739,7 @@ class _UpdateScreenState extends State<UpdateScreen>
                       TextWidget(
                         text: _progress >= 100 ? "Open" : 'Update Now',
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        color: _textWhiteColor,
                       ),
                     ],
                   ),

@@ -6,9 +6,11 @@ import '../../widgets/loading/pagination_indicator.dart';
 import 'tabbed_content_view.dart';
 
 class SearchResultsList extends StatefulWidget {
-  const SearchResultsList({super.key, required this.query});
+  const SearchResultsList(
+      {super.key, required this.query, required this.category});
 
   final String query;
+  final String category;
 
   @override
   State<SearchResultsList> createState() => _SearchResultsListState();
@@ -35,7 +37,7 @@ class _SearchResultsListState extends State<SearchResultsList>
       final provider = Provider.of<SearchProvider>(context, listen: false);
       provider.setQuery(widget.query);
       await provider
-          .loadSourcesAndSearch("videos", widget.query)
+          .loadSourcesAndSearch(widget.category, widget.query)
           .then((_) => _animationController.forward());
     });
   }
@@ -136,8 +138,7 @@ class _SearchResultsListState extends State<SearchResultsList>
   // }
 
   Widget _buildCategoryContent(SearchProvider provider) {
-    final categoryResults =
-        provider.allCategoryResults[provider.currentCategory];
+    final categoryResults = provider.allCategoryResults[widget.category];
     if (categoryResults == null) {
       return const Center(
         child: PaginationLoadingIndicator(
@@ -167,10 +168,10 @@ class _SearchResultsListState extends State<SearchResultsList>
                 categoryResults: categoryResults,
                 sources: provider.sources,
                 isGrid: provider.isGrid,
+                category: widget.category,
                 query: widget.query,
                 onLoadMore: (sourceId) {
-                  return provider.loadMoreContent(
-                      provider.currentCategory, sourceId);
+                  return provider.loadMoreContent(widget.category, sourceId);
                   // return true;
                 },
               );

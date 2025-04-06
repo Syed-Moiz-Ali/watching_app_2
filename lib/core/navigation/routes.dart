@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:watching_app_2/app/splash_screen.dart';
+import 'package:watching_app_2/shared/screens/update_screen.dart';
 
 import '../../features/videos/presentation/screens/content_detail.dart';
 import '../../shared/screens/favorites/favorites.dart';
@@ -54,7 +56,10 @@ class AppRoutes {
     }
   }
 
-  static const String home = '/';
+  static const String splash = '/';
+  static const String home = '/home';
+  static const String auth = '/auth';
+  static const String update = '/update';
   static const String bottomNavigation = '/bottom-navigation';
   static const String categories = '/categories';
   static const String detail = '/detail';
@@ -89,8 +94,20 @@ class AppRoutes {
         _fixedTransitionPreferences[settings.name] ?? _appWideTransition;
 
     switch (settings.name) {
+      case splash:
+        return _createRoute(SplashScreen(), settings, transitionType);
       case home:
         return _createRoute(const NavigationScreen(), settings, transitionType);
+      case auth:
+        return _createRoute(const NavigationScreen(), settings, transitionType);
+      case update:
+        final String updateUrl = args['updateUrl'] ?? '';
+        return _createRoute(
+            UpdateScreen(
+              updateUrl: updateUrl,
+            ),
+            settings,
+            transitionType);
 
       case detail:
         if (args.containsKey('item')) {
@@ -122,7 +139,12 @@ class AppRoutes {
 
       case searchResult:
         if (args.containsKey('query')) {
-          return _createRoute(SearchResultsList(query: args['query']), settings,
+          return _createRoute(
+              SearchResultsList(
+                query: args['query'],
+                category: args['category'],
+              ),
+              settings,
               transitionType);
         }
         return _errorRoute(settings.name);

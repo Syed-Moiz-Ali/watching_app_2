@@ -1,6 +1,6 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:watching_app_2/data/database/local_database.dart';
 import '../../../data/models/content_item.dart';
 import '../../../data/models/content_source.dart';
 import '../../../data/scrapers/scraper_service.dart';
@@ -56,39 +56,45 @@ class SearchProvider with ChangeNotifier {
   Future<void> loadSourcesAndSearch(String category, String query) async {
     _currentQuery = query;
     _isLoading = true;
-    _errorMap[category] = null;
     _activeSourceIndex = 0;
     notifyListeners();
 
-    try {
-      final loadedSources = await _sourceManager.loadSources(category);
-      _sources = loadedSources;
+    // Determine which categories to process
+    List<String> categoriesToProcess =
+        category.toLowerCase() == "all" ? ContentTypes.ALL_TYPES : [category];
 
-      for (var source in _sources) {
-        if (source.type == '1') {
+    for (String currentCategory in categoriesToProcess) {
+      _errorMap[currentCategory] = null;
+
+      try {
+        final loadedSources = await _sourceManager.loadSources(currentCategory);
+        _sources = loadedSources;
+
+        final activeSources = _sources.where((source) {
+          final mappedCategory = ContentTypes.TYPE_TO_CATEGORY[source.type];
+          return mappedCategory == currentCategory;
+        }).toList();
+        for (var source in activeSources) {
+          // log("source.url is ${_scraperServices[source.url]}");
           if (_scraperServices[source.url] == null) {
             _scraperServices[source.url] = ScraperService(source);
           }
-          _currentPageMap["${category}_${source.url}"] = 1;
-          _hasMoreDataMap["${category}_${source.url}"] = true;
+          _currentPageMap["${currentCategory}_${source.url}"] = 1;
+          _hasMoreDataMap["${currentCategory}_${source.url}"] = true;
         }
+
+        for (int i = 0; i < activeSources.length; i++) {
+          _activeSourceIndex = i;
+          notifyListeners();
+          await _searchVideosFromSource(activeSources[i], currentCategory);
+        }
+      } catch (e) {
+        _errorMap[currentCategory] = 'Failed to load sources: $e';
       }
-
-      final activeSources =
-          _sources.where((source) => source.type == '1').toList();
-
-      for (int i = 0; i < activeSources.length; i++) {
-        _activeSourceIndex = i;
-        notifyListeners();
-        await _searchVideosFromSource(activeSources[i], category);
-      }
-
-      notifyListeners();
-    } catch (e) {
-      _isLoading = false;
-      _errorMap[category] = 'Failed to load sources: $e';
-      notifyListeners();
     }
+
+    _isLoading = false;
+    notifyListeners();
   }
 
   Future<void> _searchVideosFromSource(
@@ -98,6 +104,7 @@ class SearchProvider with ChangeNotifier {
     try {
       final newVideos = await _scraperServices[source.url]!
           .search(_currentQuery, _currentPageMap[sourceKey] ?? 1);
+      // log("newVideos is $newVideos");
 
       if (_allCategoryResults[category] == null) {
         _allCategoryResults[category] = {};
@@ -112,6 +119,7 @@ class SearchProvider with ChangeNotifier {
       if (newVideos.isEmpty) {
         _hasMoreDataMap[sourceKey] = false;
       }
+      log("_allCategoryResults is $_allCategoryResults");
       notifyListeners();
     } catch (e) {
       _errorMap["${category}_${source.url}"] =

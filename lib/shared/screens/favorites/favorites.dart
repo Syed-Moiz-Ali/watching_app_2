@@ -158,6 +158,8 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
   int _currentPlayingIndex = -1;
   List<ContentItem> favorites = []; // Original list
   List<ContentItem> filteredFavorites = []; // Filtered list
+  // Track if filters are applied
+  bool _filtersApplied = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -178,9 +180,16 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
 
             if (snapshot.hasData) {
               favorites = snapshot.data ?? [];
-              if (filteredFavorites.isEmpty) {
-                // Only update filteredFavorites if no filters are applied
+
+              // Only update filteredFavorites if no filters are applied
+              // or if this is the first data load
+              if (!_filtersApplied || filteredFavorites.isEmpty) {
                 filteredFavorites = List.from(favorites);
+              } else {
+                // If filters are applied, we need to preserve the filter logic
+                // but update the list if elements were added or removed
+                // This is just a placeholder - your actual filter logic may be different
+                _updateFilteredListWithNewItems(favorites);
               }
             }
 
@@ -196,7 +205,7 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
 
             return Scaffold(
               body: VideoGridView(
-                videos: filteredFavorites, // ✅ Use filtered list
+                videos: filteredFavorites,
                 isGrid: widget.isGrid,
                 contentType: widget.contentType,
                 currentPlayingIndex: _currentPlayingIndex,
@@ -216,10 +225,11 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
                   FiltersBottomSheet.show(
                     context,
                     contentType: widget.contentType,
-                    items: favorites, // ✅ Pass unfiltered list
+                    items: favorites, // Pass unfiltered list
                     onFiltersApplied: (filteredItems) {
                       setState(() {
-                        filteredFavorites = filteredItems; // ✅ Apply filters
+                        filteredFavorites = filteredItems;
+                        _filtersApplied = true; // Mark that filters are applied
                       });
                     },
                   );
@@ -243,5 +253,34 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
         );
       },
     );
+  }
+
+  // Method to update filtered list while preserving filter logic
+  void _updateFilteredListWithNewItems(List<ContentItem> newFullList) {
+    // This is a simple example - you'll need to adjust based on your actual filtering logic
+    // For example, if you're filtering by tags, categories, etc.
+
+    // Get the URLs of items in the current filtered list
+    final Set<String> filteredUrls =
+        filteredFavorites.map((item) => item.contentUrl).toSet();
+
+    // For new items in the full list that match filter criteria, add them
+    for (final item in newFullList) {
+      // This assumes your filter bottom sheet provides the logic to check if an item
+      // should be included based on the current filters
+      // Replace this with your actual filter logic check
+      bool matchesCurrentFilters = true; // Replace with your filter check
+
+      if (matchesCurrentFilters && !filteredUrls.contains(item.contentUrl)) {
+        filteredFavorites.add(item);
+      }
+    }
+
+    // Remove items from filtered list that no longer exist in the full list
+    final Set<String> fullListUrls =
+        newFullList.map((item) => item.contentUrl).toSet();
+
+    filteredFavorites
+        .removeWhere((item) => !fullListUrls.contains(item.contentUrl));
   }
 }

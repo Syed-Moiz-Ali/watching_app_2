@@ -19,6 +19,7 @@ import '../../../../core/navigation/app_navigator.dart';
 import '../../../../presentation/provider/similar_content_provider.dart';
 import '../../../../shared/screens/video_player/components/similar_content.dart';
 import 'dart:ui';
+import 'dart:developer';
 
 class ContentDetail extends StatefulWidget {
   final ContentItem item;
@@ -44,6 +45,7 @@ class _ContentDetailState extends State<ContentDetail>
   void initState() {
     super.initState();
     var provider = Provider.of<WebviewProvider>(context, listen: false);
+    log("this is the content detail page and the item is ${widget.item}");
     provider.loadVideos(widget.item);
 
     _scrollController = ScrollController()

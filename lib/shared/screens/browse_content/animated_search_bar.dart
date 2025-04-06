@@ -1,70 +1,63 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:ui';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
+import 'package:watching_app_2/data/database/local_database.dart';
 
-class AnimatedSearchBar extends StatefulWidget {
-  const AnimatedSearchBar({
+import '../../widgets/misc/text_widget.dart';
+
+class UltraPremiumSearchBar extends StatefulWidget {
+  const UltraPremiumSearchBar({
     super.key,
     required this.onSearch,
-    required this.onFilterTap,
+    required this.onCategoryChanged,
     required this.recentSearches,
     required this.onRecentSearchesUpdated,
+    this.categories = ContentTypes.ALL_TYPES,
     this.hintText = 'Search your content...',
-    this.primaryColor = const Color(0xFF6C5CE7), // Premium violet
-    this.backgroundColor = Colors.white, // Light background
-    this.textColor = const Color(0xFF2D3748), // Dark slate for text
+    this.primaryColor = const Color(0xFF6C5CE7),
+    this.backgroundColor = Colors.white,
+    this.textColor = const Color(0xFF2D3748),
+    this.accentColor = const Color(0xFF6C5CE7),
+    this.animationDuration = const Duration(milliseconds: 250),
   });
 
   final Color backgroundColor;
+  final List<String> categories;
   final String hintText;
-  final VoidCallback onFilterTap;
+  final Function(String) onCategoryChanged;
   final Function(List<String>) onRecentSearchesUpdated;
-  final Function(String) onSearch;
+  final Function(String, String) onSearch;
   final Color primaryColor;
   final List<String> recentSearches;
   final Color textColor;
+  final Color accentColor;
+  final Duration animationDuration;
 
   @override
-  State<AnimatedSearchBar> createState() => _AnimatedSearchBarState();
+  State<UltraPremiumSearchBar> createState() => _UltraPremiumSearchBarState();
 }
 
-class _AnimatedSearchBarState extends State<AnimatedSearchBar>
-    with TickerProviderStateMixin {
-  late AnimationController _bounceAnimController;
-  late Animation<double> _bounceAnimation;
-  late AnimationController _focusAnimController;
-  late Animation<double> _focusAnimation;
-  bool _isSearchFocused = false;
-  OverlayEntry? _overlayEntry;
-  late AnimationController _recentSearchesAnimController;
-  late AnimationController _searchBarAnimController;
-  late Animation<double> _searchBarAnimation;
+class _UltraPremiumSearchBarState extends State<UltraPremiumSearchBar>
+    with SingleTickerProviderStateMixin {
   late TextEditingController _searchController;
   late FocusNode _searchFocusNode;
-  late AnimationController _shimmerAnimController;
-  late Animation<double> _shimmerAnimation;
-  late AnimationController _pulseAnimController;
-  late Animation<double> _pulseAnimation;
-  bool _showRecentSearches = false;
+  bool _isSearchFocused = false;
+  String _selectedCategory = 'All';
+  bool _isDropdownOpen = false;
+  OverlayEntry? _overlayEntry;
   late StreamSubscription<bool> keyboardSubscription;
-
-  @override
-  void dispose() {
-    _removeRecentSearchesOverlay();
-    _searchController.dispose();
-    _searchFocusNode.dispose();
-    _searchBarAnimController.dispose();
-    _focusAnimController.dispose();
-    _bounceAnimController.dispose();
-    _shimmerAnimController.dispose();
-    _recentSearchesAnimController.dispose();
-    _pulseAnimController.dispose();
-    super.dispose();
-  }
+  late AnimationController _animationController;
+  late Animation<double> _searchBarAnimation;
+  late Animation<double> _borderRadiusAnimation;
+  late Animation<Color?> _borderColorAnimation;
+  late Animation<double> _shadowOpacityAnimation;
+  late Animation<double> _iconSizeAnimation;
+  bool _isHovering = false;
 
   @override
   void initState() {
@@ -72,6 +65,36 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
     _searchController = TextEditingController();
     _searchFocusNode = FocusNode();
     _searchFocusNode.addListener(_handleFocusChange);
+    _selectedCategory = widget.categories.first;
+
+    // Setup animations
+    _animationController = AnimationController(
+      duration: widget.animationDuration,
+      vsync: this,
+    );
+
+    _searchBarAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
+    );
+
+    _borderRadiusAnimation = Tween<double>(begin: 24.0, end: 16.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
+    );
+
+    _borderColorAnimation = ColorTween(
+      begin: widget.textColor.withOpacity(0.15),
+      end: widget.primaryColor,
+    ).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
+    );
+
+    _shadowOpacityAnimation = Tween<double>(begin: 0.05, end: 0.12).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
+    );
+
+    _iconSizeAnimation = Tween<double>(begin: 22.0, end: 24.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
+    );
 
     var keyboardVisibilityController = KeyboardVisibilityController();
     // Query
@@ -87,99 +110,192 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
         _searchFocusNode.unfocus();
       }
     });
-    // Entry animation - smoother and more premium feel
-    _searchBarAnimController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    );
-    _searchBarAnimation = CurvedAnimation(
-      parent: _searchBarAnimController,
-      curve: Curves.easeOutExpo, // More premium easing
-    );
+  }
 
-    // Focus animation - refined transition
-    _focusAnimController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-    _focusAnimation = CurvedAnimation(
-      parent: _focusAnimController,
-      curve: Curves.easeOutCubic, // Smoother transition
-    );
-
-    // Bounce animation - more subtle and elegant
-    _bounceAnimController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 350),
-    );
-    _bounceAnimation = CurvedAnimation(
-      parent: _bounceAnimController,
-      curve: Curves.easeOutBack, // Nicer bounce
-    );
-
-    // Shimmer animation - subtle gradient flow
-    _shimmerAnimController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2500), // Slower, more elegant
-    )..repeat();
-    _shimmerAnimation = CurvedAnimation(
-      parent: _shimmerAnimController,
-      curve: Curves.easeInOutSine,
-    );
-
-    // Pulse animation for search icon - subtle attention effect
-    _pulseAnimController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat(reverse: true);
-    _pulseAnimation = Tween<double>(begin: 0.95, end: 1.05).animate(
-      CurvedAnimation(
-        parent: _pulseAnimController,
-        curve: Curves.easeInOutSine,
-      ),
-    );
-
-    // Recent searches animation
-    _recentSearchesAnimController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 350),
-    );
-
-    // Start entry animation
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _searchBarAnimController.forward();
-    });
+  @override
+  void dispose() {
+    _removeDropdownOverlay();
+    _searchController.dispose();
+    _searchFocusNode.dispose();
+    _animationController.dispose();
+    keyboardSubscription.cancel();
+    super.dispose();
   }
 
   void _handleFocusChange() {
     setState(() {
       _isSearchFocused = _searchFocusNode.hasFocus;
       if (_isSearchFocused) {
-        _focusAnimController.forward();
-        _bounceAnimController.forward(from: 0.0);
-        _pulseAnimController.stop();
-        if (widget.recentSearches.isNotEmpty) {
-          _showRecentSearches = true;
-          _recentSearchesAnimController.forward();
-        }
+        _animationController.forward();
       } else {
-        _focusAnimController.reverse();
-        _pulseAnimController.repeat(reverse: true);
-        if (_showRecentSearches) {
-          _recentSearchesAnimController.reverse().then((_) {
-            setState(() {
-              _showRecentSearches = false;
-              _removeRecentSearchesOverlay();
-            });
-          });
-        }
+        _animationController.reverse();
+        _hideDropdown();
       }
     });
   }
 
-  void _removeRecentSearchesOverlay() {
+  void _showDropdown(BuildContext context) {
+    _removeDropdownOverlay();
+
+    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final position = renderBox.localToGlobal(Offset.zero);
+    final size = renderBox.size;
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: position.dy + size.height - 30,
+        right: 16,
+        width: 220,
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 200),
+          opacity: 1.0,
+          curve: Curves.easeOutCubic,
+          child: AnimatedSlide(
+            duration: const Duration(milliseconds: 200),
+            offset: const Offset(0, 0),
+            curve: Curves.easeOutCubic,
+            child: Material(
+              elevation: 16,
+              borderRadius: BorderRadius.circular(16),
+              shadowColor: widget.primaryColor.withOpacity(0.2),
+              color: widget.backgroundColor,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      // color: widget.backgroundColor.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: widget.primaryColor.withOpacity(0.1),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: _buildDropdownContent(),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    Overlay.of(context).insert(_overlayEntry!);
+    setState(() {
+      _isDropdownOpen = true;
+    });
+  }
+
+  void _hideDropdown() {
+    _removeDropdownOverlay();
+    setState(() {
+      _isDropdownOpen = false;
+    });
+  }
+
+  void _removeDropdownOverlay() {
     _overlayEntry?.remove();
     _overlayEntry = null;
+  }
+
+  Widget _buildDropdownContent() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Padding(
+        //   padding: const EdgeInsets.all(16),
+        //   child: Row(
+        //     children: [
+        //       Icon(
+        //         Icons.category_rounded,
+        //         color: widget.primaryColor,
+        //         size: 18,
+        //       ),
+        //       const SizedBox(width: 8),
+        //       TextWidget(text:
+        //         'Select Category',
+        //         style: TextStyle(
+        //           fontWeight: FontWeight.bold,
+        //           color: widget.textColor,
+        //           fontSize: 14,
+        //           letterSpacing: 0.3,
+        //         ),
+        //       ),
+        //     ],
+        //   ),
+        // ),
+        // const Divider(height: 1, thickness: 1.2),
+        ...widget.categories.map((category) => _buildCategoryItem(category)),
+      ],
+    );
+  }
+
+  Widget _buildCategoryItem(String category) {
+    final bool isSelected = category == _selectedCategory;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            _selectedCategory = category;
+          });
+          widget.onCategoryChanged(category);
+          _hideDropdown();
+        },
+        splashColor: widget.primaryColor.withOpacity(0.1),
+        highlightColor: widget.primaryColor.withOpacity(0.05),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+          decoration: BoxDecoration(
+            color: isSelected ? widget.primaryColor.withOpacity(0.08) : null,
+            border: Border(
+              bottom: BorderSide(
+                color: Colors.grey.withOpacity(0.12),
+                width: 1,
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: isSelected ? widget.primaryColor : Colors.transparent,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: isSelected
+                        ? widget.primaryColor
+                        : widget.textColor.withOpacity(0.3),
+                    width: 1.5,
+                  ),
+                ),
+                child: isSelected
+                    ? const Icon(
+                        Icons.check,
+                        size: 14,
+                        color: Colors.white,
+                      )
+                    : null,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: TextWidget(
+                  text: category,
+                  color: isSelected ? widget.primaryColor : null,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _addToRecentSearches(String query) {
@@ -196,219 +312,129 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
     widget.onRecentSearchesUpdated(updatedSearches);
   }
 
-  Widget _buildSearchBarContainer() {
-    // Calculate interpolated values based on focus state
-    final double horizontalPadding = lerpDouble(16, 12, _focusAnimation.value)!;
-    final double verticalPadding = lerpDouble(14, 8, _focusAnimation.value)!;
-    final double borderRadius = lerpDouble(28, 16, _focusAnimation.value)!;
-    final double elevation = lerpDouble(4, 16, _focusAnimation.value)!;
-
-    // Dynamic glass effect gradient
-    final Color gradientStart = Color.lerp(
-      widget.backgroundColor,
-      widget.primaryColor.withOpacity(0.05),
-      _isSearchFocused ? 0.15 : 0.02,
-    )!;
-
-    final Color gradientEnd = Color.lerp(
-      widget.backgroundColor,
-      widget.primaryColor.withOpacity(0.1),
-      _isSearchFocused ? 0.25 : 0.05,
-    )!;
-
-    // Shimmer effect colors
-    const Color shimmerColor = AppColors.primaryColor;
-
-    final Color borderColor = _isSearchFocused
-        ? AppColors.primaryColor.withOpacity(0.8)
-        : Color.lerp(AppColors.primaryColor, widget.primaryColor, .1)!
-            .withOpacity(0.5);
-
-    return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: horizontalPadding,
-        vertical: verticalPadding,
-      ),
-      decoration: BoxDecoration(
-        color: widget.backgroundColor,
-        borderRadius: BorderRadius.circular(borderRadius),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [gradientStart, gradientEnd],
-        ),
-        border: Border.all(
-          color: borderColor,
-          width: _isSearchFocused ? 2.0 : 1.3,
-        ),
-        boxShadow: [
-          // BoxShadow(
-          //   color: _isSearchFocused
-          //       ? shimmerColor.withOpacity(0.2)
-          //       : widget.primaryColor.withOpacity(0.1),
-          //   blurRadius: elevation,
-          //   spreadRadius: elevation / 4,
-          //   offset: const Offset(0, 3),
-          // ),
-          if (_isSearchFocused)
-            BoxShadow(
-              color: shimmerColor.withOpacity(0.04),
-              blurRadius: elevation * 2,
-              spreadRadius: 0,
-              offset: const Offset(0, 1),
-            ),
-        ],
-      ),
-      child: _buildSearchContent(borderRadius),
-    );
-  }
-
-  Widget _buildSearchContent(double borderRadius) {
-    return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          children: [
-            _buildSearchIcon(),
-            const SizedBox(width: 16),
-            Expanded(
-              child: TextField(
-                focusNode: _searchFocusNode,
-                controller: _searchController,
-                onEditingComplete: () {
-                  widget.onSearch(_searchController.text);
-                  _addToRecentSearches(_searchController.text);
-                  _searchFocusNode.unfocus();
-                },
-                onChanged: (value) {
-                  setState(() {});
-                },
-                style: TextStyle(
-                  color: widget.textColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.2,
-                ),
-                decoration: InputDecoration(
-                  hintText: widget.hintText,
-                  hintStyle: TextStyle(
-                    color: _isSearchFocused
-                        ? widget.textColor
-                        : widget.textColor.withOpacity(.5),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    letterSpacing: 0.1,
-                  ),
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
-            ),
-            _buildClearButton(),
-            if (!_isSearchFocused && _searchController.text.isEmpty)
-              _buildFilterButton(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSearchIcon() {
-    final Color iconColor = _isSearchFocused
-        ? widget.primaryColor
-        : Color.lerp(widget.textColor, widget.primaryColor, 0.5)!
-            .withOpacity(0.7);
-
-    final gradient = LinearGradient(
-      colors: [
-        widget.primaryColor,
-        HSLColor.fromColor(widget.primaryColor)
-            .withLightness(
-                HSLColor.fromColor(widget.primaryColor).lightness + 0.15)
-            .toColor(),
-      ],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    );
-
+  Widget _buildSearchBar() {
     return AnimatedBuilder(
-      animation: _isSearchFocused ? _bounceAnimation : _pulseAnimation,
+      animation: _animationController,
       builder: (context, child) {
-        final double scale = _isSearchFocused
-            ? 1.0 + (_bounceAnimation.value * 0.15)
-            : _pulseAnimation.value;
-
-        return Transform.scale(
-          scale: scale,
-          child: Container(
-            padding: const EdgeInsets.all(10),
+        return MouseRegion(
+          onEnter: (_) => setState(() => _isHovering = true),
+          onExit: (_) => setState(() => _isHovering = false),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: _isSearchFocused
-                  ? widget.primaryColor.withOpacity(0.1)
-                  : widget.primaryColor.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(14),
-              gradient: _isSearchFocused
-                  ? LinearGradient(
-                      colors: [
-                        widget.primaryColor.withOpacity(0.12),
-                        widget.primaryColor.withOpacity(0.08),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                  : null,
-              boxShadow: _isSearchFocused
-                  ? [
-                      BoxShadow(
-                        color: widget.primaryColor.withOpacity(0.2),
-                        blurRadius: 8,
-                        spreadRadius: 0,
-                        offset: const Offset(0, 2),
-                      ),
-                    ]
-                  : null,
-            ),
-            child: ShaderMask(
-              shaderCallback: (bounds) => _isSearchFocused
-                  ? gradient.createShader(bounds)
-                  : LinearGradient(colors: [iconColor, iconColor])
-                      .createShader(bounds),
-              child: const Icon(
-                Icons.search_rounded,
-                color: Colors.white,
-                size: 24,
+              color: widget.backgroundColor,
+              borderRadius: BorderRadius.circular(_borderRadiusAnimation.value),
+              border: Border.all(
+                color: _isSearchFocused
+                    ? _borderColorAnimation.value ??
+                        widget.textColor.withOpacity(0.15)
+                    : widget.primaryColor,
+                width: _isSearchFocused ? 2.0 : 1.5,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: _isSearchFocused
+                      ? widget.primaryColor
+                          .withOpacity(_shadowOpacityAnimation.value)
+                      : Colors.black.withOpacity(_isHovering ? 0.08 : 0.05),
+                  blurRadius: _isSearchFocused ? 12 : 8,
+                  spreadRadius: _isSearchFocused ? 2 : 0,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
+            child: _buildSearchContent(),
           ),
         );
       },
     );
   }
 
+  Widget _buildSearchContent() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Row(
+        children: [
+          AnimatedBuilder(
+            animation: _animationController,
+            builder: (context, child) {
+              return Icon(
+                Icons.search_rounded,
+                color: _isSearchFocused
+                    ? widget.primaryColor
+                    : widget.textColor.withOpacity(0.6),
+                size: _iconSizeAnimation.value,
+              );
+            },
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextField(
+              focusNode: _searchFocusNode,
+              controller: _searchController,
+              onEditingComplete: () {
+                widget.onSearch(_searchController.text, _selectedCategory);
+                // _addToRecentSearches(_searchController.text);
+                _searchFocusNode.unfocus();
+              },
+              onChanged: (_) {
+                setState(() {});
+              },
+              cursorColor: widget.primaryColor,
+              cursorWidth: 2,
+              cursorRadius: const Radius.circular(1),
+              style: TextStyle(
+                color: widget.textColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 0.2,
+              ),
+              decoration: InputDecoration(
+                hintText: widget.hintText,
+                hintStyle: GoogleFonts.plusJakartaSans(
+                  color: AppColors.greyColor,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 0.2,
+                ),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+            ),
+          ),
+          if (_searchController.text.isNotEmpty) _buildClearButton(),
+          _buildFilterButton(),
+        ],
+      ),
+    );
+  }
+
   Widget _buildClearButton() {
-    return AnimatedOpacity(
-      opacity: _searchController.text.isNotEmpty ? 1.0 : 0.0,
-      duration: const Duration(milliseconds: 200),
-      child: IconButton(
-        onPressed: () {
-          _searchController.clear();
-          setState(() {});
-        },
-        icon: const Icon(
-          Icons.close_rounded,
-          size: 18,
-        ),
-        style: IconButton.styleFrom(
-          foregroundColor: widget.textColor.withOpacity(0.6),
-          backgroundColor: widget.textColor.withOpacity(0.05),
-          padding: const EdgeInsets.all(8),
-          minimumSize: const Size(36, 36),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+    return Container(
+      margin: const EdgeInsets.only(right: 8),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            _searchController.clear();
+            setState(() {});
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Ink(
+            decoration: BoxDecoration(
+              color: widget.textColor.withOpacity(0.07),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              child: Icon(
+                Icons.close_rounded,
+                size: 18,
+                color: widget.textColor.withOpacity(0.7),
+              ),
+            ),
           ),
         ),
       ),
@@ -416,23 +442,56 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
   }
 
   Widget _buildFilterButton() {
-    return AnimatedOpacity(
-      opacity: !_isSearchFocused ? 1.0 : 0.0,
+    return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      child: IconButton(
-        onPressed: widget.onFilterTap,
-        icon: const Icon(
-          Icons.tune_rounded,
-          size: 20,
-        ),
-        style: IconButton.styleFrom(
-          foregroundColor: widget.primaryColor,
-          backgroundColor: widget.primaryColor.withOpacity(0.1),
-          padding: const EdgeInsets.all(8),
-          minimumSize: const Size(36, 36),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: _isDropdownOpen
+            ? widget.primaryColor
+            : (_isHovering || _isSearchFocused)
+                ? widget.primaryColor.withOpacity(0.12)
+                : widget.primaryColor.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: _isDropdownOpen
+            ? [
+                BoxShadow(
+                  color: widget.primaryColor.withOpacity(0.3),
+                  blurRadius: 8,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 2),
+                )
+              ]
+            : null,
+      ),
+      child: InkWell(
+        onTap: () {
+          if (_isDropdownOpen) {
+            _hideDropdown();
+          } else {
+            _showDropdown(context);
+          }
+        },
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextWidget(
+              text: _selectedCategory,
+              color: _isDropdownOpen ? AppColors.backgroundColorLight : null,
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              letterSpacing: 0.2,
+            ),
+            const SizedBox(width: 4),
+            AnimatedRotation(
+              turns: _isDropdownOpen ? 0.5 : 0.0,
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                Icons.keyboard_arrow_down_rounded,
+                color: _isDropdownOpen ? Colors.white : widget.primaryColor,
+                size: 18,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -440,29 +499,6 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([
-        _searchBarAnimation,
-        _focusAnimation,
-        _bounceAnimation,
-        _shimmerAnimation,
-      ]),
-      builder: (context, child) {
-        // Enhanced entrance animation
-        final double yOffset = 50 * (1 - _searchBarAnimation.value);
-        final double scaleValue = 0.95 + (0.05 * _searchBarAnimation.value);
-
-        return Transform.translate(
-          offset: Offset(0, yOffset),
-          child: Transform.scale(
-            scale: scaleValue,
-            child: Opacity(
-              opacity: _searchBarAnimation.value,
-              child: _buildSearchBarContainer(),
-            ),
-          ),
-        );
-      },
-    );
+    return _buildSearchBar();
   }
 }

@@ -13,7 +13,8 @@
 
     "query": {
       "recent": ""
-    }
+    },
+    "enabled": true
   },
 
   {
@@ -29,7 +30,8 @@
     "pageType": "page=",
     "query": {
       "recent": ""
-    }
+    },
+    "enabled": true
   },
   {
     "url": "https://api.avrebo.net/api/v1/video/listRandom?limit=20",
@@ -44,6 +46,7 @@
     "headers": {},
     "query": {
       "recent": ""
-    }
+    },
+    "enabled": true
   }
 ]

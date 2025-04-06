@@ -96,6 +96,12 @@ class ElementSelector {
       customExtraction: json['custom_extraction'],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        if (selector != null) 'selector': selector,
+        if (attribute != null) 'attribute': attribute,
+        if (customExtraction != null) 'custom_extraction': customExtraction,
+      };
 }
 
 class ScraperConfig {
@@ -224,4 +230,43 @@ class ScraperConfig {
           : null,
     );
   }
+  Map<String, dynamic> toJson() => {
+        'title_selector': titleSelector.toJson(),
+        'thumbnail_selector': thumbnailSelector.toJson(),
+        'content_url_selector': contentUrlSelector.toJson(),
+        if (contentSelector != null)
+          'content_selector': contentSelector!.toJson(),
+        if (videoSelector != null) 'video_selector': videoSelector!.toJson(),
+        if (detailSelector != null) 'detail_selector': detailSelector!.toJson(),
+        if (previewSelector != null)
+          'preview_selector': previewSelector!.toJson(),
+        if (qualitySelector != null)
+          'quality_selector': qualitySelector!.toJson(),
+        if (timeSelector != null) 'time_selector': timeSelector!.toJson(),
+        if (viewsSelector != null) 'views_selector': viewsSelector!.toJson(),
+        if (durationSelector != null)
+          'duration_selector': durationSelector!.toJson(),
+        if (watchingLinkSelector != null)
+          'watching_link_selector': watchingLinkSelector!.toJson(),
+        if (keywordsSelector != null)
+          'keywords_selector': keywordsSelector!.toJson(),
+        if (similarContentSelector != null)
+          'similar_content_selector': similarContentSelector!.toJson(),
+        if (genreSelector != null) 'genre_selector': genreSelector!.toJson(),
+        if (statusSelector != null) 'status_selector': statusSelector!.toJson(),
+        if (chapterCountSelector != null)
+          'chapter_count_selector': chapterCountSelector!.toJson(),
+        if (chapterIdSelector != null)
+          'chapter_id_selector': chapterIdSelector!.toJson(),
+        if (chapterDataSelector != null)
+          'chapter_data_selector': chapterDataSelector!.toJson(),
+        if (chapterImageSelector != null)
+          'chapter_image_selector': chapterImageSelector!.toJson(),
+        if (discriptionSelector != null)
+          'discription_selector': discriptionSelector!.toJson(),
+        if (userSelector != null) 'user_selector': userSelector!.toJson(),
+        if (likesSelector != null) 'likes_selector': likesSelector!.toJson(),
+        if (commentsSelector != null)
+          'comments_selector': commentsSelector!.toJson(),
+      };
 }

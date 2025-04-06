@@ -56,6 +56,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:watching_app_2/app/app_widget.dart';
 import 'package:watching_app_2/presentation/provider/manga_detail_provider.dart';
 import 'package:watching_app_2/presentation/provider/navigation_provider.dart';
 import 'package:watching_app_2/presentation/provider/favorites_provider.dart';
@@ -64,7 +65,6 @@ import 'package:watching_app_2/presentation/provider/source_provider.dart';
 import 'package:watching_app_2/presentation/provider/theme_provider.dart';
 import 'package:watching_app_2/presentation/provider/similar_content_provider.dart';
 import 'package:watching_app_2/presentation/provider/webview_provider.dart';
-import 'app.dart';
 import 'core/services/network_status_service.dart';
 import 'core/services/service_locator.dart';
 

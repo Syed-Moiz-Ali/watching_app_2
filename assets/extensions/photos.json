@@ -44,7 +44,7 @@
       },
 
       "similar_content_selector": {
-        "selector": ".user_uploads > .video-list > .video-item"
+        "selector": "#list_ul > li[itemprop=\"associatedMedia\"]"
       },
       "content_selector": {
         "selector": "ul  > li[itemprop=\"associatedMedia\"]"
@@ -81,7 +81,7 @@
       },
 
       "similar_content_selector": {
-        "selector": ".user_uploads > .video-list > .video-item"
+        "selector": "#list_ul > li[itemprop=\"associatedMedia\"]"
       },
       "content_selector": {
         "selector": "ul  > li[itemprop=\"associatedMedia\"]"
@@ -118,7 +118,7 @@
       },
 
       "similar_content_selector": {
-        "selector": ".user_uploads > .video-list > .video-item"
+        "selector": "#mainlist > li[itemprop=\"associatedMedia\"]"
       },
       "content_selector": {
         "selector": "ul  > li[itemprop=\"associatedMedia\"]"
@@ -153,7 +153,9 @@
         "selector": "div > a",
         "attribute": "href"
       },
-
+      "similar_content_selector": {
+        "selector": ".image-gallery-items > .image-gallery-items__item "
+      },
       "content_selector": {
         "selector": ".container-2  > .image-gallery-items > .image-gallery-items__item"
       }

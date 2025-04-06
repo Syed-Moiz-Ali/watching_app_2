@@ -160,7 +160,7 @@ class _VideoPlayerState extends State<VideoPlayer>
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
-          height: isFullscreen ? double.infinity : 35.h,
+          height: isFullscreen ? double.infinity : 40.h,
           decoration: BoxDecoration(
             boxShadow: [
               BoxShadow(

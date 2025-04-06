@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 
 import '../loading/loading_indicator.dart';
 
@@ -352,7 +353,7 @@ class _ImageWidgetState extends State<ImageWidget>
     // Early validation: if the URL is empty or invalid, show error widget
     if (imageUrl.isEmpty) {
       _isError = true;
-      return _buildErrorWidget();
+      return _buildFallbackErrorWidget();
     }
 
     // Check if it's a local asset path
@@ -364,7 +365,7 @@ class _ImageWidgetState extends State<ImageWidget>
     final uri = Uri.tryParse(imageUrl);
     if (uri == null || !uri.hasScheme || !uri.hasAuthority) {
       _isError = true;
-      return _buildErrorWidget(); // Invalid URL (no host or scheme)
+      return _buildFallbackErrorWidget(); // Invalid URL (no host or scheme)
     }
 
     // For valid URLs, attempt to load the image
@@ -402,13 +403,13 @@ class _ImageWidgetState extends State<ImageWidget>
           },
           errorBuilder: (context, error, stackTrace) {
             _isError = true;
-            return _buildErrorWidget();
+            return _buildFallbackErrorWidget();
           },
         );
       }
     } catch (e) {
       _isError = true;
-      return _buildErrorWidget();
+      return _buildFallbackErrorWidget();
     }
   }
 
@@ -425,21 +426,21 @@ class _ImageWidgetState extends State<ImageWidget>
     } catch (e) {
       // Catch any loading errors and return the error widget silently
       _isError = true;
-      return _buildErrorWidget();
+      return _buildFallbackErrorWidget();
     }
   }
 
   Widget _buildRasterImage(String imageUrl) {
     try {
       return CachedNetworkImage(
-        imageUrl: imageUrl,
+        imageUrl: "imageUrl",
         fit: widget.fit,
         height: widget.height,
         width: widget.width,
         placeholder: (context, url) => _buildPlaceholder(),
         errorWidget: (context, url, error) {
           _isError = true;
-          return _buildErrorWidget();
+          return _buildFallbackErrorWidget();
         },
         fadeInDuration: _getTransitionDuration(),
         fadeOutDuration: _getTransitionDuration(),
@@ -514,7 +515,7 @@ class _ImageWidgetState extends State<ImageWidget>
     } catch (e) {
       // Catch any loading errors and return the error widget silently
       _isError = true;
-      return _buildErrorWidget();
+      return _buildFallbackErrorWidget();
     }
   }
 
@@ -591,12 +592,10 @@ class _ImageWidgetState extends State<ImageWidget>
               size: min(40, (widget.width ?? 80) / 4),
             ),
             const SizedBox(height: 8),
-            Text(
-              'Image not available',
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: min(14, (widget.width ?? 80) / 8),
-              ),
+            TextWidget(
+              text: 'Image not available',
+              color: Colors.grey[600],
+              fontSize: min(14, (widget.width ?? 80) / 8),
             ),
           ],
         ),

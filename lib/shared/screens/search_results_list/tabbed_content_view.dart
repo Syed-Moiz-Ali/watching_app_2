@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/core/global/globals.dart';
+import 'package:watching_app_2/data/database/local_database.dart';
+import 'package:watching_app_2/features/wallpapers/presentation/widgets/wallpaper_grid_view.dart';
 import 'package:watching_app_2/shared/widgets/misc/image.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 import '../../../core/navigation/app_navigator.dart';
@@ -15,20 +17,22 @@ import '../../../data/models/content_source.dart';
 import '../../../features/videos/presentation/widgets/video_grid_view.dart';
 
 class TabbedContentView extends StatefulWidget {
-  final Map<String, List<ContentItem>> categoryResults;
-  final List<ContentSource> sources;
-  final bool isGrid;
-  final String query;
-  final Future Function(String sourceId)? onLoadMore;
-
   const TabbedContentView({
     super.key,
     required this.categoryResults,
     required this.sources,
     this.isGrid = false,
     required this.query,
+    required this.category,
     this.onLoadMore,
   });
+
+  final Future Function(String sourceId)? onLoadMore;
+  final String category;
+  final Map<String, List<ContentItem>> categoryResults;
+  final bool isGrid;
+  final String query;
+  final List<ContentSource> sources;
 
   @override
   State<TabbedContentView> createState() => _TabbedContentViewState();
@@ -36,14 +40,40 @@ class TabbedContentView extends StatefulWidget {
 
 class _TabbedContentViewState extends State<TabbedContentView>
     with SingleTickerProviderStateMixin {
-  String? _selectedSourceId;
   late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _slideAnimation;
-  final Map<String, ScrollController> _scrollControllers = {};
-  final PageController _pageController = PageController();
   int _currentPlayingIndex = -1;
+  late Animation<double> _fadeAnimation;
   final Map<String, bool> _isLoading = {};
+  final PageController _pageController = PageController();
+  final Map<String, ScrollController> _scrollControllers = {};
+  String? _selectedSourceId;
+  late Animation<double> _slideAnimation;
+
+  @override
+  void didUpdateWidget(TabbedContentView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.categoryResults != widget.categoryResults) {
+      final newSourcesWithContent = widget.categoryResults.entries
+          .where((entry) => entry.value.isNotEmpty)
+          .toList();
+      for (var entry in newSourcesWithContent) {
+        _scrollControllers.putIfAbsent(entry.key, () => ScrollController());
+        _isLoading.putIfAbsent(entry.key, () => false);
+      }
+      _scrollControllers
+          .removeWhere((key, _) => !widget.categoryResults.containsKey(key));
+      _isLoading
+          .removeWhere((key, _) => !widget.categoryResults.containsKey(key));
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _scrollControllers.forEach((_, controller) => controller.dispose());
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -79,32 +109,6 @@ class _TabbedContentViewState extends State<TabbedContentView>
     _animationController.forward();
   }
 
-  @override
-  void didUpdateWidget(TabbedContentView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.categoryResults != widget.categoryResults) {
-      final newSourcesWithContent = widget.categoryResults.entries
-          .where((entry) => entry.value.isNotEmpty)
-          .toList();
-      for (var entry in newSourcesWithContent) {
-        _scrollControllers.putIfAbsent(entry.key, () => ScrollController());
-        _isLoading.putIfAbsent(entry.key, () => false);
-      }
-      _scrollControllers
-          .removeWhere((key, _) => !widget.categoryResults.containsKey(key));
-      _isLoading
-          .removeWhere((key, _) => !widget.categoryResults.containsKey(key));
-    }
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    _scrollControllers.forEach((_, controller) => controller.dispose());
-    _pageController.dispose();
-    super.dispose();
-  }
-
   void _switchSource(String sourceId, int index) {
     if (_selectedSourceId != sourceId) {
       setState(() {
@@ -120,34 +124,6 @@ class _TabbedContentViewState extends State<TabbedContentView>
 
       _animationController.forward();
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final sourcesWithContent = widget.categoryResults.entries
-        .where((entry) => entry.value.isNotEmpty)
-        .toList();
-
-    if (sourcesWithContent.isEmpty) {
-      return _buildEmptyState();
-    }
-
-    return SizedBox(
-      height: 100.h,
-      child: Stack(
-        children: [
-          _buildBackgroundEffect(sourcesWithContent),
-          Column(
-            children: [
-              _buildPremiumSourceSelector(sourcesWithContent),
-              Expanded(
-                child: _buildContentPageView(sourcesWithContent),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _buildBackgroundEffect(
@@ -418,6 +394,7 @@ class _TabbedContentViewState extends State<TabbedContentView>
 
         if (!scrollController.hasListeners) {
           scrollController.addListener(() {
+            log("_isLoading[$sourceId]: ${_isLoading[sourceId]} and widget.onLoadMore != null: ${widget.onLoadMore != null} ");
             if (_isLoading[sourceId] == true) return;
 
             if (widget.onLoadMore != null &&
@@ -445,31 +422,41 @@ class _TabbedContentViewState extends State<TabbedContentView>
             padding: EdgeInsets.only(top: 8.sp, left: 12.sp, right: 12.sp),
             child: Stack(
               children: [
-                VideoGridView(
-                  controller: scrollController,
-                  videos: results,
-                  isGrid: widget.isGrid,
-                  onItemTap: (itemIndex) {
-                    final scaleController = AnimationController(
-                        duration: const Duration(milliseconds: 200),
-                        vsync: this);
+                if (widget.category == ContentTypes.VIDEO) ...[
+                  VideoGridView(
+                    controller: scrollController,
+                    videos: results,
+                    isGrid: widget.isGrid,
+                    onItemTap: (itemIndex) {
+                      final scaleController = AnimationController(
+                          duration: const Duration(milliseconds: 200),
+                          vsync: this);
 
-                    scaleController.forward().then((_) {
-                      scaleController.reverse().then((_) {
-                        scaleController.dispose();
-                        NH.nameNavigateTo(AppRoutes.detail,
-                            arguments: {"item": results[itemIndex]});
+                      scaleController.forward().then((_) {
+                        scaleController.reverse().then((_) {
+                          scaleController.dispose();
+                          NH.nameNavigateTo(AppRoutes.detail,
+                              arguments: {"item": results[itemIndex]});
+                        });
                       });
-                    });
-                  },
-                  currentPlayingIndex: _currentPlayingIndex,
-                  onHorizontalDragStart: (index) => setState(() {
-                    _currentPlayingIndex = index;
-                  }),
-                  onHorizontalDragEnd: (index) => setState(() {
-                    _currentPlayingIndex = index;
-                  }),
-                ),
+                    },
+                    currentPlayingIndex: _currentPlayingIndex,
+                    onHorizontalDragStart: (index) => setState(() {
+                      _currentPlayingIndex = index;
+                    }),
+                    onHorizontalDragEnd: (index) => setState(() {
+                      _currentPlayingIndex = index;
+                    }),
+                  ),
+                ] else if (widget.category == ContentTypes.IMAGE) ...[
+                  WallpaperGridView(
+                    wallpapers: results,
+                    onItemTap: (itemIndex) {
+                      NH.nameNavigateTo(AppRoutes.wallpaperDetail,
+                          arguments: {"item": results[itemIndex]});
+                    },
+                  ),
+                ],
                 if (_isLoading[sourceId] == true)
                   Positioned(
                     bottom: 20.sp,
@@ -508,5 +495,33 @@ class _TabbedContentViewState extends State<TabbedContentView>
         });
       }
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final sourcesWithContent = widget.categoryResults.entries
+        .where((entry) => entry.value.isNotEmpty)
+        .toList();
+
+    if (sourcesWithContent.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    return SizedBox(
+      height: 100.h,
+      child: Stack(
+        children: [
+          _buildBackgroundEffect(sourcesWithContent),
+          Column(
+            children: [
+              _buildPremiumSourceSelector(sourcesWithContent),
+              Expanded(
+                child: _buildContentPageView(sourcesWithContent),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }

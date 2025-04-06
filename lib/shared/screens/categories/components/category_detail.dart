@@ -2,6 +2,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
+import 'package:watching_app_2/core/global/globals.dart';
+import 'package:watching_app_2/core/navigation/app_navigator.dart';
+import 'package:watching_app_2/core/navigation/routes.dart';
 import 'package:watching_app_2/shared/widgets/misc/image.dart';
 
 import '../../../../data/models/category_model.dart';
@@ -186,6 +189,8 @@ class _PremiumCategoryDetailScreenState
         return ElevatedButton(
           onPressed: () {
             HapticFeedback.mediumImpact();
+            NH.nameNavigateTo(AppRoutes.searchResult,
+                arguments: {"query": widget.category.title});
             // Action functionality
           },
           style: ElevatedButton.styleFrom(
@@ -405,47 +410,47 @@ class _PremiumCategoryDetailScreenState
               });
             },
           ),
-          actions: [
-            IconButton(
-              icon: Container(
-                padding: EdgeInsets.all(8.sp),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.3),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  _isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                  color: Colors.white,
-                  size: 18.sp,
-                ),
-              ),
-              onPressed: () {
-                HapticFeedback.lightImpact();
-                setState(() {
-                  _isBookmarked = !_isBookmarked;
-                });
-              },
-            ),
-            IconButton(
-              icon: Container(
-                padding: EdgeInsets.all(8.sp),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.3),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.share,
-                  color: Colors.white,
-                  size: 18.sp,
-                ),
-              ),
-              onPressed: () {
-                HapticFeedback.lightImpact();
-                // Share functionality
-              },
-            ),
-            SizedBox(width: 8.w),
-          ],
+          // actions: [
+          //   IconButton(
+          //     icon: Container(
+          //       padding: EdgeInsets.all(8.sp),
+          //       decoration: BoxDecoration(
+          //         color: Colors.black.withOpacity(0.3),
+          //         shape: BoxShape.circle,
+          //       ),
+          //       child: Icon(
+          //         _isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+          //         color: Colors.white,
+          //         size: 18.sp,
+          //       ),
+          //     ),
+          //     onPressed: () {
+          //       HapticFeedback.lightImpact();
+          //       setState(() {
+          //         _isBookmarked = !_isBookmarked;
+          //       });
+          //     },
+          //   ),
+          //   IconButton(
+          //     icon: Container(
+          //       padding: EdgeInsets.all(8.sp),
+          //       decoration: BoxDecoration(
+          //         color: Colors.black.withOpacity(0.3),
+          //         shape: BoxShape.circle,
+          //       ),
+          //       child: Icon(
+          //         Icons.share,
+          //         color: Colors.white,
+          //         size: 18.sp,
+          //       ),
+          //     ),
+          //     onPressed: () {
+          //       HapticFeedback.lightImpact();
+          //       // Share functionality
+          //     },
+          //   ),
+          //   SizedBox(width: 8.w),
+          // ],
           flexibleSpace: _buildFloatingHeader(),
         ),
         body: Stack(
@@ -551,25 +556,25 @@ class _PremiumCategoryDetailScreenState
                             SizedBox(height: 2.h),
 
                             // Stats row with wrap for responsive layout
-                            FadeTransition(
-                              opacity: _contentOpacityAnimation,
-                              child: SlideTransition(
-                                position: _titleSlideAnimation,
-                                child: Wrap(
-                                  spacing: 2.w,
-                                  runSpacing: 2.h,
-                                  children: [
-                                    _buildStatItem(Icons.visibility_outlined,
-                                        '10.5K views'),
-                                    _buildStatItem(
-                                        Icons.star_outline, '4.9 rating'),
-                                    _buildStatItem(
-                                        Icons.update_outlined, 'Daily updates'),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 2.h),
+                            // FadeTransition(
+                            //   opacity: _contentOpacityAnimation,
+                            //   child: SlideTransition(
+                            //     position: _titleSlideAnimation,
+                            //     child: Wrap(
+                            //       spacing: 2.w,
+                            //       runSpacing: 2.h,
+                            //       children: [
+                            //         _buildStatItem(Icons.visibility_outlined,
+                            //             '10.5K views'),
+                            //         _buildStatItem(
+                            //             Icons.star_outline, '4.9 rating'),
+                            //         _buildStatItem(
+                            //             Icons.update_outlined, 'Daily updates'),
+                            //       ],
+                            //     ),
+                            //   ),
+                            // ),
+                            // SizedBox(height: 2.h),
 
                             // Action buttons with staggered animation
                             FadeTransition(

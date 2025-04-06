@@ -156,19 +156,19 @@ class _BrowseContentState extends State<BrowseContent>
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Center(
-                child: AnimatedSearchBar(
+                child: UltraPremiumSearchBar(
                   primaryColor: AppColors.greyColor,
                   backgroundColor: AppColors.transparent,
                   hintText: 'Search for anything...',
-                  onSearch: (value) {
+                  onSearch: (value, category) {
                     if (value.isNotEmpty) {
                       // NH.navigateTo(GlobalSearchDataList(query: value));
                       context.read<SearchProvider>().setAllCategoryResults({});
                       NH.nameNavigateTo(AppRoutes.searchResult,
-                          arguments: {'query': value});
+                          arguments: {'query': value, 'category': category});
                     }
                   },
-                  onFilterTap: () {},
+                  onCategoryChanged: (value) {},
                   recentSearches: const [
                     'Action',
                     'Flutter',
