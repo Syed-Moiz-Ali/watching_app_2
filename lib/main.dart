@@ -76,16 +76,24 @@ void main() {
   // Animate back from fullscreen
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   setupLocator();
-  runApp(MultiProvider(providers: [
-    ChangeNotifierProvider(create: (_) => SourceProvider()),
-    ChangeNotifierProvider(create: (_) => ThemeProvider()..initializeTheme()),
-    ChangeNotifierProvider(create: (_) => WebviewProvider()),
-    ChangeNotifierProvider(
-        create: (_) => NetworkServiceProvider()..initConnectivity()),
-    ChangeNotifierProvider(create: (_) => FavoritesProvider()),
-    ChangeNotifierProvider(create: (_) => SimilarContentProvider()),
-    ChangeNotifierProvider(create: (_) => NavigationProvider()),
-    ChangeNotifierProvider(create: (_) => SearchProvider()),
-    ChangeNotifierProvider(create: (_) => MangaDetailProvider()),
-  ], child: const SafeArea(child: MyApp())));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => SourceProvider()),
+        ChangeNotifierProvider(
+            create: (_) => ThemeProvider()..initializeTheme()),
+        ChangeNotifierProvider(create: (_) => WebviewProvider()),
+        ChangeNotifierProvider(
+            create: (_) => NetworkServiceProvider()..initConnectivity()),
+        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+        ChangeNotifierProvider(create: (_) => SimilarContentProvider()),
+        ChangeNotifierProvider(create: (_) => NavigationProvider()),
+        ChangeNotifierProvider(create: (_) => SearchProvider()),
+        ChangeNotifierProvider(create: (_) => MangaDetailProvider()),
+      ],
+      child: const SafeArea(
+        child: MyApp(),
+      ),
+    ),
+  );
 }

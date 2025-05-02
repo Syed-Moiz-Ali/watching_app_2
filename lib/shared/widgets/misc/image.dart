@@ -433,7 +433,7 @@ class _ImageWidgetState extends State<ImageWidget>
   Widget _buildRasterImage(String imageUrl) {
     try {
       return CachedNetworkImage(
-        imageUrl: "imageUrl",
+        imageUrl: imageUrl,
         fit: widget.fit,
         height: widget.height,
         width: widget.width,

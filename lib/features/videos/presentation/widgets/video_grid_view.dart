@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:watching_app_2/data/database/local_database.dart';
 
 import '../../../../data/models/content_item.dart';
 import 'video_card.dart';
@@ -23,7 +24,7 @@ class VideoGridView extends StatelessWidget {
       required this.onHorizontalDragStart,
       required this.onHorizontalDragEnd,
       this.controller, // Make it optional
-      this.contentType = 'video' // Make it optional
+      this.contentType = ContentTypes.VIDEO // Make it optional
       });
 
   @override

@@ -1,10 +1,12 @@
+import 'dart:developer';
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
-import 'package:watching_app_2/core/global/globals.dart';
 import 'package:watching_app_2/core/navigation/app_navigator.dart';
 import 'package:watching_app_2/core/navigation/routes.dart';
+import 'package:watching_app_2/data/database/local_database.dart';
 import 'package:watching_app_2/shared/widgets/misc/image.dart';
 
 import '../../../../data/models/category_model.dart';
@@ -188,9 +190,13 @@ class _PremiumCategoryDetailScreenState
       builder: (context, value, child) {
         return ElevatedButton(
           onPressed: () {
+            log("rtyuiop");
             HapticFeedback.mediumImpact();
-            NH.nameNavigateTo(AppRoutes.searchResult,
-                arguments: {"query": widget.category.title});
+            NH.nameNavigateTo(AppRoutes.searchResult, arguments: {
+              "query": widget.category.title.toLowerCase(),
+              "category": ContentTypes.VIDEO
+            });
+
             // Action functionality
           },
           style: ElevatedButton.styleFrom(
