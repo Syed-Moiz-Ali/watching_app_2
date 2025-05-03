@@ -287,38 +287,34 @@ class _VideoCardState extends State<VideoCard>
   }
 
   Widget _buildPlayButton() {
-    return Positioned(
-      top: widget.isGrid ? 12 : 16,
-      right: widget.isGrid ? 12 : 16,
-      child: TweenAnimationBuilder<double>(
-        duration: const Duration(milliseconds: 400),
-        tween: Tween(begin: 0.0, end: _isHovered ? 1.1 : 1.0),
-        builder: (context, value, child) {
-          return Transform.scale(
-            scale: value,
-            child: Container(
-              padding: EdgeInsets.all(widget.isGrid ? 10 : 14),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.95),
-                borderRadius: BorderRadius.circular(120),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primaryColor.withOpacity(0.3),
-                    blurRadius: 12,
-                    spreadRadius: 2,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Icon(
-                Icons.play_arrow_rounded,
-                color: AppColors.primaryColor,
-                size: widget.isGrid ? 20 : 36,
-              ),
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 400),
+      tween: Tween(begin: 0.0, end: _isHovered ? 1.1 : 1.0),
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: value,
+          child: Container(
+            padding: EdgeInsets.all(widget.isGrid ? 10 : 14),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.95),
+              borderRadius: BorderRadius.circular(120),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryColor.withOpacity(0.3),
+                  blurRadius: 12,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-          );
-        },
-      ),
+            child: Icon(
+              Icons.play_arrow_rounded,
+              color: AppColors.primaryColor,
+              size: widget.isGrid ? 20 : 36,
+            ),
+          ),
+        );
+      },
     );
   }
 

@@ -339,7 +339,7 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildWelcomeCard(),
+            // _buildWelcomeCard(),
             const SizedBox(height: 30),
 
             // Appearance Section

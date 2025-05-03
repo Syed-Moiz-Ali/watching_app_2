@@ -7,6 +7,7 @@ import 'package:watching_app_2/data/models/content_item.dart';
 import 'package:watching_app_2/presentation/provider/similar_content_provider.dart';
 import 'package:watching_app_2/presentation/provider/webview_provider.dart';
 import 'package:watching_app_2/shared/widgets/appbars/app_bar.dart';
+import 'package:watching_app_2/shared/widgets/loading/loading_indicator.dart';
 import 'package:watching_app_2/shared/widgets/misc/padding.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:animations/animations.dart';
@@ -88,6 +89,7 @@ class _VideoPlayerState extends State<VideoPlayer>
                 IconButton(
                   icon: const Icon(Icons.refresh),
                   onPressed: () {
+                    provider.loadVideos(widget.item);
                     provider.webViewController.reload();
                   },
                 ),
@@ -152,7 +154,7 @@ class _VideoPlayerState extends State<VideoPlayer>
         ),
       );
     }
-    Provider.of<SimilarContentProvider>(context);
+    // Provider.of<SimilarContentProvider>(context);
     return Column(children: [
       ClipRRect(
         borderRadius:
@@ -162,19 +164,24 @@ class _VideoPlayerState extends State<VideoPlayer>
           curve: Curves.easeInOut,
           height: isFullscreen ? double.infinity : 50.h,
           decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
-              ),
-            ],
+            // boxShadow: [
+            //   BoxShadow(
+            //     color: Colors.black.withOpacity(0.2),
+            //     blurRadius: 10,
+            //     offset: const Offset(0, 5),
+            //   ),
+            // ],
+            // border: Border.all(),
             borderRadius:
                 isFullscreen ? BorderRadius.zero : BorderRadius.circular(12),
           ),
-          child: WebViewWidget(
-            controller: provider.webViewController,
-          ),
+          child: provider.isLoading
+              ? const Center(
+                  child: CustomLoadingIndicator(),
+                )
+              : WebViewWidget(
+                  controller: provider.webViewController,
+                ),
         ),
       ),
       // if (isFullscreen) ...[
