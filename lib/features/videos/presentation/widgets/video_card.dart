@@ -163,41 +163,81 @@ class _VideoCardState extends State<VideoCard>
                   ),
                 ],
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(widget.isGrid ? 16 : 24),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    if (widget.item.source.isPreview == '1' && widget.isPlaying)
-                      VideoPlayerWidget(
-                        imageUrl: SMA.formatImage(
-                          image: widget.item.thumbnailUrl,
-                          baseUrl: widget.item.source.url,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Use AnimatedSwitcher to add/remove widgets from tree with animation
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 500),
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
+                      // Custom transition that slides and fades
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(0.0, 0.05),
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: child,
                         ),
-                        videoUrl: SMA.formatImage(
-                          image: widget.item.preview,
-                          baseUrl: widget.item.source.url,
-                        ),
-                        isShown: widget.isPlaying,
-                      )
-                    else
-                      _buildThumbnailImage(widget.item),
-                    _buildGradientOverlay(),
-                    if (widget.item.source.isPreview == '1') _buildPlayButton(),
-                    if (widget.item.duration != '0:00') _buildDurationBadge(),
-                    _buildQualityBadge(),
+                      );
+                    },
+                    child:
+                        widget.item.source.isPreview == '1' && widget.isPlaying
+                            ? VideoPlayerWidget(
+                                key: const ValueKey('video_player'),
+                                imageUrl: SMA.formatImage(
+                                  image: widget.item.thumbnailUrl,
+                                  baseUrl: widget.item.source.url,
+                                ),
+                                videoUrl: SMA.formatImage(
+                                  image: widget.item.preview,
+                                  baseUrl: widget.item.source.url,
+                                ),
+                                isShown: widget.isPlaying,
+                              )
+                            : _buildThumbnailImage(widget.item),
+                  ),
+
+                  _buildGradientOverlay(),
+
+                  // Use AnimatedSwitcher for play button too
+                  if (widget.item.source.isPreview == '1')
                     Positioned(
-                      left: widget.isGrid ? 12 : 16,
-                      bottom: widget.isGrid ? 12 : 16,
-                      child: FavoriteButton(
-                        item: widget.item,
-                        contentType: widget.contentType,
-                        // primaryColor: AppColors.errorColor,
-                        isGrid: widget.isGrid,
+                      top: 10,
+                      right: 10,
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        transitionBuilder:
+                            (Widget child, Animation<double> animation) {
+                          return ScaleTransition(
+                            scale: animation,
+                            child: FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: widget.isPlaying
+                            ? const SizedBox.shrink(key: ValueKey('empty'))
+                            : _buildPlayButton(),
                       ),
                     ),
-                  ],
-                ),
+
+                  if (widget.item.duration != '0:00') _buildDurationBadge(),
+                  _buildQualityBadge(),
+
+                  Positioned(
+                    left: widget.isGrid ? 12 : 16,
+                    bottom: widget.isGrid ? 12 : 16,
+                    child: FavoriteButton(
+                      item: widget.item,
+                      contentType: widget.contentType,
+                      isGrid: widget.isGrid,
+                    ),
+                  ),
+                ],
               ),
             ),
           );
@@ -219,6 +259,8 @@ class _VideoCardState extends State<VideoCard>
               image: widget.item.thumbnailUrl,
               baseUrl: widget.item.source.url,
             ),
+            customBorderRadius: BorderRadius.vertical(
+                top: Radius.circular(widget.isGrid ? 16 : 24)),
             fit: BoxFit.cover,
           ),
         );
@@ -314,7 +356,7 @@ class _VideoCardState extends State<VideoCard>
             ),
             const SizedBox(width: 6),
             TextWidget(
-              text: widget.item.duration.replaceAll("HD", ""),
+              text: widget.item.duration.replaceAll("HD", "").trim(),
               fontSize: widget.isGrid ? 12.sp : 14.sp,
               color: Colors.white,
               fontWeight: FontWeight.w600,

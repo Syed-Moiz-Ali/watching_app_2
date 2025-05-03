@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:watching_app_2/app/splash_screen.dart';
+import 'package:watching_app_2/shared/screens/local_auth_screen.dart';
 import 'package:watching_app_2/shared/screens/update_screen.dart';
 
 import '../../features/videos/presentation/screens/content_detail.dart';
@@ -95,11 +96,11 @@ class AppRoutes {
 
     switch (settings.name) {
       case splash:
-        return _createRoute(SplashScreen(), settings, transitionType);
+        return _createRoute(const SplashScreen(), settings, transitionType);
       case home:
         return _createRoute(const NavigationScreen(), settings, transitionType);
       case auth:
-        return _createRoute(const NavigationScreen(), settings, transitionType);
+        return _createRoute(const LocalAuthScreen(), settings, transitionType);
       case update:
         final String updateUrl = args['updateUrl'] ?? '';
         return _createRoute(

@@ -70,6 +70,8 @@ dependencies:
   flutter_native_splash: ^2.4.1
   open_file: ^3.5.10
   package_info_plus: ^8.3.0
+  local_auth: ^2.3.0
+  flutter_local_authentication: ^1.2.0
 
 dev_dependencies:
   flutter_test:

@@ -6,6 +6,8 @@ import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/data/models/content_item.dart';
 import 'package:watching_app_2/data/database/local_database.dart';
+import 'package:watching_app_2/features/wallpapers/presentation/widgets/wallpaper_grid_view.dart';
+import 'package:watching_app_2/shared/widgets/misc/gap.dart';
 
 import 'package:watching_app_2/shared/widgets/misc/tabbar.dart';
 
@@ -204,22 +206,30 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
             }
 
             return Scaffold(
-              body: VideoGridView(
-                videos: filteredFavorites,
-                isGrid: widget.isGrid,
-                contentType: widget.contentType,
-                currentPlayingIndex: _currentPlayingIndex,
-                onHorizontalDragStart: (index) => setState(() {
-                  _currentPlayingIndex = index;
-                }),
-                onHorizontalDragEnd: (index) => setState(() {
-                  _currentPlayingIndex = index;
-                }),
-                onItemTap: (index) {
-                  NH.nameNavigateTo(AppRoutes.detail,
-                      arguments: {'item': filteredFavorites[index]});
-                },
-              ),
+              body: widget.contentType == ContentTypes.IMAGE
+                  ? WallpaperGridView(
+                      wallpapers: filteredFavorites,
+                      onItemTap: (index) {
+                        NH.nameNavigateTo(AppRoutes.wallpaperDetail,
+                            arguments: {'item': filteredFavorites[index]});
+                      },
+                    )
+                  : VideoGridView(
+                      videos: filteredFavorites,
+                      isGrid: widget.isGrid,
+                      contentType: widget.contentType,
+                      currentPlayingIndex: _currentPlayingIndex,
+                      onHorizontalDragStart: (index) => setState(() {
+                        _currentPlayingIndex = index;
+                      }),
+                      onHorizontalDragEnd: (index) => setState(() {
+                        _currentPlayingIndex = index;
+                      }),
+                      onItemTap: (index) {
+                        NH.nameNavigateTo(AppRoutes.detail,
+                            arguments: {'item': filteredFavorites[index]});
+                      },
+                    ),
               floatingActionButton: GestureDetector(
                 onTap: () {
                   FiltersBottomSheet.show(
@@ -235,16 +245,26 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
                   );
                 },
                 child: CustomPadding(
-                  bottomFactor: .1,
+                  bottomFactor: .12,
                   child: Container(
-                    width: 13.w,
-                    height: 13.w,
+                    width: 25.w,
+                    height: 5.h,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
-                      color: AppColors.backgroundColorDark,
+                      color: AppColors.primaryColor,
                     ),
-                    child: const Icon(Icons.menu,
-                        size: 28, color: AppColors.backgroundColorLight),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.filter_list_rounded,
+                            size: 18.sp, color: AppColors.backgroundColorLight),
+                        CustomGap(widthFactor: .02),
+                        TextWidget(
+                          text: "Filter",
+                          color: AppColors.backgroundColorLight,
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -8,6 +8,7 @@ import 'dart:ui';
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/core/services/backup_service.dart';
+import 'package:watching_app_2/shared/provider/local_auth_provider.dart';
 import 'package:watching_app_2/shared/widgets/appbars/app_bar.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 
@@ -37,7 +38,6 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
   // State variables
   bool _isDarkMode = false;
   bool _notificationsEnabled = true;
-  bool _biometricAuthEnabled = false;
   final double _textSize = 1.0;
   int? _hoveredSectionIndex;
   int? _hoveredItemIndex;
@@ -424,11 +424,9 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                   title: 'Biometric Authentication',
                   subtitle: 'Use fingerprint or face to unlock',
                   icon: Icons.fingerprint,
-                  value: _biometricAuthEnabled,
+                  value: context.read<LocalAuthProvider>().isProtectionEnabled,
                   onChanged: (value) {
-                    setState(() {
-                      _biometricAuthEnabled = value;
-                    });
+                    context.read<LocalAuthProvider>().toggleProtection(value);
                   },
                   type: _SettingType.toggle,
                 ),
@@ -889,7 +887,9 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
             height: 28,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              color: AppColors.disabledColor,
+              color: value
+                  ? _primaryColor.withOpacity(0.9)
+                  : AppColors.disabledColor,
               boxShadow: [
                 BoxShadow(
                   color: value
@@ -944,7 +944,9 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                     height: 24,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.greyColor,
+                      color: value
+                          ? AppColors.backgroundColorLight.withOpacity(0.4)
+                          : AppColors.greyColor,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),

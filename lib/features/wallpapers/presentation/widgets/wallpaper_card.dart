@@ -224,14 +224,11 @@ class _WallpaperCardState extends State<WallpaperCard>
 
   // Wallpaper image with cached network image
   Widget _buildWallpaperImage() {
-    return Hero(
-      tag: 'wallpaper-${widget.item.thumbnailUrl}',
-      child: ImageWidget(
-        imagePath: SMA.formatImage(
-            image: widget.item.thumbnailUrl.toString(),
-            baseUrl: widget.item.source.url),
-        fit: BoxFit.cover,
-      ),
+    return ImageWidget(
+      imagePath: SMA.formatImage(
+          image: widget.item.thumbnailUrl.toString(),
+          baseUrl: widget.item.source.url),
+      fit: BoxFit.cover,
     );
   }
 

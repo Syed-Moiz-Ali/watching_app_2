@@ -169,7 +169,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget>
               height: 30,
               width: 30,
               child: CupertinoActivityIndicator(
-                color: AppColors.secondaryColor,
+                color: AppColors.backgroundColorLight,
               ),
             ),
           )

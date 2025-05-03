@@ -65,6 +65,7 @@ import 'package:watching_app_2/presentation/provider/source_provider.dart';
 import 'package:watching_app_2/presentation/provider/theme_provider.dart';
 import 'package:watching_app_2/presentation/provider/similar_content_provider.dart';
 import 'package:watching_app_2/presentation/provider/webview_provider.dart';
+import 'package:watching_app_2/shared/provider/local_auth_provider.dart';
 import 'core/services/network_status_service.dart';
 import 'core/services/service_locator.dart';
 
@@ -89,6 +90,8 @@ void main() {
         ChangeNotifierProvider(create: (_) => SimilarContentProvider()),
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
         ChangeNotifierProvider(create: (_) => SearchProvider()),
+        ChangeNotifierProvider(
+            create: (_) => LocalAuthProvider()..loadPreferences()),
         ChangeNotifierProvider(create: (_) => MangaDetailProvider()),
       ],
       child: const SafeArea(

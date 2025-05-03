@@ -91,6 +91,52 @@ class WebviewProvider with ChangeNotifier {
 
   /// Builds the NavigationDelegate for WebView navigation handling.
   NavigationDelegate _buildNavigationDelegate() {
+    final List<String> blockPatterns = [
+      // General ad patterns
+      'intent://',
+      'blank',
+      'ad',
+      'ads',
+      'advert',
+      'banner',
+      'popup',
+      'pop-up',
+      'tracking',
+      'tracker',
+      'analytics',
+      'doubleclick.net',
+      'googlesyndication',
+      'googleadservices',
+      'facebook.com/plugins',
+      'smartadserver',
+      'taboola',
+      'outbrain',
+
+      // Adult content patterns
+      'adult',
+      'xxx',
+      'porn',
+      'sex',
+      'dating',
+      'escort',
+      'hookup',
+      'mature',
+      'nsfw',
+      'livecam',
+      'webcam',
+      'onlyfans',
+      'naked',
+      'nude',
+      '18+',
+      '21+',
+      'casino',
+      'gambling',
+      'bet',
+      'betting'
+    ];
+
+    // Convert URL to lowercase for case-insensitive matching
+
     return NavigationDelegate(
       onPageStarted: (url) {
         _log('Page load started: $url');
@@ -103,10 +149,16 @@ class WebviewProvider with ChangeNotifier {
       },
       onNavigationRequest: (request) {
         _log('Navigation request to: ${request.url}');
-        if (request.url.startsWith('https://www.youtube.com/')) {
-          _log('Blocking YouTube navigation');
-          return NavigationDecision.prevent;
+        String lowerUrl = request.url.toLowerCase();
+
+        // Check if URL contains any block patterns
+        for (var pattern in blockPatterns) {
+          if (lowerUrl.contains(pattern)) {
+            _log('Blocked navigation to restricted content: ${request.url}');
+            return NavigationDecision.prevent;
+          }
         }
+
         return NavigationDecision.navigate;
       },
       onWebResourceError: (error) {
