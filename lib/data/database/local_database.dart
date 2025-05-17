@@ -56,6 +56,7 @@ class LocalDatabase {
   static const String COLUMN_QUALITY = 'quality';
   static const String COLUMN_TIME = 'time';
   static const String COLUMN_THUMBNAIL_URL = 'thumbnail_url';
+  static const String COLUMN_VIDEO_URL = 'video_url';
   static const String COLUMN_CONTENT_URL = 'content_url';
   static const String COLUMN_VIEWS = 'views';
   static const String COLUMN_SOURCE_ID = 'source_id';
@@ -139,6 +140,7 @@ class LocalDatabase {
         $COLUMN_QUALITY $textType,
         $COLUMN_TIME $textType,
         $COLUMN_THUMBNAIL_URL $textType,
+        $COLUMN_VIDEO_URL $textType,
         $COLUMN_CONTENT_URL $textType,
         $COLUMN_VIEWS $textType,
         $COLUMN_SOURCE_ID $intType,
@@ -170,6 +172,7 @@ class LocalDatabase {
       COLUMN_QUALITY: item.quality,
       COLUMN_TIME: item.time,
       COLUMN_THUMBNAIL_URL: item.thumbnailUrl,
+      COLUMN_VIDEO_URL: item.videoUrl,
       COLUMN_CONTENT_URL: item.contentUrl,
       COLUMN_VIEWS: item.views,
       COLUMN_SOURCE_ID: sourceId,
@@ -287,6 +290,7 @@ class LocalDatabase {
       orderBy: '$COLUMN_ADDED_AT DESC',
     );
 
+    print('Favorites query result: $favorites'); // Debug log
     return await Future.wait(favorites.map((favorite) async {
       return await _mapToContentItem(favorite, db);
     }).toList());
@@ -317,6 +321,7 @@ class LocalDatabase {
       quality: favorite[COLUMN_QUALITY] as String,
       time: favorite[COLUMN_TIME] as String,
       thumbnailUrl: favorite[COLUMN_THUMBNAIL_URL] as String,
+      videoUrl: favorite[COLUMN_VIDEO_URL] as String,
       contentUrl: favorite[COLUMN_CONTENT_URL] as String,
       views: favorite[COLUMN_VIEWS] as String,
       source: source,

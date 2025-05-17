@@ -18,6 +18,10 @@ class ScraperService {
     return scraper.getContentByType(queryType, page);
   }
 
+  Future<List<ContentItem>> getTikTokContent(String url, int page) {
+    return scraper.getTikTokContent(url, page);
+  }
+
   Future<List<ContentItem>> getDetails(String url) {
     return scraper.getDetails(url);
   }

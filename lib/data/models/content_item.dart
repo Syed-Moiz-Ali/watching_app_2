@@ -8,6 +8,7 @@ class ContentItem {
   final String time;
   final String thumbnailUrl;
   final String contentUrl;
+  final String videoUrl;
   final String views;
   final ContentSource source;
   final DateTime scrapedAt;
@@ -30,6 +31,7 @@ class ContentItem {
     this.time = "0:00",
     required this.thumbnailUrl,
     required this.contentUrl,
+    this.videoUrl = '',
     this.views = "0",
     required this.source,
     required this.scrapedAt,
@@ -54,6 +56,7 @@ class ContentItem {
     String? time,
     String? thumbnailUrl,
     String? contentUrl,
+    String? videoUrl,
     String? views,
     ContentSource? source,
     DateTime? scrapedAt,
@@ -75,6 +78,7 @@ class ContentItem {
       time: time ?? this.time,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       contentUrl: contentUrl ?? this.contentUrl,
+      videoUrl: videoUrl ?? this.videoUrl,
       views: views ?? this.views,
       source: source ?? this.source,
       scrapedAt: scrapedAt ?? this.scrapedAt,

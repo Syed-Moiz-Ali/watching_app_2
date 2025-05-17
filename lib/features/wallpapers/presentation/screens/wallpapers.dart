@@ -8,6 +8,7 @@ import '../../../../data/models/content_source.dart';
 import '../../../../data/scrapers/scraper_service.dart';
 import '../../../../shared/widgets/appbars/app_bar.dart';
 import '../../../../shared/widgets/buttons/floating_action_button.dart';
+import '../../../../shared/widgets/loading/loading_indicator.dart';
 import '../../../../shared/widgets/loading/pagination_indicator.dart';
 import '../../../../shared/widgets/misc/text_widget.dart';
 import '../widgets/wallpaper_grid_view.dart';
@@ -178,8 +179,8 @@ class _WallpapersState extends State<Wallpapers> {
         children: [
           isLoading
               ? const Center(
-                  child: PaginationLoadingIndicator(
-                    loadingText: "Loading videos...",
+                  child: CustomLoadingIndicator(
+                    loadingText: "Loading wallpapers...",
                   ),
                 )
               : error != null

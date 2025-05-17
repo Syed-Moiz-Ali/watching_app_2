@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:watching_app_2/app/splash_screen.dart';
+import 'package:watching_app_2/features/tiktok/presentation/screens/tiktok_screen.dart';
 import 'package:watching_app_2/shared/screens/local_auth_screen.dart';
 import 'package:watching_app_2/shared/screens/update_screen.dart';
 
@@ -72,6 +73,7 @@ class AppRoutes {
   static const String sourceList = '/source-list';
   static const String videoList = '/video-list';
   static const String wallpapers = '/wallpapers';
+  static const String tiktok = '/tiktok';
   static const String wallpaperDetail = '/wallpaper-detail';
 
   // Special routes that should override the random selection
@@ -130,7 +132,12 @@ class AppRoutes {
               settings, transitionType);
         }
         return _errorRoute(settings.name);
-
+      case tiktok:
+        if (args.containsKey('source')) {
+          return _createRoute(
+              TikTok(source: args['source']), settings, transitionType);
+        }
+        return _errorRoute(settings.name);
       case video:
         if (args.containsKey('item')) {
           return _createRoute(

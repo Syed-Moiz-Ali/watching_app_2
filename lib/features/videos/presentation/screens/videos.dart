@@ -192,8 +192,8 @@ class _VideosState extends State<Videos> {
           isLoading
               ? const Center(
                   child: CustomLoadingIndicator(
-                      // loadingText: "Loading videos...",
-                      ),
+                    loadingText: "Loading videos...",
+                  ),
                 )
               : error != null
                   ? Center(child: Text(error!))

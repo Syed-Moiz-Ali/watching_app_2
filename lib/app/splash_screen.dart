@@ -161,11 +161,11 @@ class _SplashScreenState extends State<SplashScreen>
                 const SizedBox(height: 48),
 
                 // Custom styled loading indicator
-                const SizedBox(
-                  width: 36,
-                  height: 36,
-                  child: CustomLoadingIndicator(),
-                ),
+                // const SizedBox(
+                //   width: 36,
+                //   height: 36,
+                //   child: CustomLoadingIndicator(),
+                // ),
               ],
             ),
           ),

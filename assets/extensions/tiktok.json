@@ -14,6 +14,28 @@
     "query": {
       "recent": ""
     },
+    "config": {
+      "title_selector": {
+        "selector": "video_text.meta_title.default.text"
+      },
+      "thumbnail_selector": {
+        "selector": "poster_url"
+      },
+      "content_url_selector": {
+        "selector": "video_id"
+      },
+      
+
+
+      "video_selector": {
+        "selector": "mp4_url"
+      },
+
+      "content_selector": {
+        "selector": "data"
+      }
+    },
+    
     "enabled": true
   },
 
@@ -31,6 +53,29 @@
     "query": {
       "recent": ""
     },
+    "config": {
+      "title_selector": {
+        "selector": "post.text"
+       
+      },
+      "thumbnail_selector": {
+        "selector": "post.media.0.thumb_url "
+      },
+      "content_url_selector": {
+        "selector": "post.id",
+        "attribute": "href"
+      },
+   
+    
+
+      "video_selector": {
+        "selector": "post.media.0.url"
+      },
+
+      "content_selector": {
+        "selector": "list"
+      }
+    },
     "enabled": true
   },
   {
@@ -46,6 +91,25 @@
     "headers": {},
     "query": {
       "recent": ""
+    },
+    "config": {
+      "title_selector": {
+        "selector": "title"
+      },
+      "thumbnail_selector": {
+        "selector": "thumb "
+      },
+      "content_url_selector": {
+        "selector": "id"
+      },
+      
+      "video_selector": {
+        "selector": "video_url"
+      },
+
+      "content_selector": {
+        "selector": "data.list"
+      }
     },
     "enabled": true
   }

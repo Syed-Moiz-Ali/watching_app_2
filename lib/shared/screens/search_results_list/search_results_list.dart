@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../presentation/provider/search_provider.dart';
 import '../../widgets/appbars/app_bar.dart';
+import '../../widgets/loading/loading_indicator.dart';
 import '../../widgets/loading/pagination_indicator.dart';
 import 'tabbed_content_view.dart';
 
@@ -141,9 +142,7 @@ class _SearchResultsListState extends State<SearchResultsList>
     final categoryResults = provider.allCategoryResults[widget.category];
     if (categoryResults == null) {
       return const Center(
-        child: PaginationLoadingIndicator(
-          loadingText: 'loading videos',
-        ),
+        child: CustomLoadingIndicator(),
       );
     }
     int totalResults = 0;

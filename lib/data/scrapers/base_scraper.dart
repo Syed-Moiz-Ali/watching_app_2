@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
@@ -20,19 +21,23 @@ abstract class BaseScraper {
   BaseScraper(this.source, this.config);
 
   // Content Scraping Methods
-  Future<List<ContentItem>> scrapeContent(String html) =>
-      _scrape(html, config.contentSelector, parseElements);
+  Future<List<ContentItem>> scrapeContent(String data) =>
+      _scrapeHtml(data, config.contentSelector, parseElements);
+  Future<List<ContentItem>> scrapeTikTokContent(String data) =>
+      source.decodeType == '2'
+          ? _scrapeJson(data, config.contentSelector, parseJsonElements)
+          : _scrapeHtml(data, config.contentSelector, parseElements);
 
-  Future<List<ContentItem>> scrapeDetailContent(String html) =>
-      _scrape(html, config.detailSelector, parseElements);
+  Future<List<ContentItem>> scrapeDetailContent(String data) =>
+      _scrapeHtml(data, config.detailSelector, parseElements);
 
-  Future<List<ContentItem>> scrapeChapterContent(String html) =>
-      _scrape(html, config.chapterDataSelector, parseElements);
+  Future<List<ContentItem>> scrapeChapterContent(String data) =>
+      _scrapeHtml(data, config.chapterDataSelector, parseElements);
 
-  Future<List<VideoSource>> scrapeVideos(String html) async {
+  Future<List<VideoSource>> scrapeVideos(String data) async {
     log("this is videoSelector and ${config.videoSelector!.selector}");
     if (config.videoSelector == null) return [];
-    final document = parse(html);
+    final document = parse(data);
     final elements =
         document.querySelectorAll(config.videoSelector!.selector ?? '');
     return elements.isNotEmpty
@@ -40,7 +45,7 @@ abstract class BaseScraper {
         : [];
   }
 
-  Future<List<ContentItem>> scrapeSimilarContent(String html) async {
+  Future<List<ContentItem>> scrapeSimilarContent(String data) async {
     final provider = _getSimilarContentProvider();
     await provider.setSimilarContents([]);
 
@@ -48,7 +53,7 @@ abstract class BaseScraper {
       return [];
     }
 
-    return _scrape(html, config.similarContentSelector, (elements) async {
+    return _scrapeHtml(data, config.similarContentSelector, (elements) async {
       final items = await parseElements(elements);
       await provider.setSimilarContents(items);
       return items;
@@ -62,6 +67,8 @@ abstract class BaseScraper {
   Future<List<ContentItem>> getContentByType(String queryType, int page) =>
       _fetchAndScrape(source.getQueryUrl(queryType, page), scrapeContent);
 
+  Future<List<ContentItem>> getTikTokContent(String url, int page) =>
+      _fetchAndScrape(source.getQueryUrl(url, page), scrapeTikTokContent);
   Future<List<ContentItem>> getDetails(String url) =>
       _fetchAndScrape(url, scrapeDetailContent);
 
@@ -83,6 +90,19 @@ abstract class BaseScraper {
       } catch (e) {
         _logError('Error parsing element: $e');
       }
+    }
+    return items;
+  }
+
+  Future<List<ContentItem>> parseJsonElements(List elements) async {
+    final items = <ContentItem>[];
+    log("elements is $elements");
+    try {
+      for (var element in elements) {
+        items.add(await _parseTiTokContentItem(element));
+      }
+    } catch (e) {
+      _logError('Error parsing json element: $e');
     }
     return items;
   }
@@ -141,7 +161,7 @@ abstract class BaseScraper {
     }
   }
 
-  Future<List<T>> _scrape<T>(
+  Future<List<T>> _scrapeHtml<T>(
     String html,
     ElementSelector? selector,
     Future<List<T>> Function(List<Element>) parser,
@@ -149,6 +169,41 @@ abstract class BaseScraper {
     final document = parse(html);
     final elements = document.querySelectorAll(selector?.selector ?? '');
     return elements.isEmpty ? [] : await parser(elements);
+  }
+
+  Future<List<T>> _scrapeJson<T>(
+    String jsonString,
+    ElementSelector? selector,
+    Future<List<T>> Function(List) parser,
+  ) async {
+    try {
+      Map jsonData = jsonDecode(jsonString);
+      // log("jsonData is $jsonData");
+      final elements = _extractJsonElements(jsonData, selector?.selector ?? '');
+      return elements.isEmpty ? [] : await parser(elements);
+    } catch (e) {
+      _logError('Error parsing JSON: $e');
+      return [];
+    }
+  }
+
+  List _extractJsonElements(Map jsonData, String selector) {
+    try {
+      log(selector.contains('.').toString());
+      if (!selector.contains('.')) {
+        return jsonData[selector] ?? [];
+      }
+
+      final keys = selector.split('.');
+      dynamic value = jsonData;
+      for (final key in keys) {
+        value = value[key];
+      }
+      return (value is List) ? value : [value];
+    } catch (e) {
+      _logDebug('Error extracting JSON elements for $selector: $e');
+      return [];
+    }
   }
 
   Future<ContentItem> _parseContentItem(Element element) async {
@@ -199,6 +254,46 @@ abstract class BaseScraper {
           await getAttributeValue(config.commentsSelector, element: element) ??
               '',
     );
+  }
+
+  Future<ContentItem> _parseTiTokContentItem(Map element) async {
+    return ContentItem(
+      title: await _extractNestedValue(
+              element, config.titleSelector.selector!.split('.')) ??
+          'Unknown',
+      thumbnailUrl: await _extractNestedValue(
+              element, config.thumbnailSelector.selector!.split('.')) ??
+          'Unknown',
+      contentUrl: await _extractNestedValue(
+              element, config.contentUrlSelector.selector!.split('.')) ??
+          'Unknown',
+      videoUrl: await _extractNestedValue(
+              element, config.videoSelector!.selector!.split('.')) ??
+          'Unknown',
+      scrapedAt: DateTime.now(),
+      addedAt: DateTime.now(),
+      source: source,
+    );
+  }
+
+  dynamic _extractNestedValue(Map data, List<String> paths) {
+    dynamic value = data;
+    for (final path in paths) {
+      if (value is Map) {
+        value = value[path];
+      } else if (value is List) {
+        // Try to parse path as integer for list index
+        try {
+          final index = int.parse(path);
+          value = value[index];
+        } catch (e) {
+          return null;
+        }
+      } else {
+        return value?.toString();
+      }
+    }
+    return value?.toString();
   }
 
   Future<VideoSource> _parseVideoSource(

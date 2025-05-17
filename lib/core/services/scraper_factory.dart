@@ -1,7 +1,6 @@
 import 'package:watching_app_2/data/models/content_source.dart';
 import 'package:watching_app_2/data/models/scraper_config.dart';
 import 'package:watching_app_2/data/scrapers/base_scraper.dart';
-
 // Photo Scrapers
 import '../../data/scrapers/sources/photos/definebabe.dart';
 import '../../data/scrapers/sources/photos/erowall.dart';
@@ -9,8 +8,6 @@ import '../../data/scrapers/sources/photos/peakpx.dart';
 import '../../data/scrapers/sources/photos/pmatehunter.dart';
 import '../../data/scrapers/sources/photos/wallpaper.mob.dart';
 import '../../data/scrapers/sources/photos/wallpaperporn.dart';
-
-// Video Scrapers
 import '../../data/scrapers/sources/videos/pandamovies.dart';
 import '../../data/scrapers/sources/videos/baddies.dart';
 import '../../data/scrapers/sources/videos/bdsm.dart';
@@ -48,10 +45,11 @@ class DummyScraper extends BaseScraper {
       : super(
           source,
           ScraperConfig(
-            titleSelector: ElementSelector(),
-            thumbnailSelector: ElementSelector(),
-            contentUrlSelector: ElementSelector(),
-            contentSelector: ElementSelector(),
+            titleSelector: source.config!.titleSelector,
+            thumbnailSelector: source.config!.thumbnailSelector,
+            contentUrlSelector: source.config!.contentUrlSelector,
+            contentSelector: source.config!.contentSelector,
+            videoSelector: source.config!.videoSelector,
           ),
         );
 }
@@ -110,6 +108,10 @@ class ScraperFactory {
       'kissmanga': (source) => KissManga(source),
       'manhwa18': (source) => Manwha18(source),
     },
+    'tiktok': {
+      // 'tikporn': (source) => TikPorn(source),
+      // 'xxxfollow': (source) => Xxxfollow(source),
+    }
   };
 
   /// Creates an appropriate scraper instance for the given content source

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -155,6 +157,9 @@ class _SourceCardState extends State<SourceCard> with TickerProviderStateMixin {
                                 arguments: {"source": widget.source});
                           } else if (widget.source.type == '3') {
                             NH.nameNavigateTo(AppRoutes.wallpapers,
+                                arguments: {"source": widget.source});
+                          } else if (widget.source.type == '2') {
+                            NH.nameNavigateTo(AppRoutes.tiktok,
                                 arguments: {"source": widget.source});
                           } else if (widget.source.type == '4') {
                             NH.navigateTo(Manga(source: widget.source));

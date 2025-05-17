@@ -1,11 +1,14 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/data/models/content_item.dart';
 import 'package:watching_app_2/data/database/local_database.dart';
+import 'package:watching_app_2/features/tiktok/widgets/tiktok_gridview.dart';
 import 'package:watching_app_2/features/wallpapers/presentation/widgets/wallpaper_grid_view.dart';
 import 'package:watching_app_2/shared/widgets/misc/gap.dart';
 
@@ -172,6 +175,7 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
 
     return Consumer<FavoritesProvider>(
       builder: (context, favoritesProvider, child) {
+        // log("widget.contentType is ${widget.contentType}");
         return StreamBuilder<List<ContentItem>>(
           stream: favoritesProvider.watchFavoritesByType(widget.contentType),
           builder: (context, snapshot) {
@@ -204,7 +208,6 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
                 },
               );
             }
-
             return Scaffold(
               body: widget.contentType == ContentTypes.IMAGE
                   ? WallpaperGridView(
@@ -214,22 +217,37 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
                             arguments: {'item': filteredFavorites[index]});
                       },
                     )
-                  : VideoGridView(
-                      videos: filteredFavorites,
-                      isGrid: widget.isGrid,
-                      contentType: widget.contentType,
-                      currentPlayingIndex: _currentPlayingIndex,
-                      onHorizontalDragStart: (index) => setState(() {
-                        _currentPlayingIndex = index;
-                      }),
-                      onHorizontalDragEnd: (index) => setState(() {
-                        _currentPlayingIndex = index;
-                      }),
-                      onItemTap: (index) {
-                        NH.nameNavigateTo(AppRoutes.detail,
-                            arguments: {'item': filteredFavorites[index]});
-                      },
-                    ),
+                  : widget.contentType == ContentTypes.TIKTOK
+                      ? WallpaperGridView(
+                          wallpapers: filteredFavorites,
+                          onItemTap: (index) {
+                            NH.navigateTo(TiktokGridView(
+                              tiktok: filteredFavorites,
+                              onItemTap: (index) {},
+                              initalPage: index,
+                            ));
+                            // NH.nameNavigateTo(AppRoutes.tiktok, arguments: {
+                            //   'source': filteredFavorites[index],
+                            //   'initalPage': index
+                            // });
+                          },
+                        )
+                      : VideoGridView(
+                          videos: filteredFavorites,
+                          isGrid: widget.isGrid,
+                          contentType: widget.contentType,
+                          currentPlayingIndex: _currentPlayingIndex,
+                          onHorizontalDragStart: (index) => setState(() {
+                            _currentPlayingIndex = index;
+                          }),
+                          onHorizontalDragEnd: (index) => setState(() {
+                            _currentPlayingIndex = index;
+                          }),
+                          onItemTap: (index) {
+                            NH.nameNavigateTo(AppRoutes.detail,
+                                arguments: {'item': filteredFavorites[index]});
+                          },
+                        ),
               floatingActionButton: GestureDetector(
                 onTap: () {
                   FiltersBottomSheet.show(

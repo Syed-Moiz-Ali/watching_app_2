@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:watching_app_2/shared/widgets/loading/loading_indicator.dart';
 
 import '../../../../core/enums/enums.dart';
 import '../../../../core/navigation/app_navigator.dart';
@@ -177,7 +178,7 @@ class _MangaState extends State<Manga> {
         children: [
           isLoading
               ? const Center(
-                  child: PaginationLoadingIndicator(
+                  child: CustomLoadingIndicator(
                     loadingText: "Loading videos...",
                   ),
                 )

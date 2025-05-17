@@ -309,7 +309,7 @@ class _UltraPremiumNavBarState extends State<UltraPremiumNavBar>
                   ? ImageFilter.blur(sigmaX: 10, sigmaY: 10)
                   : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
               child: Container(
-                height: 10.h,
+                height: 12.h,
                 decoration: BoxDecoration(
                   color: backgroundColor,
                   borderRadius: BorderRadius.circular(30),
