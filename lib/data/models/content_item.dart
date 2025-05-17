@@ -8,7 +8,7 @@ class ContentItem {
   final String time;
   final String thumbnailUrl;
   final String contentUrl;
-  final String videoUrl;
+  final String? videoUrl;
   final String views;
   final ContentSource source;
   final DateTime scrapedAt;

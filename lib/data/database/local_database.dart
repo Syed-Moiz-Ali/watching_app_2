@@ -88,16 +88,43 @@ class LocalDatabase {
     return _database!;
   }
 
-  /// Initialize the database
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2, // Increment version from 1 to 2
       onCreate: _createDB,
+      onUpgrade: _onUpgrade, // Add this upgrade handler
     );
+  }
+
+// 2. Add this method to handle database migrations
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion == 1 && newVersion == 2) {
+      // Check if the column already exists to avoid errors
+      var tableInfo = await db.rawQuery("PRAGMA table_info($FAVORITES_TABLE)");
+      bool hasVideoUrlColumn = false;
+
+      for (var column in tableInfo) {
+        if (column['name'] == COLUMN_VIDEO_URL) {
+          hasVideoUrlColumn = true;
+          break;
+        }
+      }
+
+      if (!hasVideoUrlColumn) {
+        // Add the new video_url column with a default value
+        await db.execute(
+          "ALTER TABLE $FAVORITES_TABLE ADD COLUMN $COLUMN_VIDEO_URL TEXT DEFAULT ''",
+        );
+
+        if (kDebugMode) {
+          print('Added $COLUMN_VIDEO_URL column to $FAVORITES_TABLE');
+        }
+      }
+    }
   }
 
   /// Create database tables
@@ -172,7 +199,7 @@ class LocalDatabase {
       COLUMN_QUALITY: item.quality,
       COLUMN_TIME: item.time,
       COLUMN_THUMBNAIL_URL: item.thumbnailUrl,
-      COLUMN_VIDEO_URL: item.videoUrl,
+      COLUMN_VIDEO_URL: item.videoUrl ?? '',
       COLUMN_CONTENT_URL: item.contentUrl,
       COLUMN_VIEWS: item.views,
       COLUMN_SOURCE_ID: sourceId,

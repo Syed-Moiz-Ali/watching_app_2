@@ -93,7 +93,7 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
 
     // Initialize video controller
     _controller =
-        VideoPlayerController.networkUrl(Uri.parse(widget.item.videoUrl))
+        VideoPlayerController.networkUrl(Uri.parse(widget.item.videoUrl ?? ''))
           ..initialize().then((_) {
             setState(() {
               _isVideoLoaded = true;
@@ -209,7 +209,7 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
         });
       },
       child: VisibilityDetector(
-        key: Key(widget.item.videoUrl),
+        key: Key(widget.item.videoUrl ?? ''),
         onVisibilityChanged: (visibilityInfo) {
           if (visibilityInfo.visibleFraction == 0) {
             _controller.pause();
