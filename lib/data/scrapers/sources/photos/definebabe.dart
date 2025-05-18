@@ -157,13 +157,13 @@ import '../../../models/scraper_config.dart';
 import '../../base_scraper.dart';
 
 class Definebabe extends BaseScraper {
-  Definebabe(ContentSource source) : super(source, source.config!);
+  Definebabe(ContentSource source) : super(source);
 
   @override
   Future<String?> extractCustomValue(ElementSelector selector,
       {Element? element, Document? document}) async {
     // log("this is scraper class in this and selector is ${selector == config.watchingLinkSelector && document != null}");
-    if (selector == config.watchingLinkSelector) {
+    if (selector == source.config!.watchingLinkSelector) {
       try {
         Map watchingLink = {};
         // log('the link of this is ${element.querySelector('#video_html5_api')!.outerHtml}');

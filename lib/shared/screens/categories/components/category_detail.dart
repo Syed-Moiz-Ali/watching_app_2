@@ -190,7 +190,7 @@ class _PremiumCategoryDetailScreenState
       builder: (context, value, child) {
         return ElevatedButton(
           onPressed: () {
-            log("rtyuiop");
+            // log("rtyuiop");
             HapticFeedback.mediumImpact();
             NH.nameNavigateTo(AppRoutes.searchResult, arguments: {
               "query": widget.category.title.toLowerCase(),

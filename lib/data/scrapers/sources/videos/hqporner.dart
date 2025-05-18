@@ -8,13 +8,16 @@ import '../../../models/scraper_config.dart';
 import '../../base_scraper.dart';
 
 class HQPorner extends BaseScraper {
-  HQPorner(ContentSource source) : super(source, source.config!);
+  HQPorner(ContentSource source)
+      : super(
+          source,
+        );
 
   @override
   Future<String?> extractCustomValue(ElementSelector selector,
       {Element? element, Document? document}) async {
     // log("this is scraper class in this and selector is ${selector == config.watchingLinkSelector && document != null}");
-    if (selector == config.watchingLinkSelector) {
+    if (selector == source.config!.watchingLinkSelector) {
       try {
         Map watchingLinks = {};
         var links = element!.querySelector('script')?.text;
@@ -34,7 +37,7 @@ class HQPorner extends BaseScraper {
         SMA.logger.logError('Error extracting watching link: $e');
         return '';
       }
-    } else if (selector == config.thumbnailSelector) {
+    } else if (selector == source.config!.thumbnailSelector) {
       try {
         var imageElement = element!
             .querySelector('section > a > div')!

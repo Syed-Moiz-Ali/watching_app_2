@@ -57,6 +57,7 @@ class ApiClient {
           SMA.logger.logInfo('Received empty response from API');
           return null; // Return null for empty response
         }
+        // SMA.logger.logInfo('Response Body: ${resBody}');
         return resBody; // Return the response body if data is present
       } else {
         var errorData = json.decode(resBody);

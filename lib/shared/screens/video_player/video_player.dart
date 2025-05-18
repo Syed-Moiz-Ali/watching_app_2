@@ -10,7 +10,6 @@ import 'package:watching_app_2/shared/widgets/appbars/app_bar.dart';
 import 'package:watching_app_2/shared/widgets/loading/loading_indicator.dart';
 import 'package:watching_app_2/shared/widgets/misc/padding.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:animations/animations.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../widgets/misc/gap.dart';
@@ -120,20 +119,11 @@ class _VideoPlayerState extends State<VideoPlayer>
             ),
           ),
           child: SafeArea(
-            child: PageTransitionSwitcher(
-              transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
-                return FadeThroughTransition(
-                  animation: primaryAnimation,
-                  secondaryAnimation: secondaryAnimation,
-                  child: child,
-                );
-              },
-              child: CustomPadding(
-                allSidesFactor: .02,
-                child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: _buildMainContent(provider)),
-              ),
+            child: CustomPadding(
+              allSidesFactor: .02,
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: _buildMainContent(provider)),
             ),
           ),
         ),

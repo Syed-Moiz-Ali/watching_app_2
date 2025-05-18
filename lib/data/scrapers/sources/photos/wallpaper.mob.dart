@@ -6,13 +6,16 @@ import '../../../models/scraper_config.dart';
 import '../../base_scraper.dart';
 
 class WallpaperMob extends BaseScraper {
-  WallpaperMob(ContentSource source) : super(source, source.config!);
+  WallpaperMob(ContentSource source)
+      : super(
+          source,
+        );
 
   @override
   Future<String?> extractCustomValue(ElementSelector selector,
       {Element? element, Document? document}) async {
     // log("this is scraper class in this and selector is ${selector == config.watchingLinkSelector && document != null}");
-    if (selector == config.thumbnailSelector) {
+    if (selector == source.config!.thumbnailSelector) {
       try {
         var srcset =
             element!.querySelector('div > a > img')?.attributes['srcset'];

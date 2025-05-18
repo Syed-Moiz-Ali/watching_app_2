@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/core/navigation/app_navigator.dart';
 import 'package:watching_app_2/shared/widgets/loading/loading_indicator.dart';
 
@@ -71,16 +72,16 @@ class _SplashScreenState extends State<SplashScreen>
     return Scaffold(
       // Premium dark gradient background
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF1E1E2A), // Deep navy/charcoal
-              Color(0xFF0A0A14), // Nearly black
-            ],
-          ),
-        ),
+        // decoration: const BoxDecoration(
+        //   gradient: LinearGradient(
+        //     begin: Alignment.topCenter,
+        //     end: Alignment.bottomCenter,
+        //     colors: [
+        //       Color(0xFF1E1E2A), // Deep navy/charcoal
+        //       Color(0xFF0A0A14), // Nearly black
+        //     ],
+        //   ),
+        // ),
         child: AnimatedBuilder(
           animation: _animationController,
           builder: (context, child) {
@@ -102,10 +103,10 @@ class _SplashScreenState extends State<SplashScreen>
                   height: 110,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.transparent,
+                    color: Colors.black,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF6A5AE0).withOpacity(0.25),
+                        color: AppColors.primaryColor.withOpacity(0.25),
                         blurRadius: 20,
                         spreadRadius: 5,
                       ),
@@ -127,7 +128,7 @@ class _SplashScreenState extends State<SplashScreen>
                   fontSize: 22.sp,
                   fontWeight: FontWeight.w300,
                   letterSpacing: 6,
-                  color: Colors.white,
+                  color: AppColors.primaryColor,
                 ),
 
                 const SizedBox(height: 8),
@@ -137,7 +138,7 @@ class _SplashScreenState extends State<SplashScreen>
                   text: 'Premium Viewing Experience',
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w400,
-                  color: Colors.white.withOpacity(0.7),
+                  color: AppColors.primaryColor.withOpacity(0.7),
                   letterSpacing: 0.5,
                 ),
 
@@ -150,9 +151,9 @@ class _SplashScreenState extends State<SplashScreen>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Colors.white.withOpacity(0),
-                        Colors.white.withOpacity(0.7),
-                        Colors.white.withOpacity(0),
+                        AppColors.primaryColor.withOpacity(0),
+                        AppColors.primaryColor.withOpacity(0.7),
+                        AppColors.primaryColor.withOpacity(0),
                       ],
                     ),
                   ),

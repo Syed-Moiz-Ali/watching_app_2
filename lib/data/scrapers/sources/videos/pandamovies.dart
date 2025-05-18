@@ -98,13 +98,16 @@ import '../../../models/scraper_config.dart';
 import '../../base_scraper.dart';
 
 class Pandamovies extends BaseScraper {
-  Pandamovies(ContentSource source) : super(source, source.config!);
+  Pandamovies(ContentSource source)
+      : super(
+          source,
+        );
 
   @override
   Future<String?> extractCustomValue(ElementSelector selector,
       {Element? element, Document? document}) async {
     // log("this is scraper class in this and selector is ${selector == config.watchingLinkSelector && document != null}");
-    if (selector == config.watchingLinkSelector) {
+    if (selector == source.config!.watchingLinkSelector) {
       try {
         Map watchingLink = {};
 

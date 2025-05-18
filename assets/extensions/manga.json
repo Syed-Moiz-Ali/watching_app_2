@@ -12,6 +12,54 @@
       "popular": "webtoons/{page}?orderby=trending",
       "rating": "webtoons/{page}?orderby=rating"
     },
+    "config": {
+      "title_selector": {
+        "selector": ".bsx >  .thumb > a",
+        "attribute": "title"
+      },
+      "thumbnail_selector": {
+        "selector": ".bsx >  .thumb > a   >  img",
+        "attribute": "data-src"
+      },
+      "content_url_selector": {
+        "selector": ".bsx >  .thumb > a",
+        "attribute": "href"
+      },
+      "detail_selector": {
+        "selector": "html"
+      },
+      "detail": {
+        "discription_selector": {
+          "selector": "meta[name='description']",
+          "attribute": "content"
+        },
+        "genre_selector": {
+          "selector": ".post-status > .post-content_item:last-child > .summary-content"
+        },
+        "status_selector": {
+          "selector": ".post-status > .post-content_item:last-child > .summary-content"
+        },
+        "chapter_name_selector": {
+          "selector": "a"
+        },
+        "chapter_image_selector": {
+          "selector": ""
+        },
+        "chapters_selector": {
+          "selector": "#chapterlist > .row-content-chapter > li"
+        },
+        "chapter_id_selector": {
+          "selector": "a",
+          "attribute":"href"
+        }
+
+       
+      },
+
+      "content_selector": {
+        "selector": ".manga-lists > .manga-item"
+      }
+    },
     "enabled": true
   },
   {

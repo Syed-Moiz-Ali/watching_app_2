@@ -150,13 +150,16 @@ import '../../../models/scraper_config.dart';
 import '../../base_scraper.dart';
 
 class Eroticmv extends BaseScraper {
-  Eroticmv(ContentSource source) : super(source, source.config!);
+  Eroticmv(ContentSource source)
+      : super(
+          source,
+        );
 
   @override
   Future<String?> extractCustomValue(ElementSelector selector,
       {Element? element, Document? document}) async {
     // log("this is scraper class in this and selector is ${selector == config.watchingLinkSelector && document != null}");
-    if (selector == config.watchingLinkSelector) {
+    if (selector == source.config!.watchingLinkSelector) {
       try {
         Map watchingLink = {};
 
@@ -179,7 +182,7 @@ class Eroticmv extends BaseScraper {
         SMA.logger.logError('Error extracting watching link: $e');
         return '';
       }
-    } else if (selector == config.thumbnailSelector) {
+    } else if (selector == source.config!.thumbnailSelector) {
       try {
         var srcset = element!
             .querySelector(

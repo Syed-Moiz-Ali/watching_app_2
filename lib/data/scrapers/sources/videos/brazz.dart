@@ -85,12 +85,15 @@ import '../../../models/scraper_config.dart';
 import '../../base_scraper.dart';
 
 class Brazz extends BaseScraper {
-  Brazz(ContentSource source) : super(source, source.config!);
+  Brazz(ContentSource source)
+      : super(
+          source,
+        );
 
   @override
   Future<String?> extractCustomValue(ElementSelector selector,
       {Element? element, Document? document}) async {
-    if (selector == config.watchingLinkSelector) {
+    if (selector == source.config!.watchingLinkSelector) {
       try {
         Map watchingLink = {};
         var links = element!.querySelector('video > source')?.attributes['src'];

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:watching_app_2/data/models/content_source.dart';
 import 'package:watching_app_2/data/models/scraper_config.dart';
 import 'package:watching_app_2/data/scrapers/base_scraper.dart';
@@ -35,23 +37,9 @@ import '../../data/scrapers/sources/videos/whoreshub.dart';
 import '../../data/scrapers/sources/videos/xtapes.dart';
 import '../../data/scrapers/sources/videos/youjizz.dart';
 
-// Manga Scrapers
-import '../../data/scrapers/sources/manga/kissmanga.dart';
-import '../../data/scrapers/sources/manga/manhwa18.dart';
-
 /// Dummy Scraper class for handling null cases
 class DummyScraper extends BaseScraper {
-  DummyScraper(ContentSource source)
-      : super(
-          source,
-          ScraperConfig(
-            titleSelector: source.config!.titleSelector,
-            thumbnailSelector: source.config!.thumbnailSelector,
-            contentUrlSelector: source.config!.contentUrlSelector,
-            contentSelector: source.config!.contentSelector,
-            videoSelector: source.config!.videoSelector,
-          ),
-        );
+  DummyScraper(ContentSource source) : super(source);
 }
 
 /// Factory class for creating scraper instances based on content source
@@ -66,7 +54,7 @@ class ScraperFactory {
       'pornhits': (source) => PornHits(source),
       'tabooporn': (source) => GoodPorn(source),
       'hqporner': (source) => HQPorner(source),
-      'tabooporn2': (source) => Tabooporn2(source),
+      // 'tabooporn2': (source) => Tabooporn2(source),
       'crazyshit': (source) => CrazyShit(source),
       'onlyporn': (source) => PornHits(source),
       'youjizz': (source) => YouJizz(source),
@@ -104,10 +92,10 @@ class ScraperFactory {
       'wallpaperporn': (source) => WallpaperPorn(source),
       'definebabe': (source) => Definebabe(source),
     },
-    'manga': {
-      'kissmanga': (source) => KissManga(source),
-      'manhwa18': (source) => Manwha18(source),
-    },
+    // 'manga': {
+    //   'kissmanga': (source) => KissManga(source),
+    //   'manhwa18': (source) => Manwha18(source),
+    // },
     'tiktok': {
       // 'tikporn': (source) => TikPorn(source),
       // 'xxxfollow': (source) => Xxxfollow(source),
@@ -125,7 +113,7 @@ class ScraperFactory {
         return builder(source);
       }
     }
-
+    // log("wertyuioiuytrewertyui" + source.config!.toJson().toString());
     // Return dummy scraper if no match found
     return DummyScraper(source);
   }

@@ -124,13 +124,16 @@ import '../../base_scraper.dart';
 // }
 
 class PornHits extends BaseScraper {
-  PornHits(ContentSource source) : super(source, source.config!);
+  PornHits(ContentSource source)
+      : super(
+          source,
+        );
 
   @override
   Future<String?> extractCustomValue(ElementSelector selector,
       {Element? element, Document? document}) async {
     // log("this is scraper class in this and selector is ${selector == config.watchingLinkSelector && document != null}");
-    if (selector == config.watchingLinkSelector) {
+    if (selector == source.config!.watchingLinkSelector) {
       try {
         Map watchingLinks = {};
         if (source.name == 'porhits') {
@@ -190,7 +193,7 @@ class PornHits extends BaseScraper {
         SMA.logger.logError('Error extracting watching link: $e');
         return '';
       }
-    } else if (selector == config.titleSelector) {
+    } else if (selector == source.config!.titleSelector) {
       var titleElement = element!.querySelector('.item-info > a');
       var title = titleElement?.attributes['title'] ??
           element.querySelector('.item-info > a >  strong')?.text.trim() ??

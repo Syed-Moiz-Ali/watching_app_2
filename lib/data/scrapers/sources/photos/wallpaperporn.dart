@@ -6,12 +6,15 @@ import '../../../models/scraper_config.dart';
 import '../../base_scraper.dart';
 
 class WallpaperPorn extends BaseScraper {
-  WallpaperPorn(ContentSource source) : super(source, source.config!);
+  WallpaperPorn(ContentSource source)
+      : super(
+          source,
+        );
 
   @override
   Future<String?> extractCustomValue(ElementSelector selector,
       {Element? element, Document? document}) async {
-    if (selector == config.thumbnailSelector) {
+    if (selector == source.config!.thumbnailSelector) {
       try {
         String imageUrl = element!
             .querySelector(' a > img')!

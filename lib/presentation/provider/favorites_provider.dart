@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:watching_app_2/data/models/content_item.dart';
 
@@ -113,6 +115,7 @@ class FavoritesProvider with ChangeNotifier {
 
   // Add to favorites
   Future<void> addToFavorites(ContentItem item, String contentType) async {
+    log("contentTypecontentType is $contentType");
     if (!ContentTypes.isValidType(contentType)) {
       throw ArgumentError('Invalid content type: $contentType');
     }
@@ -239,15 +242,15 @@ class FavoritesProvider with ChangeNotifier {
     }
   }
 
-  // Additional methods using DatabaseManager features
-  Future<String> createBackup() async {
-    return await _dbManager.backupDatabase();
-  }
+  // // Additional methods using DatabaseManager features
+  // Future<String> createBackup() async {
+  //   return await _dbManager.backupDatabase();
+  // }
 
-  Future<void> restoreBackup(String backupPath) async {
-    await _dbManager.restoreDatabase(backupPath);
-    await refresh(); // Refresh the cache after restore
-  }
+  // Future<void> restoreBackup(String backupPath) async {
+  //   await _dbManager.restoreDatabase(backupPath);
+  //   await refresh(); // Refresh the cache after restore
+  // }
 
   Future<void> deleteBackup(String backupPath) async {
     await _dbManager.deleteBackup(backupPath);

@@ -382,7 +382,7 @@
     "url": "https://sxypix.com/php/",
     "type": "3",
     "NSFW": "1",
-    "getType": "2",
+    "getType": "1",
     "decodeType": "2",
     "isPreview": "0",
     "name": "sxypix",
@@ -396,5 +396,42 @@
       "all": "0",
       "popular": "1"
     }
+  },
+  {
+    "url": "https://wallpapercat.com/",
+    "type": "3",
+    
+    "NSFW": "0",
+    "getType": "2",
+    "decodeType": "2",
+    "isPreview": "0",
+    "name": "wallpapercat",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://wallpapercat.com/favicon.ico?id=8",
+    
+    "query": {
+     
+      "trending": "api/images/{page}/60/vertical?category_id=0&variant=main_top&view_variant=1",
+      "resolution": "api/images/{page}/60/vertical?variant=main_top&view_variant=0&sort_by=resolution"
+    }, "config": {
+      "title_selector": {
+        "selector": "._thumb > img",
+        "attribute": "alt"
+      },
+      "thumbnail_selector": {
+        "selector": "._thumb > img",
+        "attribute":"data-srcset"
+      },
+      "content_url_selector": {
+        "selector": "a",
+        "attribute": "href"
+      },
+
+      "content_selector": {
+        "selector": "body > .collection_thumb_vertical"
+      }
+    },
+    "enabled": true
   }
 ]

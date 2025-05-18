@@ -16,30 +16,29 @@ import '../../presentation/provider/similar_content_provider.dart';
 /// Abstract base class for content scraping operations
 abstract class BaseScraper {
   final ContentSource source;
-  final ScraperConfig config;
 
-  BaseScraper(this.source, this.config);
+  BaseScraper(this.source);
 
   // Content Scraping Methods
   Future<List<ContentItem>> scrapeContent(String data) =>
-      _scrapeHtml(data, config.contentSelector, parseElements);
+      _scrapeHtml(data, source.config!.contentSelector, parseElements);
   Future<List<ContentItem>> scrapeTikTokContent(String data) =>
       source.decodeType == '2'
-          ? _scrapeJson(data, config.contentSelector, parseJsonElements)
-          : _scrapeHtml(data, config.contentSelector, parseElements);
+          ? _scrapeJson(data, source.config!.contentSelector, parseJsonElements)
+          : _scrapeHtml(data, source.config!.contentSelector, parseElements);
 
   Future<List<ContentItem>> scrapeDetailContent(String data) =>
-      _scrapeHtml(data, config.detailSelector, parseElements);
+      _scrapeHtml(data, source.config!.detailSelector, parseElements);
 
-  Future<List<ContentItem>> scrapeChapterContent(String data) =>
-      _scrapeHtml(data, config.chapterDataSelector, parseElements);
+  // Future<List<ContentItem>> scrapeChapterContent(String data) =>
+  //     _scrapeHtml(data, config.chapterDataSelector, parseElements);
 
   Future<List<VideoSource>> scrapeVideos(String data) async {
-    log("this is videoSelector and ${config.videoSelector!.selector}");
-    if (config.videoSelector == null) return [];
+    log("this is videoSelector and ${source.config!.videoSelector!.selector}");
+    if (source.config!.videoSelector == null) return [];
     final document = parse(data);
     final elements =
-        document.querySelectorAll(config.videoSelector!.selector ?? '');
+        document.querySelectorAll(source.config!.videoSelector!.selector ?? '');
     return elements.isNotEmpty
         ? videoParseElement(document, elements.first)
         : [];
@@ -49,11 +48,12 @@ abstract class BaseScraper {
     final provider = _getSimilarContentProvider();
     await provider.setSimilarContents([]);
 
-    if (config.similarContentSelector?.selector?.isEmpty ?? true) {
+    if (source.config!.similarContentSelector?.selector?.isEmpty ?? true) {
       return [];
     }
 
-    return _scrapeHtml(data, config.similarContentSelector, (elements) async {
+    return _scrapeHtml(data, source.config!.similarContentSelector,
+        (elements) async {
       final items = await parseElements(elements);
       await provider.setSimilarContents(items);
       return items;
@@ -72,8 +72,8 @@ abstract class BaseScraper {
   Future<List<ContentItem>> getDetails(String url) =>
       _fetchAndScrape(url, scrapeDetailContent);
 
-  Future<List<ContentItem>> getChapter(String url) =>
-      _fetchAndScrape(url, scrapeChapterContent);
+  // Future<List<ContentItem>> getChapter(String url) =>
+  //     _fetchAndScrape(url, scrapeChapterContent);
 
   Future<List<VideoSource>> getVideos(String url) =>
       _fetchAndScrape(url, (html) async {
@@ -84,6 +84,7 @@ abstract class BaseScraper {
   // Parsing Methods
   Future<List<ContentItem>> parseElements(List<Element> elements) async {
     final items = <ContentItem>[];
+    // log("elements map is ${elements.map((e) => e.outerHtml)}");
     for (final element in elements) {
       try {
         items.add(await _parseContentItem(element));
@@ -134,8 +135,36 @@ abstract class BaseScraper {
       final target = document?.querySelector(selector.selector ?? '') ??
           element?.querySelector(selector.selector ?? '');
       return selector.attribute != null
-          ? target?.attributes[selector.attribute]!.trim()
+          ? target?.attributes[selector.attribute]?.trim()
           : target?.text.trim();
+    } catch (e) {
+      _logDebug('Error getting attribute from ${selector.selector}: $e');
+      return null;
+    }
+  }
+
+  Future<List<Element>?> getMultipleAttributeValue(
+    ElementSelector? selector, {
+    Element? element,
+    Document? document,
+  }) async {
+    if (selector == null) return null;
+
+    try {
+      // if (selector.customExtraction == true) {
+      //   return await extractCustomValue(selector,
+      //       element: element, document: document);
+      // }
+
+      final targets = document?.querySelectorAll(selector.selector ?? '') ??
+          element?.querySelectorAll(selector.selector ?? '');
+      if (targets!.isEmpty) return null;
+      return targets;
+      // final values = targets.map((target) => selector.attribute != null
+      //     ? target.attributes[selector.attribute]?.trim()
+      //     : target.text.trim()).whereType<String>();
+
+      // return values;
     } catch (e) {
       _logDebug('Error getting attribute from ${selector.selector}: $e');
       return null;
@@ -167,7 +196,9 @@ abstract class BaseScraper {
     Future<List<T>> Function(List<Element>) parser,
   ) async {
     final document = parse(html);
-    final elements = document.querySelectorAll(selector?.selector ?? '');
+    log("selector of main is ${selector!.selector!}");
+    // log("elements is ${document.querySelectorAll(selector.selector ?? '')}");
+    final elements = document.querySelectorAll(selector.selector ?? '');
     return elements.isEmpty ? [] : await parser(elements);
   }
 
@@ -208,67 +239,85 @@ abstract class BaseScraper {
 
   Future<ContentItem> _parseContentItem(Element element) async {
     return ContentItem(
-      title: await getAttributeValue(config.titleSelector, element: element) ??
+      title: await getAttributeValue(source.config!.titleSelector,
+              element: element) ??
           'Unknown',
-      thumbnailUrl:
-          await getAttributeValue(config.thumbnailSelector, element: element) ??
-              '',
-      contentUrl: await getAttributeValue(config.contentUrlSelector,
+      thumbnailUrl: await getAttributeValue(source.config!.thumbnailSelector,
               element: element) ??
           '',
-      duration:
-          await getAttributeValue(config.durationSelector, element: element) ??
-              '0:00',
-      preview:
-          await getAttributeValue(config.previewSelector, element: element) ??
-              '',
-      quality:
-          await getAttributeValue(config.qualitySelector, element: element) ??
-              'HD',
-      time: await getAttributeValue(config.timeSelector, element: element) ??
+      contentUrl: await getAttributeValue(source.config!.contentUrlSelector,
+              element: element) ??
+          '',
+      duration: await getAttributeValue(source.config!.durationSelector,
+              element: element) ??
+          '0:00',
+      preview: await getAttributeValue(source.config!.previewSelector,
+              element: element) ??
+          '',
+      quality: await getAttributeValue(source.config!.qualitySelector,
+              element: element) ??
+          'HD',
+      time: await getAttributeValue(source.config!.timeSelector,
+              element: element) ??
           'Unknown',
-      views: await getAttributeValue(config.viewsSelector, element: element) ??
+      views: await getAttributeValue(source.config!.viewsSelector,
+              element: element) ??
           'Unknown',
       scrapedAt: DateTime.now(),
       addedAt: DateTime.now(),
       source: source,
-      genre:
-          await getAttributeValue(config.genreSelector, element: element) ?? '',
-      status:
-          await getAttributeValue(config.statusSelector, element: element) ??
-              '',
-      chapterCount: await getAttributeValue(config.chapterCountSelector,
-              element: element) ??
-          '',
-      chapterId:
-          await getAttributeValue(config.chapterIdSelector, element: element) ??
-              '',
-      chapterImages: await getAttributeValue(config.chapterImageSelector,
-              element: element) ??
-          '',
-      user:
-          await getAttributeValue(config.userSelector, element: element) ?? '',
-      likes:
-          await getAttributeValue(config.likesSelector, element: element) ?? '',
-      comments:
-          await getAttributeValue(config.commentsSelector, element: element) ??
-              '',
+      detailContent: DetailModel(
+        discription: await getAttributeValue(source.config!.discriptionSelector,
+                element: element) ??
+            '',
+        genre: await getAttributeValue(source.config!.genreSelector,
+                element: element) ??
+            '',
+        chapterSelector: await getAttributeValue(
+                source.config!.chaptersSelector,
+                element: element) ??
+            '',
+        status: await getAttributeValue(source.config!.statusSelector,
+                element: element) ??
+            '',
+        chapter: await Future.wait((await getMultipleAttributeValue(
+                    source.config!.chaptersSelector,
+                    element: element) ??
+                [])
+            .map((c) async {
+          log("chapter for this is ${c} annd ${source.config!.chapterIdSelector!.toJson()} ${source.config!.chapterNameSelector!.toJson()}");
+          return Chapter(
+            chapterId: await getAttributeValue(source.config!.chapterIdSelector,
+                    element: c) ??
+                '',
+            chapterName: await getAttributeValue(
+                    source.config!.chapterNameSelector,
+                    element: c) ??
+                '',
+            chapterImage: await getAttributeValue(
+                    source.config!.chapterImageSelector,
+                    element: c) ??
+                '',
+          );
+        })),
+        // chapter:
+      ),
     );
   }
 
   Future<ContentItem> _parseTiTokContentItem(Map element) async {
     return ContentItem(
       title: await _extractNestedValue(
-              element, config.titleSelector.selector!.split('.')) ??
+              element, source.config!.titleSelector.selector!.split('.')) ??
           'Unknown',
       thumbnailUrl: await _extractNestedValue(
-              element, config.thumbnailSelector.selector!.split('.')) ??
+              element, source.config!.thumbnailSelector.selector!.split('.')) ??
           'Unknown',
-      contentUrl: await _extractNestedValue(
-              element, config.contentUrlSelector.selector!.split('.')) ??
+      contentUrl: await _extractNestedValue(element,
+              source.config!.contentUrlSelector.selector!.split('.')) ??
           'Unknown',
       videoUrl: await _extractNestedValue(
-              element, config.videoSelector!.selector!.split('.')) ??
+              element, source.config!.videoSelector!.selector!.split('.')) ??
           'Unknown',
       scrapedAt: DateTime.now(),
       addedAt: DateTime.now(),
@@ -301,10 +350,10 @@ abstract class BaseScraper {
     return VideoSource(
       scrapedAt: DateTime.now(),
       source: source,
-      watchingLink: await getAttributeValue(config.watchingLinkSelector,
+      watchingLink: await getAttributeValue(source.config!.watchingLinkSelector,
               element: element) ??
           '',
-      keywords: await getAttributeValue(config.keywordsSelector,
+      keywords: await getAttributeValue(source.config!.keywordsSelector,
               document: document) ??
           '',
     );

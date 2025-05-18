@@ -126,12 +126,15 @@ import '../../../models/scraper_config.dart';
 import '../../base_scraper.dart';
 
 class Taboohome extends BaseScraper {
-  Taboohome(ContentSource source) : super(source, source.config!);
+  Taboohome(ContentSource source)
+      : super(
+          source,
+        );
 
   @override
   Future<String?> extractCustomValue(ElementSelector selector,
       {Element? element, Document? document}) async {
-    if (selector == config.watchingLinkSelector) {
+    if (selector == source.config!.watchingLinkSelector) {
       try {
         Map watchingLink = {};
         var links = element!

@@ -65,19 +65,27 @@ class SearchProvider with ChangeNotifier {
 
     for (String currentCategory in categoriesToProcess) {
       _errorMap[currentCategory] = null;
-
+      log("currentCategory is $currentCategory");
       try {
         final loadedSources = await _sourceManager.loadSources(currentCategory);
         _sources = loadedSources;
+        // log("loadedSources is $loadedSources");
 
         final activeSources = _sources.where((source) {
           final mappedCategory = ContentTypes.TYPE_TO_CATEGORY[source.type];
-          return mappedCategory == currentCategory;
+          return mappedCategory == currentCategory && source.enabled == true;
         }).toList();
+        // log("activeSources count: ${activeSources.length}, sources: ${activeSources.map((s) => s.url).toList()}");
+        // log("activeSources is ${activeSources.length}");
         for (var source in activeSources) {
-          // log("source.url is ${_scraperServices[source.url]}");
+          if (source.url == null || source.url.isEmpty) {
+            log("Skipping source with null or empty URL: $source");
+            continue; // Skip invalid sources
+          }
+          log("source.url is ${source.url}");
           if (_scraperServices[source.url] == null) {
             _scraperServices[source.url] = ScraperService(source);
+            log("this is for ${source.url}");
           }
           _currentPageMap["${currentCategory}_${source.url}"] = 1;
           _hasMoreDataMap["${currentCategory}_${source.url}"] = true;
@@ -89,6 +97,7 @@ class SearchProvider with ChangeNotifier {
           await _searchVideosFromSource(activeSources[i], currentCategory);
         }
       } catch (e) {
+        log("Failed to load sources: $e");
         _errorMap[currentCategory] = 'Failed to load sources: $e';
       }
     }
@@ -100,7 +109,7 @@ class SearchProvider with ChangeNotifier {
   Future<void> _searchVideosFromSource(
       ContentSource source, String category) async {
     String sourceKey = "${category}_${source.url}";
-
+    log("sourceKey is $sourceKey");
     try {
       final newVideos = await _scraperServices[source.url]!
           .search(_currentQuery, _currentPageMap[sourceKey] ?? 1);
@@ -119,7 +128,7 @@ class SearchProvider with ChangeNotifier {
       if (newVideos.isEmpty) {
         _hasMoreDataMap[sourceKey] = false;
       }
-      log("_allCategoryResults is $_allCategoryResults");
+      // log("_allCategoryResults is $_allCategoryResults");
       notifyListeners();
     } catch (e) {
       _errorMap["${category}_${source.url}"] =

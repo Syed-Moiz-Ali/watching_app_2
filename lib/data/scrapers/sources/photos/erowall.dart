@@ -6,12 +6,12 @@ import '../../../models/scraper_config.dart';
 import '../../base_scraper.dart';
 
 class EroWall extends BaseScraper {
-  EroWall(ContentSource source) : super(source, source.config!);
+  EroWall(ContentSource source) : super(source);
 
   @override
   Future<String?> extractCustomValue(ElementSelector selector,
       {Element? element, Document? document}) async {
-    if (selector == config.thumbnailSelector) {
+    if (selector == source.config!.thumbnailSelector) {
       try {
         String imageUrl = element!
             .querySelector(' a > img')!

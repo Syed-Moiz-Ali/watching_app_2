@@ -1,5 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -82,16 +84,20 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
         curve: const Interval(0.2, 1.0, curve: Curves.easeOutCubic),
       ),
     );
-
-    var provider = context.read<MangaDetailProvider>();
-    provider.loadMangaDetails(widget.item);
-
+    getDetails();
     // Staggered animations
     Future.delayed(const Duration(milliseconds: 100), () {
       _headerAnimationController.forward();
       Future.delayed(const Duration(milliseconds: 300), () {
         _contentAnimationController.forward();
       });
+    });
+  }
+
+  getDetails() async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      var provider = context.read<MangaDetailProvider>();
+      await provider.loadMangaDetails(widget.item);
     });
   }
 
@@ -221,7 +227,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
     );
   }
 
-  Widget _buildChapterList(ContentItem details, int chapterCount) {
+  Widget _buildChapterList(ContentItem details) {
     return AnimatedBuilder(
       animation: _contentAnimationController,
       builder: (context, child) {
@@ -252,7 +258,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
                           child: Text(
-                            "$chapterCount Chapters",
+                            "${details.detailContent!.chapter!.length} Chapters",
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
@@ -267,10 +273,11 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                 ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
-                  itemCount: chapterCount, // Limiting to 20 for performance
+                  itemCount: details.detailContent!.chapter!
+                      .length, // Limiting to 20 for performance
                   itemBuilder: (context, index) {
-                    final chapterNum = chapterCount - index;
-
+                    // final chapterNum = details.detailContent!.chapter!.length - index;
+                    final chapter = details.detailContent!.chapter![index];
                     // Apply staggered animation for chapters
                     final staggeredAnimation = CurvedAnimation(
                       parent: _contentAnimationController,
@@ -280,7 +287,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                         curve: Curves.easeOut,
                       ),
                     );
-
+                    // log("chapter for this is ${chapter.toJson()}");
                     return FadeTransition(
                       opacity: staggeredAnimation,
                       child: SlideTransition(
@@ -295,13 +302,13 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                               borderRadius: BorderRadius.circular(16),
                               onTap: () {
                                 // var newDetail = details;
-                                var updatedDetails = details.copyWith(
-                                  chapterId: details.chapterId.replaceAll(
-                                      "$chapterCount", chapterNum.toString()),
-                                );
-                                NH.navigateTo(MangaReaderScreen(
-                                  item: updatedDetails,
-                                ));
+                                // var updatedDetails = details.copyWith(
+                                //   chapterId: details.chapterId.replaceAll(
+                                //       "$chapterCount", chapterNum.toString()),
+                                // );
+                                // NH.navigateTo(MangaReaderScreen(
+                                //   item: updatedDetails,
+                                // ));
                                 // Handle chapter selection
                               },
                               child: Padding(
@@ -333,7 +340,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                                       ),
                                       child: Center(
                                         child: Text(
-                                          "$chapterNum",
+                                          "${index}",
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Colors.white,
@@ -349,7 +356,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            "Chapter $chapterNum",
+                                            chapter.chapterName!,
                                             style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 16,
@@ -392,7 +399,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                     );
                   },
                 ),
-                if (chapterCount > 20)
+                if (details.detailContent!.chapter!.length > 20)
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.only(top: 16.0),
@@ -547,12 +554,17 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
           }
 
           final details = provider.mangaDetail!;
-          final statusColor =
-              details.status.trim().toLowerCase().contains("ongoing")
-                  ? Colors.greenAccent
-                  : details.status.trim().toLowerCase().contains("completed")
-                      ? Colors.blueAccent
-                      : Colors.orangeAccent;
+          final statusColor = details.detailContent!.status!
+                  .trim()
+                  .toLowerCase()
+                  .contains("ongoing")
+              ? Colors.greenAccent
+              : details.detailContent!.status!
+                      .trim()
+                      .toLowerCase()
+                      .contains("completed")
+                  ? Colors.blueAccent
+                  : Colors.orangeAccent;
 
           return SingleChildScrollView(
             controller: _scrollController,
@@ -668,9 +680,9 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                                 runSpacing: 12,
                                 children: [
                                   _buildInfoTag(
-                                    details.status.trim(),
+                                    details.detailContent!.status!.trim(),
                                     color: statusColor,
-                                    icon: details.status
+                                    icon: details.detailContent!.status!
                                             .trim()
                                             .toLowerCase()
                                             .contains("ongoing")
@@ -678,11 +690,11 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                                         : Icons.check_circle,
                                   ),
                                   _buildInfoTag(
-                                    "${details.chapterCount} Chapters",
+                                    "${details.detailContent!.chapter!.length} Chapters",
                                     color: Colors.amberAccent,
                                     icon: Icons.menu_book,
                                   ),
-                                  ...details.genre
+                                  ...details.detailContent!.genre!
                                       .split(", ")
                                       .take(3)
                                       .map((genre) => _buildInfoTag(
@@ -710,7 +722,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                                     child: Padding(
                                       padding: const EdgeInsets.all(16.0),
                                       child: Text(
-                                        details.discription,
+                                        details.detailContent!.discription!,
                                         style: TextStyle(
                                           fontSize: 15,
                                           height: 1.5,
@@ -803,11 +815,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                                   ? _buildShimmerPlaceholder()
                                   : _buildChapterList(
                                       details,
-                                      double.tryParse(details.chapterCount
-                                                  .replaceAll("Chapter", '')
-                                                  .trim())
-                                              ?.toInt() ??
-                                          0),
+                                    ),
                               const SizedBox(height: 32),
                             ],
                           ),

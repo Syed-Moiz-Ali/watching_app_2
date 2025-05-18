@@ -435,7 +435,7 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                   subtitle: 'backup your data',
                   icon: Icons.backup,
                   onTap: () {
-                    BackupService().createBackup();
+                    // BackupService().createBackup();
                   },
                   type: _SettingType.button,
                 ),
@@ -444,7 +444,7 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                   subtitle: 'restore your data',
                   icon: Icons.backup,
                   onTap: () {
-                    BackupService().restoreBackup();
+                    // BackupService().restoreBackup();
                   },
                   type: _SettingType.button,
                 ),

@@ -39,7 +39,7 @@ class TabbedContentView extends StatefulWidget {
 }
 
 class _TabbedContentViewState extends State<TabbedContentView>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _animationController;
   int _currentPlayingIndex = -1;
   late Animation<double> _fadeAnimation;

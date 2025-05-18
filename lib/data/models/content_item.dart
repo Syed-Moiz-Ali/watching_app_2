@@ -11,16 +11,9 @@ class ContentItem {
   final String? videoUrl;
   final String views;
   final ContentSource source;
+  final DetailModel? detailContent;
   final DateTime scrapedAt;
-  final String genre;
-  final String status;
-  final String chapterCount;
-  final String discription;
-  final String chapterId;
-  final String chapterImages;
-  final String user;
-  final String likes;
-  final String comments;
+
   final DateTime addedAt;
 
   ContentItem({
@@ -35,19 +28,10 @@ class ContentItem {
     this.views = "0",
     required this.source,
     required this.scrapedAt,
-    this.genre = '',
-    this.status = '',
-    this.chapterCount = '',
-    this.user = '',
-    this.likes = '',
-    this.comments = '',
-    this.discription = '',
-    this.chapterId = '',
-    this.chapterImages = '',
+    this.detailContent,
     required this.addedAt,
   });
 
-  // **Implementing `copyWith` method**
   ContentItem copyWith({
     String? title,
     String? duration,
@@ -59,7 +43,9 @@ class ContentItem {
     String? videoUrl,
     String? views,
     ContentSource? source,
+    DetailModel? detailContent,
     DateTime? scrapedAt,
+    DateTime? addedAt,
     String? genre,
     String? status,
     String? chapterCount,
@@ -82,16 +68,112 @@ class ContentItem {
       views: views ?? this.views,
       source: source ?? this.source,
       scrapedAt: scrapedAt ?? this.scrapedAt,
-      genre: genre ?? this.genre,
-      status: status ?? this.status,
-      chapterCount: chapterCount ?? this.chapterCount,
-      discription: discription ?? this.discription,
-      chapterId: chapterId ?? this.chapterId,
-      chapterImages: chapterImages ?? this.chapterImages,
-      user: user ?? this.user,
-      likes: likes ?? this.likes,
-      comments: comments ?? this.comments,
-      addedAt: addedAt,
+      detailContent: detailContent ?? this.detailContent,
+      addedAt: addedAt ?? this.addedAt,
     );
   }
+
+  /// Convert object to JSON map
+  Map<String, dynamic> toJson() {
+    return {
+      'title': title,
+      'duration': duration,
+      'preview': preview,
+      'quality': quality,
+      'time': time,
+      'thumbnailUrl': thumbnailUrl,
+      'contentUrl': contentUrl,
+      'videoUrl': videoUrl,
+      'views': views,
+      'source': source.toJson(), // Make sure ContentSource has toJson()
+
+      'scrapedAt': scrapedAt.toIso8601String(),
+
+      'addedAt': addedAt.toIso8601String(),
+    };
+  }
+
+  /// Create object from JSON map
+  factory ContentItem.fromJson(Map<String, dynamic> json) {
+    return ContentItem(
+      title: json['title'],
+      duration: json['duration'] ?? '0:00',
+      preview: json['preview'] ?? '',
+      quality: json['quality'] ?? 'HD',
+      time: json['time'] ?? '0:00',
+      thumbnailUrl: json['thumbnailUrl'],
+      contentUrl: json['contentUrl'],
+      videoUrl: json['videoUrl'] ?? '',
+      views: json['views'] ?? '0',
+      source: ContentSource.fromJson(json['source']), // Requires fromJson()
+      detailContent: DetailModel.fromJson(
+          json['detailContent'] ?? {}), // Requires fromJson()
+      scrapedAt: DateTime.parse(json['scrapedAt']),
+
+      addedAt: DateTime.parse(json['addedAt']),
+    );
+  }
+}
+
+class DetailModel {
+  DetailModel({
+    required this.discription,
+    required this.genre,
+    required this.status,
+    required this.chapterSelector,
+    this.chapter,
+  });
+
+  final String? discription;
+  final String? genre;
+  final String? status;
+  final String? chapterSelector;
+  final List<Chapter>? chapter;
+
+  factory DetailModel.fromJson(Map<String, dynamic> json) {
+    return DetailModel(
+      discription: json["discription"],
+      genre: json["genre"],
+      status: json["status"],
+      chapterSelector: json["chapterSelector"],
+      chapter: json["chapter"] == null
+          ? []
+          : List<Chapter>.from(
+              json["chapter"]!.map((x) => Chapter.fromJson(x))),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        "discription": discription,
+        "genre": genre,
+        "status": status,
+        "chapterSelector": chapterSelector,
+        "chapter": chapter!.map((x) => x.toJson()).toList(),
+      };
+}
+
+class Chapter {
+  Chapter({
+    required this.chapterId,
+    required this.chapterName,
+    required this.chapterImage,
+  });
+
+  final String? chapterId;
+  final String? chapterName;
+  final String? chapterImage;
+
+  factory Chapter.fromJson(Map<String, dynamic> json) {
+    return Chapter(
+      chapterId: json["chapterId"],
+      chapterName: json["chapterName"],
+      chapterImage: json["chapterImage"],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        "chapterId": chapterId,
+        "chapterName": chapterName,
+        "chapterImage": chapterImage,
+      };
 }

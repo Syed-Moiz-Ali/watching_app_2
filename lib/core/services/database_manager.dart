@@ -11,14 +11,14 @@ class DatabaseManager {
   DatabaseManager._internal();
 
   // Backup Operations
-  Future<String> backupDatabase() async {
-    try {
-      final backupPath = await _db.createBackup();
-      return backupPath;
-    } catch (e) {
-      throw Exception('Backup failed: $e');
-    }
-  }
+  // Future<String> backupDatabase() async {
+  //   try {
+  //     final backupPath = await _db.createBackup();
+  //     return backupPath;
+  //   } catch (e) {
+  //     throw Exception('Backup failed: $e');
+  //   }
+  // }
 
   Future<void> restoreDatabase(String backupPath) async {
     try {
@@ -46,11 +46,11 @@ class DatabaseManager {
     }
   }
 
-  Future<bool> removeFromFavorites(int id) async {
+  Future<int> removeFromFavorites(int id) async {
     try {
       final rowsAffected = await _db.removeFromFavorites(id);
-      final success = rowsAffected > 0;
-      return success;
+      rowsAffected > 0;
+      return rowsAffected;
     } catch (e) {
       throw Exception('Failed to remove from favorites: $e');
     }

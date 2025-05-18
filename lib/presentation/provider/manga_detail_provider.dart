@@ -21,34 +21,36 @@ class MangaDetailProvider extends ChangeNotifier {
 
       final details = await scraperService.getDetails(
           SMA.formatImage(image: item.contentUrl, baseUrl: item.source.url));
-      log("thiis is details ${mangaDetail!.chapterCount}");
+      log("thiis is details ${details.map((i) => i.toJson())}");
       mangaDetail = details.first;
+      // await loadChapterDetails(item);
       isLoading = false;
       notifyListeners();
     } catch (e) {
+      log(e.toString());
       error = 'Failed to load manga details: $e';
       isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> loadChapterDetails(ContentItem item) async {
-    ScraperService scraperService = ScraperService(item.source);
-    try {
-      isLoading = true;
-      error = null;
-      notifyListeners();
-      log('chapter id is ${item.chapterId}');
-      final details = await scraperService.getChapter(
-          SMA.formatImage(image: item.chapterId, baseUrl: item.source.url));
-      log("thiis is chapterImages ${details.first.chapterImages}");
-      chapterDetail = details.first;
-      isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      error = 'Failed to load manga details: $e';
-      isLoading = false;
-      notifyListeners();
-    }
-  }
+  // Future<void> loadChapterDetails(ContentItem item) async {
+  //   ScraperService scraperService = ScraperService(item.source);
+  //   try {
+  //     isLoading = true;
+  //     error = null;
+  //     notifyListeners();
+  //     log('chapter id is ${item.chapterId}');
+  //     final details = await scraperService.getChapter(
+  //         SMA.formatImage(image: item.chapterId, baseUrl: item.source.url));
+  //     log("thiis is chapterImages ${details.first.chapterImages}");
+  //     chapterDetail = details.first;
+  //     isLoading = false;
+  //     notifyListeners();
+  //   } catch (e) {
+  //     error = 'Failed to load manga details: $e';
+  //     isLoading = false;
+  //     notifyListeners();
+  //   }
+  // }
 }

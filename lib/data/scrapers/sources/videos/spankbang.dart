@@ -8,13 +8,16 @@ import '../../../models/scraper_config.dart';
 import '../../base_scraper.dart';
 
 class Spankbang extends BaseScraper {
-  Spankbang(ContentSource source) : super(source, source.config!);
+  Spankbang(ContentSource source)
+      : super(
+          source,
+        );
 
   @override
   Future<String?> extractCustomValue(ElementSelector selector,
       {Element? element, Document? document}) async {
-    if (selector == config.watchingLinkSelector) {
-      log("this is scraper class in this and selector is ${selector == config.watchingLinkSelector && document != null}");
+    if (selector == source.config!.watchingLinkSelector) {
+      log("this is scraper class in this and selector is ${selector == source.config!.watchingLinkSelector && document != null}");
       try {
         var scripts =
             element!.querySelectorAll('script[type="application/ld+json"]');

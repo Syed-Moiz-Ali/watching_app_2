@@ -345,65 +345,65 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
                     ),
 
                     // Right side interaction icons
-                    // Positioned(
-                    //   right: 16,
-                    //   bottom: 100,
-                    //   child: Column(
-                    //     children: [
-                    //       _buildInteractionButton(
-                    //         icon: _isLiked
-                    //             ? Icons.favorite
-                    //             : Icons.favorite_border,
-                    //         count: _formatCount(_likeCount),
-                    //         color: _isLiked ? Colors.red : Colors.white,
-                    //         onTap: () {
-                    //           setState(() {
-                    //             _isLiked = !_isLiked;
-                    //             _likeCount =
-                    //                 _isLiked ? _likeCount + 1 : _likeCount - 1;
-                    //           });
-                    //         },
-                    //       ),
-                    //       const SizedBox(height: 16),
-                    //       _buildInteractionButton(
-                    //         icon: Icons.chat_bubble_outline,
-                    //         count: _formatCount(_commentCount),
-                    //         onTap: () {
-                    //           // Show comments modal
-                    //           _showCommentsModal();
-                    //         },
-                    //       ),
-                    //       const SizedBox(height: 16),
-                    //       _buildInteractionButton(
-                    //         icon: Icons.share,
-                    //         count: _formatCount(_shareCount),
-                    //         onTap: () {
-                    //           // Show share options
-                    //           _showShareOptions();
-                    //         },
-                    //       ),
-                    //       const SizedBox(height: 16),
-                    //       _buildAnimatedIconButton(
-                    //         icon: _isMuted
-                    //             ? Icons.volume_off_rounded
-                    //             : Icons.volume_up_rounded,
-                    //         onPressed: _toggleMute,
-                    //       ),
-                    //       const SizedBox(height: 16),
-                    //       Consumer<FavoritesProvider>(
-                    //         builder: (context, provider, child) {
-                    //           return Transform.scale(
-                    //             scale: 1.2,
-                    //             child: FavoriteButton(
-                    //               item: widget.item,
-                    //               contentType: ContentTypes.TIKTOK,
-                    //             ),
-                    //           );
-                    //         },
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
+                    Positioned(
+                      right: 16,
+                      bottom: 100,
+                      child: Column(
+                        children: [
+                          // _buildInteractionButton(
+                          //   icon: _isLiked
+                          //       ? Icons.favorite
+                          //       : Icons.favorite_border,
+                          //   count: _formatCount(_likeCount),
+                          //   color: _isLiked ? Colors.red : Colors.white,
+                          //   onTap: () {
+                          //     setState(() {
+                          //       _isLiked = !_isLiked;
+                          //       _likeCount =
+                          //           _isLiked ? _likeCount + 1 : _likeCount - 1;
+                          //     });
+                          //   },
+                          // ),
+                          // const SizedBox(height: 16),
+                          // _buildInteractionButton(
+                          //   icon: Icons.chat_bubble_outline,
+                          //   count: _formatCount(_commentCount),
+                          //   onTap: () {
+                          //     // Show comments modal
+                          //     _showCommentsModal();
+                          //   },
+                          // ),
+                          // const SizedBox(height: 16),
+                          // _buildInteractionButton(
+                          //   icon: Icons.share,
+                          //   count: _formatCount(_shareCount),
+                          //   onTap: () {
+                          //     // Show share options
+                          //     _showShareOptions();
+                          //   },
+                          // ),
+                          // const SizedBox(height: 16),
+                          // _buildAnimatedIconButton(
+                          //   icon: _isMuted
+                          //       ? Icons.volume_off_rounded
+                          //       : Icons.volume_up_rounded,
+                          //   onPressed: _toggleMute,
+                          // ),
+                          // const SizedBox(height: 16),
+                          Consumer<FavoritesProvider>(
+                            builder: (context, provider, child) {
+                              return Transform.scale(
+                                scale: 1.2,
+                                child: FavoriteButton(
+                                  item: widget.item,
+                                  contentType: ContentTypes.TIKTOK,
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
 
                     // Video information
                     Positioned(
