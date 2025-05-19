@@ -46,6 +46,8 @@ class ScraperConfig {
   final ElementSelector? chapterIdSelector;
   final ElementSelector? chapterImageSelector;
   final ElementSelector? chapterNameSelector;
+  final ElementSelector? chapterImagesByIdSelectionSelector;
+  final ElementSelector? chapterImagesByIdSelector;
 
   final ElementSelector? discriptionSelector;
 
@@ -71,6 +73,8 @@ class ScraperConfig {
     this.discriptionSelector,
     this.chaptersSelector,
     this.chapterNameSelector,
+    this.chapterImagesByIdSelector,
+    this.chapterImagesByIdSelectionSelector,
   });
 
   factory ScraperConfig.fromJson(Map<String, dynamic> json) {
@@ -137,6 +141,14 @@ class ScraperConfig {
       discriptionSelector: detail['discription_selector'] != null
           ? ElementSelector.fromJson(detail['discription_selector'])
           : ElementSelector(selector: ''),
+      chapterImagesByIdSelector: detail['chapter_images_by_id_selector'] != null
+          ? ElementSelector.fromJson(detail['chapter_images_by_id_selector'])
+          : ElementSelector(selector: ''),
+      chapterImagesByIdSelectionSelector:
+          detail['chapter_images_by_id_selection_selector'] != null
+              ? ElementSelector.fromJson(
+                  detail['chapter_images_by_id_selection_selector'])
+              : ElementSelector(selector: ''),
     );
   }
   Map<String, dynamic> toJson() => {
@@ -173,5 +185,10 @@ class ScraperConfig {
           'discription_selector': discriptionSelector!.toJson(),
         if (chapterNameSelector != null)
           'chapter_name_selector': chapterNameSelector!.toJson(),
+        if (chapterNameSelector != null)
+          'chapter_images_by_id_selector': chapterImagesByIdSelector!.toJson(),
+        if (chapterNameSelector != null)
+          'chapter_images_by_id_selection_selector':
+              chapterImagesByIdSelectionSelector!.toJson(),
       };
 }

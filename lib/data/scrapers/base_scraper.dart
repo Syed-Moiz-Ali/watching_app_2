@@ -30,8 +30,8 @@ abstract class BaseScraper {
   Future<List<ContentItem>> scrapeDetailContent(String data) =>
       _scrapeHtml(data, source.config!.detailSelector, parseElements);
 
-  // Future<List<ContentItem>> scrapeChapterContent(String data) =>
-  //     _scrapeHtml(data, config.chapterDataSelector, parseElements);
+  Future<List<ContentItem>> scrapeChapterContent(String data) => _scrapeHtml(
+      data, source.config!.chapterImagesByIdSelectionSelector, parseElements);
 
   Future<List<VideoSource>> scrapeVideos(String data) async {
     log("this is videoSelector and ${source.config!.videoSelector!.selector}");
@@ -72,8 +72,8 @@ abstract class BaseScraper {
   Future<List<ContentItem>> getDetails(String url) =>
       _fetchAndScrape(url, scrapeDetailContent);
 
-  // Future<List<ContentItem>> getChapter(String url) =>
-  //     _fetchAndScrape(url, scrapeChapterContent);
+  Future<List<ContentItem>> getChapter(String url) =>
+      _fetchAndScrape(url, scrapeChapterContent);
 
   Future<List<VideoSource>> getVideos(String url) =>
       _fetchAndScrape(url, (html) async {
@@ -302,6 +302,27 @@ abstract class BaseScraper {
         })),
         // chapter:
       ),
+      chapterImagesById: await Future.wait((await getMultipleAttributeValue(
+                  source.config!.chapterImagesByIdSelectionSelector,
+                  element: element) ??
+              [])
+          .map((c) async {
+        // log("chapter for this is ${c} annd ${source.config!.chapterIdSelector!.toJson()} ${source.config!.chapterNameSelector!.toJson()}");
+        return Chapter(
+          chapterId: await getAttributeValue(
+                  source.config!.chapterImagesByIdSelector,
+                  element: c) ??
+              '',
+          chapterName: await getAttributeValue(
+                  source.config!.chapterImagesByIdSelector,
+                  element: c) ??
+              '',
+          chapterImage: await getAttributeValue(
+                  source.config!.chapterImagesByIdSelector,
+                  element: c) ??
+              '',
+        );
+      })),
     );
   }
 

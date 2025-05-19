@@ -10,7 +10,7 @@ class MangaDetailProvider extends ChangeNotifier {
   bool isLoading = false;
   String? error;
   ContentItem? mangaDetail;
-  ContentItem? chapterDetail;
+  List<Chapter>? chapterDetail;
 
   Future<void> loadMangaDetails(ContentItem item) async {
     ScraperService scraperService = ScraperService(item.source);
@@ -34,23 +34,24 @@ class MangaDetailProvider extends ChangeNotifier {
     }
   }
 
-  // Future<void> loadChapterDetails(ContentItem item) async {
-  //   ScraperService scraperService = ScraperService(item.source);
-  //   try {
-  //     isLoading = true;
-  //     error = null;
-  //     notifyListeners();
-  //     log('chapter id is ${item.chapterId}');
-  //     final details = await scraperService.getChapter(
-  //         SMA.formatImage(image: item.chapterId, baseUrl: item.source.url));
-  //     log("thiis is chapterImages ${details.first.chapterImages}");
-  //     chapterDetail = details.first;
-  //     isLoading = false;
-  //     notifyListeners();
-  //   } catch (e) {
-  //     error = 'Failed to load manga details: $e';
-  //     isLoading = false;
-  //     notifyListeners();
-  //   }
-  // }
+  Future<void> loadChapterDetails(ContentItem item) async {
+    ScraperService scraperService = ScraperService(item.source);
+    try {
+      isLoading = true;
+      error = null;
+      notifyListeners();
+      // log('chapter id is ${item.}');
+      final details = await scraperService.getChapter(SMA.formatImage(
+          image: item.detailContent!.chapter![0].chapterId!,
+          baseUrl: item.source.url));
+      // log("thiis is chapterImages ${details.first.chapterImages}");
+      chapterDetail = details.first.chapterImagesById;
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      error = 'Failed to load manga details: $e';
+      isLoading = false;
+      notifyListeners();
+    }
+  }
 }

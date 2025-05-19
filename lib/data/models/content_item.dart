@@ -12,6 +12,7 @@ class ContentItem {
   final String views;
   final ContentSource source;
   final DetailModel? detailContent;
+  final List<Chapter>? chapterImagesById;
   final DateTime scrapedAt;
 
   final DateTime addedAt;
@@ -29,6 +30,7 @@ class ContentItem {
     required this.source,
     required this.scrapedAt,
     this.detailContent,
+    this.chapterImagesById,
     required this.addedAt,
   });
 
@@ -44,6 +46,7 @@ class ContentItem {
     String? views,
     ContentSource? source,
     DetailModel? detailContent,
+    List<Chapter>? chapterImagesById,
     DateTime? scrapedAt,
     DateTime? addedAt,
     String? genre,
@@ -69,6 +72,7 @@ class ContentItem {
       source: source ?? this.source,
       scrapedAt: scrapedAt ?? this.scrapedAt,
       detailContent: detailContent ?? this.detailContent,
+      chapterImagesById: chapterImagesById ?? this.chapterImagesById,
       addedAt: addedAt ?? this.addedAt,
     );
   }
@@ -108,6 +112,9 @@ class ContentItem {
       source: ContentSource.fromJson(json['source']), // Requires fromJson()
       detailContent: DetailModel.fromJson(
           json['detailContent'] ?? {}), // Requires fromJson()
+      chapterImagesById: List<Chapter>.from(json['chapterImagesById'])
+          .map((c) => c)
+          .toList(), // Requires fromJson()
       scrapedAt: DateTime.parse(json['scrapedAt']),
 
       addedAt: DateTime.parse(json['addedAt']),
