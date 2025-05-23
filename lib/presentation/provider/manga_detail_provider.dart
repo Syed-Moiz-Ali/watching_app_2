@@ -18,10 +18,9 @@ class MangaDetailProvider extends ChangeNotifier {
       isLoading = true;
       error = null;
       notifyListeners();
-
       final details = await scraperService.getDetails(
           SMA.formatImage(image: item.contentUrl, baseUrl: item.source.url));
-      log("thiis is details ${details.map((i) => i.toJson())}");
+      log("thiis is details ${details.first.toJson()}");
       mangaDetail = details.first;
       // await loadChapterDetails(item);
       isLoading = false;
@@ -34,17 +33,16 @@ class MangaDetailProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> loadChapterDetails(ContentItem item) async {
+  Future<void> loadChapterDetails(ContentItem item, Chapter chapter) async {
     ScraperService scraperService = ScraperService(item.source);
     try {
       isLoading = true;
       error = null;
       notifyListeners();
-      // log('chapter id is ${item.}');
-      final details = await scraperService.getChapter(SMA.formatImage(
-          image: item.detailContent!.chapter![0].chapterId!,
-          baseUrl: item.source.url));
-      // log("thiis is chapterImages ${details.first.chapterImages}");
+      log('chapter id is ${chapter.toJson()}');
+      final details = await scraperService.getChapter(
+          SMA.formatImage(image: chapter.chapterId!, baseUrl: item.source.url));
+      log("thiis is chapterImages ${details.first.chapterImagesById!.first.toJson()}");
       chapterDetail = details.first.chapterImagesById;
       isLoading = false;
       notifyListeners();

@@ -307,8 +307,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                                 //       "$chapterCount", chapterNum.toString()),
                                 // );
                                 NH.navigateTo(MangaReaderScreen(
-                                  item: details,
-                                ));
+                                    item: details, chapter: chapter));
                                 // Handle chapter selection
                               },
                               child: Padding(

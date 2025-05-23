@@ -124,21 +124,26 @@ abstract class BaseScraper {
     Element? element,
     Document? document,
   }) async {
-    if (selector == null) return null;
-
+    if (selector!.selector == null) return "";
     try {
       if (selector.customExtraction == true) {
         return await extractCustomValue(selector,
             element: element, document: document);
       }
 
-      final target = document?.querySelector(selector.selector ?? '') ??
-          element?.querySelector(selector.selector ?? '');
-      return selector.attribute != null
-          ? target?.attributes[selector.attribute]?.trim()
-          : target?.text.trim();
+      if (selector.selector == "this") {
+        return selector.attribute != null
+            ? element?.attributes[selector.attribute]?.trim()
+            : element?.text.trim();
+      } else {
+        final target = document?.querySelector(selector.selector ?? '') ??
+            element?.querySelector(selector.selector ?? '');
+        return selector.attribute != null
+            ? target?.attributes[selector.attribute]?.trim()
+            : target?.text.trim();
+      }
     } catch (e) {
-      _logDebug('Error getting attribute from ${selector.selector}: $e');
+      _logDebug('Error getting single attribute from ${selector.selector}: $e');
       return null;
     }
   }
@@ -166,7 +171,8 @@ abstract class BaseScraper {
 
       // return values;
     } catch (e) {
-      _logDebug('Error getting attribute from ${selector.selector}: $e');
+      _logDebug(
+          'Error getting multiple attribute from ${selector.selector}: $e');
       return null;
     }
   }
@@ -196,9 +202,9 @@ abstract class BaseScraper {
     Future<List<T>> Function(List<Element>) parser,
   ) async {
     final document = parse(html);
-    log("selector of main is ${selector!.selector!}");
+    // log("selector of main is ${selector!.toJson()}");
     // log("elements is ${document.querySelectorAll(selector.selector ?? '')}");
-    final elements = document.querySelectorAll(selector.selector ?? '');
+    final elements = document.querySelectorAll(selector!.selector ?? '');
     return elements.isEmpty ? [] : await parser(elements);
   }
 
@@ -238,6 +244,7 @@ abstract class BaseScraper {
   }
 
   Future<ContentItem> _parseContentItem(Element element) async {
+    // log("config is ${source.config!.toJson()}");
     return ContentItem(
       title: await getAttributeValue(source.config!.titleSelector,
               element: element) ??
@@ -267,7 +274,7 @@ abstract class BaseScraper {
       addedAt: DateTime.now(),
       source: source,
       detailContent: DetailModel(
-        discription: await getAttributeValue(source.config!.discriptionSelector,
+        discription: await getAttributeValue(source.config!.descriptionSelector,
                 element: element) ??
             '',
         genre: await getAttributeValue(source.config!.genreSelector,
@@ -285,7 +292,7 @@ abstract class BaseScraper {
                     element: element) ??
                 [])
             .map((c) async {
-          log("chapter for this is ${c} annd ${source.config!.chapterIdSelector!.toJson()} ${source.config!.chapterNameSelector!.toJson()}");
+          // log("chapter for this is ${c} annd ${source.config!.chapterIdSelector!.toJson()} ${source.config!.chapterNameSelector!.toJson()}");
           return Chapter(
             chapterId: await getAttributeValue(source.config!.chapterIdSelector,
                     element: c) ??
@@ -307,14 +314,14 @@ abstract class BaseScraper {
                   element: element) ??
               [])
           .map((c) async {
-        // log("chapter for this is ${c} annd ${source.config!.chapterIdSelector!.toJson()} ${source.config!.chapterNameSelector!.toJson()}");
+        log("chapter for this is ${c} annd ${source.config!.chapterIdSelector!.toJson()} ${source.config!.chapterNameSelector!.toJson()}");
         return Chapter(
           chapterId: await getAttributeValue(
                   source.config!.chapterImagesByIdSelector,
                   element: c) ??
               '',
           chapterName: await getAttributeValue(
-                  source.config!.chapterImagesByIdSelector,
+                  source.config!.chapterTitleByIdSelector,
                   element: c) ??
               '',
           chapterImage: await getAttributeValue(

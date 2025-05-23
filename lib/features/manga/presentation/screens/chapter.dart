@@ -14,7 +14,9 @@ import '../../../../shared/widgets/misc/image.dart';
 
 class MangaReaderScreen extends StatefulWidget {
   final ContentItem item;
-  const MangaReaderScreen({super.key, required this.item});
+  final Chapter chapter;
+  const MangaReaderScreen(
+      {super.key, required this.item, required this.chapter});
 
   @override
   State<MangaReaderScreen> createState() => _MangaReaderScreenState();
@@ -59,7 +61,9 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
     ]);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<MangaDetailProvider>().loadChapterDetails(widget.item);
+      context
+          .read<MangaDetailProvider>()
+          .loadChapterDetails(widget.item, widget.chapter);
       _loadReaderSettings();
       _startAutoScrollTimerIfEnabled();
     });
@@ -344,7 +348,7 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
                       onPressed: () {
                         context
                             .read<MangaDetailProvider>()
-                            .loadChapterDetails(widget.item);
+                            .loadChapterDetails(widget.item, widget.chapter);
                       },
                     ),
                   ],

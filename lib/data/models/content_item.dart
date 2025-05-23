@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'content_source.dart';
 
 class ContentItem {
@@ -90,7 +92,8 @@ class ContentItem {
       'videoUrl': videoUrl,
       'views': views,
       'source': source.toJson(), // Make sure ContentSource has toJson()
-
+      'detailContent': detailContent!.toJson(),
+      'chapterImagesById': chapterImagesById!.map((c) => c.toJson()),
       'scrapedAt': scrapedAt.toIso8601String(),
 
       'addedAt': addedAt.toIso8601String(),
@@ -99,6 +102,7 @@ class ContentItem {
 
   /// Create object from JSON map
   factory ContentItem.fromJson(Map<String, dynamic> json) {
+    // log("jsonjsonjson is $json");
     return ContentItem(
       title: json['title'],
       duration: json['duration'] ?? '0:00',

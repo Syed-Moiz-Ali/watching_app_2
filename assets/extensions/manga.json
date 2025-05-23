@@ -50,10 +50,26 @@
         },
         "chapter_id_selector": {
           "selector": "a",
-          "attribute":"href"
+          "attribute": "href"
         }
-
-       
+      },
+      "chapter_by_id_selectors": {
+        "main_selector": {
+          "selector": " .manga-body > .read-manga > .read-content > img",
+          "attribute": ""
+        },
+        "image_selector": {
+          "selector": "this",
+          "attribute": "data-src"
+        },
+        "title_selector": {
+          "selector": "this",
+          "attribute": "alt"
+        },
+        "id_selector": {
+          "selector": "this",
+          "attribute": "data-src"
+        }
       },
 
       "content_selector": {
