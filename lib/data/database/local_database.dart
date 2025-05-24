@@ -108,14 +108,17 @@ class LocalDatabase {
     // Store content source and get its ID
     final sourceId = await _storeContentSource(item.source);
 
-    final favoriteData = {
-      COLUMN_DATA: jsonEncode(item.toJson()),
-      COLUMN_CONTENT_TYPE: contentType,
-      COLUMN_CONTENT_URL: item.contentUrl,
-      COLUMN_ADDED_AT: DateTime.now().toIso8601String(),
-    };
-
-    return await db.insert(FAVORITES_TABLE, favoriteData);
+    try {
+      final favoriteData = {
+        COLUMN_DATA: jsonEncode(item.toJson()),
+        COLUMN_CONTENT_TYPE: contentType,
+        COLUMN_CONTENT_URL: item.contentUrl,
+        COLUMN_ADDED_AT: DateTime.now().toIso8601String(),
+      };
+      return await db.insert(FAVORITES_TABLE, favoriteData);
+    } catch (e) {
+      throw Exception('Failed to serialize ContentItem: $e');
+    }
   }
 
   /// Store content source and return its ID

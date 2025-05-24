@@ -325,6 +325,79 @@
     "enabled": true
   },
   {
+    "url": "https://hdpornpics.xxx/",
+    "type": "3",
+    "NSFW": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isPreview": "0",
+    "name": "hdpornpics",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "searchUrl": "https://hdpornpics.xxx/search/{search}/{page}/",
+    "icon": "https://px.hdpornpics.xxx/images/logo.svg",
+    "query": {
+      "newest": "recent/{page}/",
+      "popular": "popular/{page}/"
+    },
+    "config": {
+      "title_selector": {
+        "selector": "a",
+        "attribute": "title"
+      },
+      "thumbnail_selector": {
+        "selector": "a > picture > img",
+        "attribute": "data-src"
+      },
+      "content_url_selector": {
+        "selector": "a",
+        "attribute": "href"
+      },
+
+      "content_selector": {
+        "selector": ".wormanka > .rosgorda > .removsko"
+      }
+    },
+    "enabled": true
+  },
+  {
+    "url": "https://www.pornpictureshq.com/",
+    "type": "3",
+    "NSFW": "1",
+    "getType": "1",
+    "decodeType": "1",
+    "isPreview": "0",
+    "name": "pornpictureshq",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "searchUrl": "https://www.pornpictureshq.com/block/thumbs/search?q={search}&page={page}",
+    "icon": "https://www.pornpictureshq.com/favicon.ico",
+    "query": {
+      "newest": "block/thumbs/galleries?order=date&page={page}",
+      "home": "block/thumbs/categories?page={page}",
+      "popular": "block/thumbs/galleries?page={page}"
+    },
+    "config": {
+      "title_selector": {
+        "selector": "a > img",
+        "attribute": "alt"
+      },
+      "thumbnail_selector": {
+        "selector": " a > img",
+        "attribute": "data-src"
+      },
+      "content_url_selector": {
+        "selector": " a",
+        "attribute": "href"
+      },
+
+      "content_selector": {
+        "selector": "body > .thumb"
+      }
+    },
+    "enabled": true
+  },
+  {
     "url": "https://www.pornpics.com/",
     "type": "3",
     "NSFW": "1",
@@ -400,7 +473,7 @@
   {
     "url": "https://wallpapercat.com/",
     "type": "3",
-    
+
     "NSFW": "0",
     "getType": "2",
     "decodeType": "2",
@@ -409,19 +482,19 @@
     "pageType": "mpage/",
     "isEmbed": "0",
     "icon": "https://wallpapercat.com/favicon.ico?id=8",
-    
+
     "query": {
-     
       "trending": "api/images/{page}/60/vertical?category_id=0&variant=main_top&view_variant=1",
       "resolution": "api/images/{page}/60/vertical?variant=main_top&view_variant=0&sort_by=resolution"
-    }, "config": {
+    },
+    "config": {
       "title_selector": {
         "selector": "._thumb > img",
         "attribute": "alt"
       },
       "thumbnail_selector": {
         "selector": "._thumb > img",
-        "attribute":"data-srcset"
+        "attribute": "data-srcset"
       },
       "content_url_selector": {
         "selector": "a",

@@ -14,34 +14,34 @@
 //               attribute: 'title', // Extract title from 'title' attribute
 //             ),
 //             thumbnailSelector: ElementSelector(
-//                 // customExtraction: (Element element) {
-//                 //   var srcset = element
-//                 //       .querySelector('.col-md-2 > .tab-thumb > a > img')
-//                 //       ?.attributes['srcset'];
+//                 customExtraction: (Element element) {
+//                   var srcset = element
+//                       .querySelector('.col-md-2 > .tab-thumb > a > img')
+//                       ?.attributes['srcset'];
 
-//                 //   var imageUrl = '';
-//                 //   if (srcset != null) {
-//                 //     // Split the srcset attribute by comma to get individual sources
-//                 //     var sources = srcset.split(', ');
-//                 //     if (sources.isNotEmpty) {
-//                 //       // Get the first source
-//                 //       var firstSource = sources.first;
-//                 //       // Split the first source by space to get the URL and size
-//                 //       var parts = firstSource.split(' ');
-//                 //       if (parts.length >= 2) {
-//                 //         // The URL is the first part
-//                 //         imageUrl = parts[0];
-//                 //       }
-//                 //     }
-//                 //   } else {
-//                 //     imageUrl = element
-//                 //             .querySelector('figure > a > img')
-//                 //             ?.attributes['data-src'] ??
-//                 //         '';
-//                 //   }
-//                 //   // log('image is $imageUrl');
-//                 //   return Future.value(imageUrl.trim());
-//                 // },
+//                   var imageUrl = '';
+//                   if (srcset != null) {
+//                     // Split the srcset attribute by comma to get individual sources
+//                     var sources = srcset.split(', ');
+//                     if (sources.isNotEmpty) {
+//                       // Get the first source
+//                       var firstSource = sources.first;
+//                       // Split the first source by space to get the URL and size
+//                       var parts = firstSource.split(' ');
+//                       if (parts.length >= 2) {
+//                         // The URL is the first part
+//                         imageUrl = parts[0];
+//                       }
+//                     }
+//                   } else {
+//                     imageUrl = element
+//                             .querySelector('figure > a > img')
+//                             ?.attributes['data-src'] ??
+//                         '';
+//                   }
+//                   // log('image is $imageUrl');
+//                   return Future.value(imageUrl.trim());
+//                 },
 //                 ),
 //             contentUrlSelector: ElementSelector(
 //               selector: '.col-md-2 > .tab-thumb > a',

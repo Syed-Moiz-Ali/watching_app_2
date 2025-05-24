@@ -622,7 +622,6 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
               fontWeight: FontWeight.w600,
               letterSpacing: -0.5,
               maxLine: 2,
-              overflow: TextOverflow.ellipsis,
             ),
             if (widget.item.source.name.isNotEmpty)
               Padding(

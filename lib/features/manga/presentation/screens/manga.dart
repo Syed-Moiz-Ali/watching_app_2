@@ -11,7 +11,7 @@ import '../../../../shared/widgets/buttons/floating_action_button.dart';
 import '../../../../shared/widgets/loading/pagination_indicator.dart';
 import '../../../../shared/widgets/misc/text_widget.dart';
 import '../../../wallpapers/presentation/widgets/wallpaper_grid_view.dart';
-import 'manga_detail.dart';
+import 'manga_detail/manga_detail.dart';
 
 class Manga extends StatefulWidget {
   final ContentSource source;

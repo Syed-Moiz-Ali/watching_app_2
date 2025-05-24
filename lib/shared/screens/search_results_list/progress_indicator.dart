@@ -655,7 +655,6 @@ class _RealtimeProgressIndicatorState extends State<RealtimeProgressIndicator>
                         return TextWidget(
                           text: name,
                           textAlign: TextAlign.center,
-                          overflow: TextOverflow.ellipsis,
                           color: textColor,
                         );
                       },

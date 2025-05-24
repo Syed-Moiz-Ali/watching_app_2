@@ -371,7 +371,6 @@ class _PremiumCategoryDetailScreenState
           child: TextWidget(
             text: content,
             fontSize: 16.sp,
-            height: 1.6,
             color: Colors.white.withOpacity(0.9),
           ),
         ),

@@ -612,7 +612,6 @@ class _CustomAppBarState extends State<CustomAppBar>
       child: Material(
         color: Colors.transparent,
         child: TextWidget(
-          overflow: TextOverflow.ellipsis,
           text: widget.title,
           styleType: widget.styleType ?? TextStyleType.heading2,
           textAlign: widget.centerTitle ? TextAlign.center : TextAlign.start,

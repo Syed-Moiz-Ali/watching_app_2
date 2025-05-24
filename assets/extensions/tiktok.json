@@ -24,8 +24,6 @@
       "content_url_selector": {
         "selector": "video_id"
       },
-      
-
 
       "video_selector": {
         "selector": "mp4_url"
@@ -35,7 +33,7 @@
         "selector": "data"
       }
     },
-    
+
     "enabled": true
   },
 
@@ -56,7 +54,6 @@
     "config": {
       "title_selector": {
         "selector": "post.text"
-       
       },
       "thumbnail_selector": {
         "selector": "post.media.0.thumb_url "
@@ -65,8 +62,6 @@
         "selector": "post.id",
         "attribute": "href"
       },
-   
-    
 
       "video_selector": {
         "selector": "post.media.0.url"
@@ -74,6 +69,42 @@
 
       "content_selector": {
         "selector": "list"
+      }
+    },
+    "enabled": true
+  },
+  {
+    "url": "https://xxtok.com/api/tenPosts",
+    "type": "2",
+    "NSFW": "1",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "cdn": "https://cdn.xxtok.com/",
+    "name": "xxtok",
+    "icon": "https://xxtok.com/apple-icon.png?67073a7e60684978",
+    "pageType": "page=",
+    "query": {
+      "recent": ""
+    },
+    "config": {
+      "title_selector": {
+        "selector": "title"
+      },
+      "thumbnail_selector": {
+        "selector": "thumbnail"
+      },
+      "content_url_selector": {
+        "selector": "src"
+      },
+
+      "video_selector": {
+        "selector": "file"
+      },
+
+      "content_selector": {
+        "selector": "data"
       }
     },
     "enabled": true
@@ -102,7 +133,7 @@
       "content_url_selector": {
         "selector": "id"
       },
-      
+
       "video_selector": {
         "selector": "video_url"
       },

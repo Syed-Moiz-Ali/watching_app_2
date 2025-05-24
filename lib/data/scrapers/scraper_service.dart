@@ -26,7 +26,7 @@ class ScraperService {
     return scraper.getDetails(url);
   }
 
-  Future<List<ContentItem>> getChapter(String url) {
+  Future<List<Chapter>> getChapter(String url) {
     return scraper.getChapter(url);
   }
 

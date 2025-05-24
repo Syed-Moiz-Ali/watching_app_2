@@ -422,7 +422,6 @@ class _VideoCardState extends State<VideoCard>
                   // color: AppColors.backgroundColorDark,
                   fontWeight: FontWeight.w700,
                   maxLine: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: widget.isGrid ? 12 : 16),
                 Wrap(

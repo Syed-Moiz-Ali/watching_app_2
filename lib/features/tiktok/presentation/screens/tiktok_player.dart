@@ -92,17 +92,19 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
     _shareCount = (200 + DateTime.now().second * 5);
 
     // Initialize video controller
-    _controller =
-        VideoPlayerController.networkUrl(Uri.parse(widget.item.videoUrl ?? ''))
-          ..initialize().then((_) {
-            setState(() {
-              _isVideoLoaded = true;
-              _controller.play();
-              _animationController.forward();
-              _startProgressListener();
-            });
-          })
-          ..setLooping(true);
+    _controller = VideoPlayerController.networkUrl(Uri.parse(
+        widget.item.source.cdn != null
+            ? widget.item.source.cdn! + widget.item.videoUrl!
+            : widget.item.videoUrl ?? ''))
+      ..initialize().then((_) {
+        setState(() {
+          _isVideoLoaded = true;
+          _controller.play();
+          _animationController.forward();
+          _startProgressListener();
+        });
+      })
+      ..setLooping(true);
 
     _controller.addListener(() {
       if (!_controller.value.isInitialized) return;
@@ -232,9 +234,13 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
                       opacity: _controller.value.isInitialized ? 1.0 : 0.0,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(16),
-                        child: AspectRatio(
-                          aspectRatio: _controller.value.aspectRatio,
-                          child: VideoPlayer(_controller),
+                        child: FittedBox(
+                          fit: BoxFit.cover,
+                          child: SizedBox(
+                            width: _controller.value.size.width,
+                            height: _controller.value.size.height,
+                            child: VideoPlayer(_controller),
+                          ),
                         ),
                       ),
                     ),
@@ -478,7 +484,9 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
         ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: ImageWidget(
-            imagePath: widget.item.thumbnailUrl,
+            imagePath: widget.item.source.cdn != null
+                ? widget.item.source.cdn! + widget.item.thumbnailUrl
+                : widget.item.thumbnailUrl,
             fit: BoxFit.cover,
           ),
         ),

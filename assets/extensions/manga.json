@@ -97,6 +97,70 @@
       "most viewes": "mangalist/page/{page}/?m_orderby=views",
       "new manga": "mangalist/page/{page}/?m_orderby=new-manga"
     },
+    "config": {
+      "title_selector": {
+        "selector": ".col-md-2 > .tab-thumb > a",
+        "attribute": "title"
+      },
+      "thumbnail_selector": {
+        "selector": ".col-md-2 > .tab-thumb > a > img",
+        "attribute": "src"
+      },
+      "content_url_selector": {
+        "selector": ".col-md-2 > .tab-thumb > a",
+        "attribute": "href"
+      },
+      "detail_selector": {
+        "selector": "html"
+      },
+      "detail": {
+        "discription_selector": {
+          "selector": "meta[name='description']",
+          "attribute": "content"
+        },
+        "genre_selector": {
+          "selector": ".post-status > .post-content_item:last-child > .summary-content"
+        },
+        "status_selector": {
+          "selector": ".post-status > .post-content_item:last-child > .summary-content"
+        },
+        "chapter_name_selector": {
+          "selector": "a"
+        },
+        "chapter_image_selector": {
+          "selector": ""
+        },
+        "chapters_selector": {
+          "selector": "#chapterlist > .row-content-chapter > li"
+        },
+        "chapter_id_selector": {
+          "selector": "a",
+          "attribute": "href"
+        }
+      },
+      "chapter_by_id_selectors": {
+        "main_selector": {
+          "selector": " .manga-body > .read-manga > .read-content > img",
+          "attribute": ""
+        },
+        "image_selector": {
+          "selector": "this",
+          "attribute": "data-src"
+        },
+        "title_selector": {
+          "selector": "this",
+          "attribute": "alt"
+        },
+        "id_selector": {
+          "selector": "this",
+          "attribute": "data-src"
+        }
+      },
+
+      "content_selector": {
+        "selector": ".tab-content-wrap > .c-tabs-item > .page-content-listin"
+      }
+    },
     "enabled": true
   }
 ]

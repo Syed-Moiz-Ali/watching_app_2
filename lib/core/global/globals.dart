@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/models/content_item.dart';
+import '../constants/colors.dart';
 import '../services/logger.dart';
 import '../services/service_locator.dart';
 
@@ -37,5 +39,23 @@ class SMA {
         .where(
             (e) => [e.title, e.thumbnailUrl, e.contentUrl, e.time].contains(''))
         .isNotEmpty;
+  }
+
+  static baseTextStyle(
+      {double? fontSize = 16.0,
+      Color? color = AppColors.backgroundColorDark,
+      FontWeight? fontWeight = FontWeight.w500,
+      TextDecoration? decoration = TextDecoration.none,
+      double? letterSpacing = 0.0,
+      List<Shadow>? shadows}) {
+    TextStyle baseStyle = GoogleFonts.urbanist(
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      color: color,
+      decoration: decoration,
+      letterSpacing: letterSpacing,
+      shadows: shadows,
+    );
+    return baseStyle;
   }
 }

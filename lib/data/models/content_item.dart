@@ -91,47 +91,48 @@ class ContentItem {
       'contentUrl': contentUrl,
       'videoUrl': videoUrl,
       'views': views,
-      'source': source.toJson(), // Make sure ContentSource has toJson()
-      'detailContent': detailContent!.toJson(),
-      'chapterImagesById': chapterImagesById!.map((c) => c.toJson()),
+      'source': source.toJson(),
+      'detailContent': detailContent?.toJson(), // Handle null case
+      'chapterImagesById':
+          chapterImagesById?.map((c) => c.toJson()).toList(), // Convert to List
       'scrapedAt': scrapedAt.toIso8601String(),
-
       'addedAt': addedAt.toIso8601String(),
     };
   }
 
   /// Create object from JSON map
   factory ContentItem.fromJson(Map<String, dynamic> json) {
-    // log("jsonjsonjson is $json");
     return ContentItem(
-      title: json['title'],
-      duration: json['duration'] ?? '0:00',
-      preview: json['preview'] ?? '',
-      quality: json['quality'] ?? 'HD',
-      time: json['time'] ?? '0:00',
-      thumbnailUrl: json['thumbnailUrl'],
-      contentUrl: json['contentUrl'],
-      videoUrl: json['videoUrl'] ?? '',
-      views: json['views'] ?? '0',
-      source: ContentSource.fromJson(json['source']), // Requires fromJson()
-      detailContent: DetailModel.fromJson(
-          json['detailContent'] ?? {}), // Requires fromJson()
-      chapterImagesById: List<Chapter>.from(json['chapterImagesById'])
-          .map((c) => c)
-          .toList(), // Requires fromJson()
-      scrapedAt: DateTime.parse(json['scrapedAt']),
-
-      addedAt: DateTime.parse(json['addedAt']),
+      title: json['title'] as String,
+      duration: json['duration'] as String? ?? '0:00',
+      preview: json['preview'] as String? ?? '',
+      quality: json['quality'] as String? ?? 'HD',
+      time: json['time'] as String? ?? '0:00',
+      thumbnailUrl: json['thumbnailUrl'] as String,
+      contentUrl: json['contentUrl'] as String,
+      videoUrl: json['videoUrl'] as String? ?? '',
+      views: json['views'] as String? ?? '0',
+      source: ContentSource.fromJson(json['source'] as Map<String, dynamic>),
+      detailContent: json['detailContent'] != null
+          ? DetailModel.fromJson(json['detailContent'] as Map<String, dynamic>)
+          : null,
+      chapterImagesById: json['chapterImagesById'] != null
+          ? (json['chapterImagesById'] as List<dynamic>)
+              .map((c) => Chapter.fromJson(c as Map<String, dynamic>))
+              .toList()
+          : null,
+      scrapedAt: DateTime.parse(json['scrapedAt'] as String),
+      addedAt: DateTime.parse(json['addedAt'] as String),
     );
   }
 }
 
 class DetailModel {
   DetailModel({
-    required this.discription,
-    required this.genre,
-    required this.status,
-    required this.chapterSelector,
+    this.discription,
+    this.genre,
+    this.status,
+    this.chapterSelector,
     this.chapter,
   });
 
@@ -143,23 +144,24 @@ class DetailModel {
 
   factory DetailModel.fromJson(Map<String, dynamic> json) {
     return DetailModel(
-      discription: json["discription"],
-      genre: json["genre"],
-      status: json["status"],
-      chapterSelector: json["chapterSelector"],
-      chapter: json["chapter"] == null
-          ? []
-          : List<Chapter>.from(
-              json["chapter"]!.map((x) => Chapter.fromJson(x))),
+      discription: json['discription'] as String?,
+      genre: json['genre'] as String?,
+      status: json['status'] as String?,
+      chapterSelector: json['chapterSelector'] as String?,
+      chapter: json['chapter'] == null
+          ? null
+          : (json['chapter'] as List<dynamic>)
+              .map((x) => Chapter.fromJson(x as Map<String, dynamic>))
+              .toList(),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        "discription": discription,
-        "genre": genre,
-        "status": status,
-        "chapterSelector": chapterSelector,
-        "chapter": chapter!.map((x) => x.toJson()).toList(),
+        'discription': discription,
+        'genre': genre,
+        'status': status,
+        'chapterSelector': chapterSelector,
+        'chapter': chapter?.map((x) => x.toJson()).toList(),
       };
 }
 
@@ -167,24 +169,30 @@ class Chapter {
   Chapter({
     required this.chapterId,
     required this.chapterName,
+    this.source,
     required this.chapterImage,
   });
 
   final String? chapterId;
   final String? chapterName;
+  ContentSource? source;
   final String? chapterImage;
 
   factory Chapter.fromJson(Map<String, dynamic> json) {
     return Chapter(
-      chapterId: json["chapterId"],
-      chapterName: json["chapterName"],
-      chapterImage: json["chapterImage"],
+      chapterId: json['chapterId'] as String?,
+      chapterName: json['chapterName'] as String?,
+      source: json['source'] != null
+          ? ContentSource.fromJson(json['source'] as Map<String, dynamic>)
+          : null,
+      chapterImage: json['chapterImage'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        "chapterId": chapterId,
-        "chapterName": chapterName,
-        "chapterImage": chapterImage,
+        'chapterId': chapterId,
+        'chapterName': chapterName,
+        'source': source?.toJson(),
+        'chapterImage': chapterImage,
       };
 }

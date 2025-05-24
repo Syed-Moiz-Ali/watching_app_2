@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:watching_app_2/core/navigation/routes.dart';
 
@@ -79,6 +81,7 @@ class _WallpapersState extends State<Wallpapers> {
     try {
       final newWallpapers =
           await scraperService.getContent(_currentQuery, _currentPage);
+      log("newWallpapers is ${newWallpapers.map((w) => w.toJson())}");
       setState(() {
         wallpapers = newWallpapers.where((item) {
           return item.thumbnailUrl.toString().trim().isNotEmpty &&

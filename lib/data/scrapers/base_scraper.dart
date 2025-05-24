@@ -30,15 +30,20 @@ abstract class BaseScraper {
   Future<List<ContentItem>> scrapeDetailContent(String data) =>
       _scrapeHtml(data, source.config!.detailSelector, parseElements);
 
-  Future<List<ContentItem>> scrapeChapterContent(String data) => _scrapeHtml(
-      data, source.config!.chapterImagesByIdSelectionSelector, parseElements);
+  Future<List<Chapter>> scrapeChapterContent(String data) async {
+    if (source.config!.chapterImagesByIdSelectionSelector == null) return [];
+    final document = parse(data);
+    final elements = document.querySelectorAll(
+        source.config!.chapterImagesByIdSelectionSelector.selector ?? '');
+    return elements.isNotEmpty ? chapterParseElement(document, elements) : [];
+  }
 
   Future<List<VideoSource>> scrapeVideos(String data) async {
-    log("this is videoSelector and ${source.config!.videoSelector!.selector}");
+    // log("this is videoSelector and ${source.config!.videoSelector!.selector}");
     if (source.config!.videoSelector == null) return [];
     final document = parse(data);
     final elements =
-        document.querySelectorAll(source.config!.videoSelector!.selector ?? '');
+        document.querySelectorAll(source.config!.videoSelector.selector ?? '');
     return elements.isNotEmpty
         ? videoParseElement(document, elements.first)
         : [];
@@ -72,7 +77,7 @@ abstract class BaseScraper {
   Future<List<ContentItem>> getDetails(String url) =>
       _fetchAndScrape(url, scrapeDetailContent);
 
-  Future<List<ContentItem>> getChapter(String url) =>
+  Future<List<Chapter>> getChapter(String url) =>
       _fetchAndScrape(url, scrapeChapterContent);
 
   Future<List<VideoSource>> getVideos(String url) =>
@@ -118,15 +123,30 @@ abstract class BaseScraper {
     }
   }
 
+  Future<List<Chapter>> chapterParseElement(
+      Document document, List<Element> elements) async {
+    List<Chapter> chaps = [];
+    try {
+      for (var element in elements) {
+        chaps.add(await _chapterParse(document, element));
+      }
+      return chaps;
+    } catch (e) {
+      _logError('Error parsing video element: $e');
+      return [];
+    }
+  }
+
   // Utility Methods
   Future<String?> getAttributeValue(
     ElementSelector? selector, {
     Element? element,
     Document? document,
   }) async {
-    if (selector!.selector == null) return "";
+    // log('selector is ${selector!.selector}');
+    // if (selector!.selector == null) return "";
     try {
-      if (selector.customExtraction == true) {
+      if (selector!.customExtraction == true) {
         return await extractCustomValue(selector,
             element: element, document: document);
       }
@@ -135,15 +155,16 @@ abstract class BaseScraper {
         return selector.attribute != null
             ? element?.attributes[selector.attribute]?.trim()
             : element?.text.trim();
-      } else {
-        final target = document?.querySelector(selector.selector ?? '') ??
-            element?.querySelector(selector.selector ?? '');
-        return selector.attribute != null
-            ? target?.attributes[selector.attribute]?.trim()
-            : target?.text.trim();
       }
+      final target = document?.querySelector(selector.selector ?? '') ??
+          element?.querySelector(selector.selector ?? '');
+      // log("target is ${target!.outerHtml}");
+      return selector.attribute != null
+          ? target?.attributes[selector.attribute]?.trim()
+          : target?.text.trim();
     } catch (e) {
-      _logDebug('Error getting single attribute from ${selector.selector}: $e');
+      _logDebug(
+          'Error getting single attribute from ${selector!.selector}: $e');
       return null;
     }
   }
@@ -153,7 +174,7 @@ abstract class BaseScraper {
     Element? element,
     Document? document,
   }) async {
-    if (selector == null) return null;
+    if (selector!.selector == null) return [];
 
     try {
       // if (selector.customExtraction == true) {
@@ -161,9 +182,10 @@ abstract class BaseScraper {
       //       element: element, document: document);
       // }
 
-      final targets = document?.querySelectorAll(selector.selector ?? '') ??
-          element?.querySelectorAll(selector.selector ?? '');
-      if (targets!.isEmpty) return null;
+      final selectorStr = selector.selector!;
+      final targets = document?.querySelectorAll(selectorStr) ??
+          element?.querySelectorAll(selectorStr);
+      if (targets == null || targets.isEmpty) return null;
       return targets;
       // final values = targets.map((target) => selector.attribute != null
       //     ? target.attributes[selector.attribute]?.trim()
@@ -172,7 +194,7 @@ abstract class BaseScraper {
       // return values;
     } catch (e) {
       _logDebug(
-          'Error getting multiple attribute from ${selector.selector}: $e');
+          'Error getting multiple attribute from ${selector?.selector ?? 'unknown'}: $e');
       return null;
     }
   }
@@ -214,7 +236,8 @@ abstract class BaseScraper {
     Future<List<T>> Function(List) parser,
   ) async {
     try {
-      Map jsonData = jsonDecode(jsonString);
+      var decoded = jsonDecode(jsonString);
+      Map jsonData = decoded is List ? {'data': decoded} : decoded;
       // log("jsonData is $jsonData");
       final elements = _extractJsonElements(jsonData, selector?.selector ?? '');
       return elements.isEmpty ? [] : await parser(elements);
@@ -244,7 +267,7 @@ abstract class BaseScraper {
   }
 
   Future<ContentItem> _parseContentItem(Element element) async {
-    // log("config is ${source.config!.toJson()}");
+    // log("config is ${element.outerHtml}");
     return ContentItem(
       title: await getAttributeValue(source.config!.titleSelector,
               element: element) ??
@@ -287,49 +310,55 @@ abstract class BaseScraper {
         status: await getAttributeValue(source.config!.statusSelector,
                 element: element) ??
             '',
-        chapter: await Future.wait((await getMultipleAttributeValue(
-                    source.config!.chaptersSelector,
-                    element: element) ??
-                [])
-            .map((c) async {
-          // log("chapter for this is ${c} annd ${source.config!.chapterIdSelector!.toJson()} ${source.config!.chapterNameSelector!.toJson()}");
-          return Chapter(
-            chapterId: await getAttributeValue(source.config!.chapterIdSelector,
-                    element: c) ??
-                '',
-            chapterName: await getAttributeValue(
-                    source.config!.chapterNameSelector,
-                    element: c) ??
-                '',
-            chapterImage: await getAttributeValue(
-                    source.config!.chapterImageSelector,
-                    element: c) ??
-                '',
-          );
-        })),
+        chapter: source.config!.chaptersSelector.selector == null
+            ? []
+            : await Future.wait((await getMultipleAttributeValue(
+                        source.config!.chaptersSelector,
+                        element: element) ??
+                    [])
+                .map((c) async {
+                // log("chapter for this is ${c} annd ${source.config!.chapterIdSelector!.toJson()} ${source.config!.chapterNameSelector!.toJson()}");
+                return Chapter(
+                  chapterId: await getAttributeValue(
+                          source.config!.chapterIdSelector,
+                          element: c) ??
+                      '',
+                  chapterName: await getAttributeValue(
+                          source.config!.chapterNameSelector,
+                          element: c) ??
+                      '',
+                  chapterImage: await getAttributeValue(
+                          source.config!.chapterImageSelector,
+                          element: c) ??
+                      '',
+                );
+              })),
         // chapter:
       ),
-      chapterImagesById: await Future.wait((await getMultipleAttributeValue(
-                  source.config!.chapterImagesByIdSelectionSelector,
-                  element: element) ??
-              [])
-          .map((c) async {
-        log("chapter for this is ${c} annd ${source.config!.chapterIdSelector!.toJson()} ${source.config!.chapterNameSelector!.toJson()}");
-        return Chapter(
-          chapterId: await getAttributeValue(
-                  source.config!.chapterImagesByIdSelector,
-                  element: c) ??
-              '',
-          chapterName: await getAttributeValue(
-                  source.config!.chapterTitleByIdSelector,
-                  element: c) ??
-              '',
-          chapterImage: await getAttributeValue(
-                  source.config!.chapterImagesByIdSelector,
-                  element: c) ??
-              '',
-        );
-      })),
+      chapterImagesById:
+          source.config!.chapterImagesByIdSelectionSelector.selector == null
+              ? []
+              : await Future.wait((await getMultipleAttributeValue(
+                          source.config!.chapterImagesByIdSelectionSelector,
+                          element: element) ??
+                      [])
+                  .map((c) async {
+                  // log("chapter for this is ${c} annd ${source.config!.chapterIdSelector!.toJson()} ${source.config!.chapterNameSelector!.toJson()}");
+                  return Chapter(
+                    chapterId: await getAttributeValue(
+                            source.config!.chapterImagesByIdSelector,
+                            element: c) ??
+                        '',
+                    chapterName: await getAttributeValue(
+                            source.config!.chapterTitleByIdSelector,
+                            element: c) ??
+                        '',
+                    chapterImage: await getAttributeValue(
+                            source.config!.chapterImagesByIdSelector,
+                            element: c) ??
+                        '',
+                  );
+                })),
     );
   }
 
@@ -345,7 +374,7 @@ abstract class BaseScraper {
               source.config!.contentUrlSelector.selector!.split('.')) ??
           'Unknown',
       videoUrl: await _extractNestedValue(
-              element, source.config!.videoSelector!.selector!.split('.')) ??
+              element, source.config!.videoSelector.selector!.split('.')) ??
           'Unknown',
       scrapedAt: DateTime.now(),
       addedAt: DateTime.now(),
@@ -383,6 +412,25 @@ abstract class BaseScraper {
           '',
       keywords: await getAttributeValue(source.config!.keywordsSelector,
               document: document) ??
+          '',
+    );
+  }
+
+  Future<Chapter> _chapterParse(Document document, Element element) async {
+    return Chapter(
+      // scrapedAt: DateTime.now(),
+      source: source,
+      chapterId: await getAttributeValue(
+              source.config!.chapterImagesByIdSelector,
+              element: element) ??
+          '',
+      chapterImage: await getAttributeValue(
+              source.config!.chapterImagesByIdSelector,
+              element: element) ??
+          '',
+      chapterName: await getAttributeValue(
+              source.config!.chapterTitleByIdSelector,
+              element: element) ??
           '',
     );
   }

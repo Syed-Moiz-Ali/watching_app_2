@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
@@ -247,6 +249,7 @@ class FavoriteButtonState extends State<FavoriteButton>
   }
 
   void _showErrorSnackbar(String errorMessage) {
+    log("errorMessage is ${errorMessage}");
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Error updating favorites: $errorMessage'),

@@ -42,8 +42,8 @@ class MangaDetailProvider extends ChangeNotifier {
       log('chapter id is ${chapter.toJson()}');
       final details = await scraperService.getChapter(
           SMA.formatImage(image: chapter.chapterId!, baseUrl: item.source.url));
-      log("thiis is chapterImages ${details.first.chapterImagesById!.first.toJson()}");
-      chapterDetail = details.first.chapterImagesById;
+      log("thiis is chapterImages ${details.map((c) => c.toJson())}");
+      chapterDetail = details;
       isLoading = false;
       notifyListeners();
     } catch (e) {

@@ -235,7 +235,6 @@ class _SimilarContentCardState extends State<SimilarContentCard>
 
                           // ),
                           maxLine: 3,
-                          overflow: TextOverflow.ellipsis,
                         ),
 
                         // Source & Time

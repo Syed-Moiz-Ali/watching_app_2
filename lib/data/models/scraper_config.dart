@@ -29,8 +29,7 @@ class ElementSelector {
       };
 
   // Create an empty selector
-  static const ElementSelector empty =
-      ElementSelector(selector: '', attribute: '', customExtraction: false);
+  static const ElementSelector empty = ElementSelector();
 }
 
 // Configuration for web scraping
