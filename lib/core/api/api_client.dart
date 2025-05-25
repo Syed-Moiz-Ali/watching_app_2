@@ -7,6 +7,7 @@ class ApiClient {
   static Future<dynamic> request({
     required String url,
     Map<String, dynamic> body = const {},
+    Map<String, dynamic> headerParams = const {},
     Map<String, dynamic>? queryParams,
     String type = 'GET',
     Duration timeoutDuration =
@@ -18,6 +19,7 @@ class ApiClient {
 
     Map<String, String> headers = {
       "Content-Type": "application/json",
+      ...headerParams
     };
 
     SMA.logger.logInfo(

@@ -13,6 +13,8 @@ class ContentSource {
   final String icon;
   final String pageType;
   final String? cdn;
+  final Map? body;
+  final Map? header;
   final String pageIncriment;
   final Map<String, String> query;
   final ScraperConfig? config;
@@ -32,6 +34,8 @@ class ContentSource {
     required this.pageType,
     this.pageIncriment = '',
     this.cdn = '',
+    this.body = const {},
+    this.header = const {},
     required this.query,
     this.config,
     this.enabled,
@@ -51,6 +55,8 @@ class ContentSource {
       icon: json['icon'] ?? '',
       pageType: json['pageType'] ?? '',
       cdn: json['cdn'] ?? '',
+      body: json['body'] ?? {},
+      header: json['header'] ?? {},
       pageIncriment: json['pageIncriment'] ?? '',
       query: Map<String, String>.from(json['query'] ?? {}),
       config: json['config'] == null
@@ -75,6 +81,8 @@ class ContentSource {
       'pageType': pageType,
       'pageIncriment': pageIncriment,
       'cdn': cdn,
+      'body': body,
+      'header': header,
       'query': query,
       'config': config?.toJson(),
       'enabled': enabled,

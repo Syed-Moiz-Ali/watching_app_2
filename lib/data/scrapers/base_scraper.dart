@@ -21,7 +21,9 @@ abstract class BaseScraper {
 
   // Content Scraping Methods
   Future<List<ContentItem>> scrapeContent(String data) =>
-      _scrapeHtml(data, source.config!.contentSelector, parseElements);
+      source.decodeType == '2'
+          ? _scrapeJson(data, source.config!.contentSelector, parseJsonElements)
+          : _scrapeHtml(data, source.config!.contentSelector, parseElements);
   Future<List<ContentItem>> scrapeTikTokContent(String data) =>
       source.decodeType == '2'
           ? _scrapeJson(data, source.config!.contentSelector, parseJsonElements)
@@ -53,7 +55,7 @@ abstract class BaseScraper {
     final provider = _getSimilarContentProvider();
     await provider.setSimilarContents([]);
 
-    if (source.config!.similarContentSelector?.selector?.isEmpty ?? true) {
+    if (source.config!.similarContentSelector.selector?.isEmpty ?? true) {
       return [];
     }
 
@@ -101,11 +103,15 @@ abstract class BaseScraper {
   }
 
   Future<List<ContentItem>> parseJsonElements(List elements) async {
+    // log("elements is ${elements}");
     final items = <ContentItem>[];
-    log("elements is $elements");
     try {
       for (var element in elements) {
-        items.add(await _parseTiTokContentItem(element));
+        // log("eelement is $element");
+        log("element is ${element is Map} and lenght is ${elements.length}");
+
+        var item = await _parseTiTokContentItem(element);
+        items.add(item);
       }
     } catch (e) {
       _logError('Error parsing json element: $e');
@@ -194,7 +200,7 @@ abstract class BaseScraper {
       // return values;
     } catch (e) {
       _logDebug(
-          'Error getting multiple attribute from ${selector?.selector ?? 'unknown'}: $e');
+          'Error getting multiple attribute from ${selector.selector ?? 'unknown'}: $e');
       return null;
     }
   }
@@ -210,7 +216,11 @@ abstract class BaseScraper {
   Future<T> _fetchAndScrape<T>(
       String url, Future<T> Function(String) scraper) async {
     try {
-      final response = await ApiClient.request(url: url);
+      final response = await ApiClient.request(
+          url: url,
+          type: source.getType.toString() == '2' ? "POST" : "GET",
+          headerParams: Map<String, dynamic>.from(source.header ?? {}));
+      // log("response is $url source.getType is ${source.getType} and header is ${source.header} and response is $response");
       return await scraper(response);
     } catch (e) {
       _logError('Error fetching data from $url: $e');
@@ -363,19 +373,28 @@ abstract class BaseScraper {
   }
 
   Future<ContentItem> _parseTiTokContentItem(Map element) async {
+    // log("parse element is ${element}");
     return ContentItem(
-      title: await _extractNestedValue(
-              element, source.config!.titleSelector.selector!.split('.')) ??
-          'Unknown',
-      thumbnailUrl: await _extractNestedValue(
-              element, source.config!.thumbnailSelector.selector!.split('.')) ??
-          'Unknown',
-      contentUrl: await _extractNestedValue(element,
-              source.config!.contentUrlSelector.selector!.split('.')) ??
-          'Unknown',
-      videoUrl: await _extractNestedValue(
-              element, source.config!.videoSelector.selector!.split('.')) ??
-          'Unknown',
+      title: source.config?.titleSelector.selector != null
+          ? await _extractNestedValue(
+                  element, source.config!.titleSelector.selector!.split('.')) ??
+              'Unknown'
+          : 'Unknown',
+      thumbnailUrl: source.config?.thumbnailSelector.selector != null
+          ? await _extractNestedValue(element,
+                  source.config!.thumbnailSelector.selector!.split('.')) ??
+              ''
+          : '',
+      contentUrl: source.config?.contentUrlSelector.selector != null
+          ? await _extractNestedValue(element,
+                  source.config!.contentUrlSelector.selector!.split('.')) ??
+              ''
+          : '',
+      videoUrl: source.config?.videoSelector.selector != null
+          ? await _extractNestedValue(
+                  element, source.config!.videoSelector.selector!.split('.')) ??
+              ''
+          : '',
       scrapedAt: DateTime.now(),
       addedAt: DateTime.now(),
       source: source,
@@ -399,6 +418,8 @@ abstract class BaseScraper {
         return value?.toString();
       }
     }
+    log("paths is ${paths} and value is ${value}");
+
     return value?.toString();
   }
 

@@ -397,6 +397,7 @@
     },
     "enabled": true
   },
+
   {
     "url": "https://www.pornpics.com/",
     "type": "3",
@@ -475,7 +476,7 @@
     "type": "3",
 
     "NSFW": "0",
-    "getType": "2",
+    "getType": "1",
     "decodeType": "2",
     "isPreview": "0",
     "name": "wallpapercat",
@@ -503,6 +504,46 @@
 
       "content_selector": {
         "selector": "body > .collection_thumb_vertical"
+      }
+    },
+    "enabled": true
+  },
+  {
+    "url": "https://backend.wallpics.app/",
+    "type": "3",
+
+    "NSFW": "0",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "name": "wallpics",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://wallpics.app/apple-touch-icon.png",
+    "searchUrl": "https://backend.wallpics.app/api/wallpaper-search?nsfwContent=true&query={search}&sortBy=recommended&paginated=1&page={page}&per_page=24",
+
+    "query": {
+      "new": "api/wallpaper-list/hot?nsfwContent=true&sortBy=date&paginated=1&page={page}&per_page=24",
+      "recommended": "api/wallpaper-list/hot?nsfwContent=true&sortBy=recommended&paginated=1&page={page}&per_page=24",
+      "popular": "api/wallpaper-list/hot?nsfwContent=true&sortBy=popular&paginated=1&page={page}&per_page=24"
+    },
+    "header": {
+      "x-auth": "1724923087",
+      "x-token": "5e2c254ddef88ff0f7f2e4ab6290c707"
+    },
+    "config": {
+      "title_selector": {
+        "selector": "name"
+      },
+      "thumbnail_selector": {
+        "selector": "thumbnail"
+      },
+      "content_url_selector": {
+        "selector": "slug"
+      },
+
+      "content_selector": {
+        "selector": "data"
       }
     },
     "enabled": true
