@@ -15,6 +15,7 @@ class ContentSource {
   final String? cdn;
   final Map? body;
   final Map? header;
+  final bool? hasEpisodes;
   final String pageIncriment;
   final Map<String, String> query;
   final ScraperConfig? config;
@@ -36,6 +37,7 @@ class ContentSource {
     this.cdn = '',
     this.body = const {},
     this.header = const {},
+    this.hasEpisodes = false,
     required this.query,
     this.config,
     this.enabled,
@@ -57,6 +59,7 @@ class ContentSource {
       cdn: json['cdn'] ?? '',
       body: json['body'] ?? {},
       header: json['header'] ?? {},
+      hasEpisodes: json['hasEpisodes'] ?? false,
       pageIncriment: json['pageIncriment'] ?? '',
       query: Map<String, String>.from(json['query'] ?? {}),
       config: json['config'] == null
@@ -83,6 +86,7 @@ class ContentSource {
       'cdn': cdn,
       'body': body,
       'header': header,
+      'hasEpisodes': hasEpisodes,
       'query': query,
       'config': config?.toJson(),
       'enabled': enabled,

@@ -16,14 +16,15 @@ import 'package:watching_app_2/shared/widgets/misc/image.dart';
 import 'package:watching_app_2/shared/widgets/buttons/primary_button.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 import '../../../../core/navigation/app_navigator.dart';
+import '../../../../data/scrapers/scraper_service.dart';
 import '../../../../presentation/provider/similar_content_provider.dart';
 import '../../../../shared/screens/video_player/components/similar_content.dart';
 import 'dart:ui';
 import 'dart:developer';
 
 class ContentDetail extends StatefulWidget {
-  final ContentItem item;
-  const ContentDetail({super.key, required this.item});
+  ContentItem item;
+  ContentDetail({super.key, required this.item});
 
   @override
   State<ContentDetail> createState() => _ContentDetailState();
@@ -40,13 +41,15 @@ class _ContentDetailState extends State<ContentDetail>
   late Animation<double> _scaleAnimation;
   late Animation<double> _headerOpacity;
   double _scrollProgress = 0;
-
+  ContentItem? detailItem;
   @override
   void initState() {
     super.initState();
+    detailItem = widget.item;
     var provider = Provider.of<WebviewProvider>(context, listen: false);
-    log("this is the content detail page and the item is ${widget.item}");
-    provider.loadVideos(widget.item);
+    log("this is the content detail page and the item is ${detailItem!.toJson()}");
+    getDetail();
+    provider.loadVideos(detailItem!);
 
     _scrollController = ScrollController()
       ..addListener(() {
@@ -115,6 +118,19 @@ class _ContentDetailState extends State<ContentDetail>
     });
   }
 
+  getDetail() async {
+    if (detailItem!.source.hasEpisodes == true) {
+      final scraperService = ScraperService(detailItem!.source);
+
+      var res = await scraperService.getDetails(SMA.formatImage(
+          baseUrl: detailItem!.source.url, image: detailItem!.contentUrl));
+      setState(() {
+        detailItem!.detailContent = res.first.detailContent;
+      });
+      // log("the res is ${res.map((r) => r.toJson())}");
+    }
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -157,7 +173,7 @@ class _ContentDetailState extends State<ContentDetail>
                     //   onPressed: () {},
                     // ),
                     FavoriteButton(
-                        item: widget.item, contentType: ContentTypes.VIDEO),
+                        item: detailItem!, contentType: ContentTypes.VIDEO),
                     _buildAnimatedIconButton(
                       icon: Icons.share,
                       onPressed: () {},
@@ -178,7 +194,7 @@ class _ContentDetailState extends State<ContentDetail>
               child: Stack(
                 children: [
                   Hero(
-                    tag: widget.item.thumbnailUrl,
+                    tag: detailItem!.thumbnailUrl,
                     child: AnimatedBuilder(
                       animation: _scaleAnimation,
                       builder: (context, child) {
@@ -213,8 +229,8 @@ class _ContentDetailState extends State<ContentDetail>
                               blendMode: BlendMode.dstIn,
                               child: ImageWidget(
                                 imagePath: SMA.formatImage(
-                                    image: widget.item.thumbnailUrl,
-                                    baseUrl: widget.item.source.url),
+                                    image: detailItem!.thumbnailUrl,
+                                    baseUrl: detailItem!.source.url),
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                               ),
@@ -233,9 +249,9 @@ class _ContentDetailState extends State<ContentDetail>
                       child: FloatingActionButton(
                         backgroundColor: AppColors.primaryColor,
                         onPressed: () {
-                          // NH.navigateTo(VideoScreen(item: widget.item));
+                          // NH.navigateTo(VideoScreen(item: detailItem!));
                           NH.nameNavigateTo(AppRoutes.video,
-                              arguments: {'item': widget.item});
+                              arguments: {'item': detailItem!});
                         },
                         // backgroundColor: AppColors.primaryColor,
                         child: Icon(
@@ -286,6 +302,204 @@ class _ContentDetailState extends State<ContentDetail>
                           const CustomGap(heightFactor: .04),
                           _buildWatchButton(),
                           const CustomGap(heightFactor: .04),
+                          if (detailItem!.detailContent != null)
+                            Container(
+                              height: 45.h,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      TextWidget(
+                                        text: "Episodes",
+                                        styleType: TextStyleType.heading2,
+                                        fontSize: 22.sp,
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 3.w, vertical: 1.h),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.primaryColor
+                                              .withOpacity(0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        child: TextWidget(
+                                          text:
+                                              "${detailItem!.detailContent!.chapter!.length} Episodes",
+                                          fontSize: 12.sp,
+                                          color: AppColors.primaryColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 2.h),
+                                  Expanded(
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      physics: const BouncingScrollPhysics(),
+                                      itemCount: widget
+                                          .item.detailContent!.chapter!.length,
+                                      itemBuilder: (context, index) {
+                                        var chapter = widget.item.detailContent!
+                                            .chapter![index];
+                                        return GestureDetector(
+                                          onTap: () {
+                                            var contentItem = ContentItem(
+                                                title: chapter.chapterId ??
+                                                    ''
+                                                        .replaceAll(
+                                                            widget.item.source
+                                                                .url,
+                                                            "")
+                                                        .replaceAll(
+                                                            "videos", ''),
+                                                thumbnailUrl:
+                                                    chapter.chapterImage ?? '',
+                                                contentUrl:
+                                                    chapter.chapterId ?? '',
+                                                source: detailItem!.source,
+                                                scrapedAt: DateTime.now(),
+                                                addedAt: DateTime.now());
+                                            NH.nameForceNavigate(
+                                                AppRoutes.detail,
+                                                arguments: {
+                                                  "item": contentItem
+                                                });
+                                          },
+                                          child: Container(
+                                            margin: EdgeInsets.only(right: 4.w),
+                                            width: 55.w,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              // gradient: LinearGradient(
+                                              //   begin: Alignment.topLeft,
+                                              //   end: Alignment.bottomRight,
+                                              //   colors: [
+                                              //     AppColors.primaryColor
+                                              //         .withOpacity(0.15),
+                                              //     AppColors.primaryColor
+                                              //         .withOpacity(0.05),
+                                              //   ],
+                                              // ),
+                                              // boxShadow: [
+                                              //   BoxShadow(
+                                              //     color: AppColors.primaryColor
+                                              //         .withOpacity(0.1),
+                                              //     blurRadius: 10,
+                                              //     offset: const Offset(0, 5),
+                                              //   ),
+                                              // ],
+                                              border: Border.all(
+                                                color: AppColors.primaryColor
+                                                    .withOpacity(0.2),
+                                                width: 1.5,
+                                              ),
+                                            ),
+                                            child: Stack(
+                                              children: [
+                                                Column(
+                                                  children: [
+                                                    Stack(
+                                                      children: [
+                                                        ImageWidget(
+                                                          imagePath: chapter
+                                                                  .chapterImage ??
+                                                              '',
+                                                          height: 25.h,
+                                                          width:
+                                                              double.infinity,
+                                                          fit: BoxFit.cover,
+                                                          customBorderRadius:
+                                                              const BorderRadius
+                                                                  .vertical(
+                                                                  top: Radius
+                                                                      .circular(
+                                                                          18)),
+                                                        ),
+                                                        Container(
+                                                          height: 25.h,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            gradient:
+                                                                LinearGradient(
+                                                              begin: Alignment
+                                                                  .topCenter,
+                                                              end: Alignment
+                                                                  .bottomCenter,
+                                                              colors: [
+                                                                Colors
+                                                                    .transparent,
+                                                                Colors.black
+                                                                    .withOpacity(
+                                                                        0.7),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          EdgeInsets.all(3.w),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          TextWidget(
+                                                            text:
+                                                                "Episode ${index + 1}",
+                                                            fontSize: 12.sp,
+                                                            color: AppColors
+                                                                .primaryColor,
+                                                          ),
+                                                          SizedBox(height: 1.h),
+                                                          TextWidget(
+                                                            text: chapter
+                                                                .chapterName!,
+                                                            maxLine: 2,
+                                                            fontSize: 14.sp,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Positioned(
+                                                  right: 2.w,
+                                                  top: 2.w,
+                                                  child: Container(
+                                                    padding:
+                                                        EdgeInsets.all(2.w),
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                      color: AppColors
+                                                          .primaryColor,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.play_arrow,
+                                                      color: Colors.white,
+                                                      size: 18.sp,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
                         ],
                       ),
                     ),
@@ -293,10 +507,23 @@ class _ContentDetailState extends State<ContentDetail>
                 ),
               ),
             ),
-            SliverToBoxAdapter(
-              child: SimilarContent(
-                  similarContents: similarProvider.similarContents),
-            ),
+            // SliverToBoxAdapter(
+            //   child: SimilarContent(
+            //       similarContents: similarProvider.similarContents),
+            // ),
+            // SliverAnimatedList(
+            //     initialItemCount: detailItem!.detailContent!.chapter!.length,
+            //     itemBuilder: (context, index, _) {
+            //       var chapter = detailItem!.detailContent!.chapter![index];
+            //       log("chapter is ${chapter}");
+            //       return Container(
+            //         child: ImageWidget(
+            //           imagePath: chapter.chapterImage ?? '',
+            //           height: 10.w,
+            //           width: 10.w,
+            //         ),
+            //       );
+            //     })
           ],
         );
       }),
@@ -327,7 +554,7 @@ class _ContentDetailState extends State<ContentDetail>
     return FadeTransition(
       opacity: _headerOpacity,
       child: TextWidget(
-        text: widget.item.title,
+        text: detailItem!.title,
         styleType: TextStyleType.heading1,
         maxLine: 5,
       ),
@@ -335,27 +562,19 @@ class _ContentDetailState extends State<ContentDetail>
   }
 
   Widget _buildMetaData() {
-    return Row(
+    // log("detailItem in meta is ${detailItem!.toJson()}");
+    return Column(
       children: [
-        // Container(
-        //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        //   decoration: BoxDecoration(
-        //     color: AppColors.secondaryColor,
-        //     borderRadius: BorderRadius.circular(20),
-        //   ),
-        //   child: Row(
-        //     children: [
-        //       const Icon(Icons.star, color: Colors.amber, size: 16),
-        //       const SizedBox(width: 4),
-        //       TextWidget(
-        //         text: '4.8',
-        //         fontWeight: FontWeight.w600,
-        //         fontSize: 17.sp,
-        //       ),
-        //     ],
-        //   ),
-        // ),
-        // const SizedBox(width: 12),
+        if (detailItem!.detailContent != null)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            child: TextWidget(
+              text: detailItem!.detailContent!.discription ?? '',
+              fontWeight: FontWeight.w600,
+              fontSize: 17.sp,
+            ),
+          ),
+        const SizedBox(width: 12),
         TextWidget(
           text: '•',
           color: AppColors.greyColor,
@@ -363,7 +582,7 @@ class _ContentDetailState extends State<ContentDetail>
         ),
         const SizedBox(width: 12),
         TextWidget(
-          text: widget.item.duration,
+          text: detailItem!.duration,
           color: AppColors.greyColor.withOpacity(.6),
           fontWeight: FontWeight.w500,
           fontSize: 17.sp,
@@ -384,19 +603,19 @@ class _ContentDetailState extends State<ContentDetail>
         _buildInfoCard(
           icon: Icons.high_quality,
           title: 'Quality',
-          value: widget.item.quality,
+          value: detailItem!.quality,
           color: Colors.purple,
         ),
         _buildInfoCard(
           icon: Icons.access_time,
           title: 'Time',
-          value: widget.item.time,
+          value: detailItem!.time,
           color: Colors.orange,
         ),
         _buildInfoCard(
           icon: Icons.source,
           title: 'Source',
-          value: widget.item.source.name,
+          value: detailItem!.source.name,
           color: Colors.green,
         ),
         _buildInfoCard(
@@ -479,8 +698,8 @@ class _ContentDetailState extends State<ContentDetail>
         width: .8,
         borderRadius: 100.w,
         onTap: () {
-          // NH.navigateTo(VideoScreen(item: widget.item));
-          NH.nameNavigateTo(AppRoutes.video, arguments: {'item': widget.item});
+          // NH.navigateTo(VideoScreen(item: detailItem!));
+          NH.nameNavigateTo(AppRoutes.video, arguments: {'item': detailItem!});
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

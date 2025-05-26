@@ -34,5 +34,146 @@
       "popular": "sort/most-views/?page={page}",
       "yuri": "sort/most-likes/?page={page}"
     }
+  },
+  {
+    "url": "https://www.hentaicity.com/",
+    "searchUrl": "https://www.hentaicity.com/search/video/{search}/{page}",
+    "type": "5",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "1",
+    "isEmbed": "0",
+    "name": "hentaicity",
+    "icon": "https://www.hentaicity.com/images/dart/logo.png",
+    "pageType": "page",
+    "hasEpisodes": false,
+    "query": {
+      "latest": "videos/straight/all-recent-{page}.html",
+      "popular": "videos/straight/all-popular-{page}.html",
+      "top rated": "videos/straight/all-rate-{page}.html",
+      "longest": "videos/straight/all-length-{page}.html"
+    },
+    "config": {
+      "title_selector": {
+        "selector": ".item > .thumb-ratio > a > img",
+        "attribute": "alt"
+      },
+      "thumbnail_selector": {
+        "selector": ".item > .thumb-ratio > a > img",
+        "attribute": "src"
+      },
+      "content_url_selector": {
+        "selector": ".item > .thumb-ratio > a",
+        "attribute": "href"
+      },
+      "quality_selector": {
+        "selector": ".item > .thumb-ratio > a > .flag-hd"
+      },
+      "time_selector": {
+        "selector": ".item > .thumb-ratio > a > .time"
+      },
+      "duration_selector": {
+        "selector": ".thumb > .l"
+      },
+      "preview_selector": {
+        "selector": ".item > .thumb-ratio > a > .trailer > video",
+        "attribute": "src"
+      },
+
+      "content_selector": {
+        "selector": ".thumb-list > .outer-item"
+      },
+      "watching_link_selector": {
+        "selector": "meta[property=\"og:video:url\"]",
+        "attribute": "content"
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": "html"
+      }
+    },
+    "enabled": true
+  },
+  {
+    "url": "https://watchhentai.net/",
+    "searchUrl": "https://watchhentai.net/page/{page}/?s={search}",
+    "type": "5",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "0",
+    "name": "watchhentai",
+    "icon": "https://watchhentai.net/logo.svg",
+    "pageType": "page",
+    "hasEpisodes": true,
+    "query": {
+      "recent": "videos/page/{page}/",
+      "trending": "trending/page/{page}/",
+      "uncensored": "genre/uncensored/page/{page}/",
+      "harem": "genre/harem/page/{page}/",
+      "rape": "genre/rape/page/{page}/"
+    },
+    "config": {
+      "title_selector": {
+        "selector": ".poster > img",
+        "attribute": "title"
+      },
+      "thumbnail_selector": {
+        "selector": ".poster > img",
+        "attribute": "data-src"
+      },
+      "content_url_selector": {
+        "selector": ".poster  a",
+        "attribute": "href"
+      },
+
+      "content_selector": {
+        "selector": ".content > .items > .item"
+      },
+      "watching_link_selector": {
+        "selector": "meta[itemprop=\"contentUrl\"]",
+        "attribute": "content"
+      },
+      "keywords_selector": {
+        "selector": "meta[name=\"keywords\"]",
+        "attribute": "content"
+      },
+
+      "video_selector": {
+        "selector": "html"
+      },
+
+      "detail_selector": {
+        "selector": "html"
+      },
+      "detail": {
+        "discription_selector": {
+          "selector": ".synopsis",
+          "attribute": ""
+        },
+
+        "chapter_name_selector": {
+          "selector": ".episodiotitle > a"
+        },
+        "chapter_image_selector": {
+          "selector": ".imagen > img",
+          "attribute": "data-src"
+        },
+        "chapters_selector": {
+          "selector": ".episodios > li"
+        },
+        "chapter_id_selector": {
+          "selector": ".episodiotitle > a",
+          "attribute": "href"
+        }
+      }
+    },
+    "enabled": true
   }
 ]

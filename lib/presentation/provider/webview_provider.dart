@@ -39,6 +39,7 @@ class WebviewProvider with ChangeNotifier {
 
     try {
       final formattedUrl = _formatContentUrl(item.source.url, item.contentUrl);
+
       _videos = await scraperService.getVideo(formattedUrl);
       _log('Found ${_videos.length} videos');
 
@@ -241,7 +242,9 @@ class WebviewProvider with ChangeNotifier {
     _setPortraitOrientation();
     _cleanupJavaScript();
     _isWebViewInitialized = false;
-    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
   /// Cleans up JavaScript event listeners in the WebView.
@@ -279,10 +282,18 @@ class WebviewProvider with ChangeNotifier {
         image: contentUrl); // Assuming SMA is a global utility
   }
 
-  /// Extracts the first video URL from the watching link JSON.
+  /// Extracts the first video URL from the watching link JSON or direct URL.
   String? _extractFirstVideoUrl(String watchingLink) {
-    final watchingLinksMap = jsonDecode(watchingLink) as Map<String, dynamic>;
-    return watchingLinksMap.values.first as String?;
+    try {
+      final watchingLinksMap = jsonDecode(watchingLink) as Map<String, dynamic>;
+      return watchingLinksMap.values.first as String?;
+    } catch (e) {
+      // If not JSON, return the URL directly if it looks like a valid URL
+      if (watchingLink.startsWith('http')) {
+        return watchingLink;
+      }
+      return null;
+    }
   }
 
   /// Updates the loading state and notifies listeners.

@@ -13,7 +13,7 @@ class ContentItem {
   final String? videoUrl;
   final String views;
   final ContentSource source;
-  final DetailModel? detailContent;
+  DetailModel? detailContent;
   final List<Chapter>? chapterImagesById;
   final DateTime scrapedAt;
 

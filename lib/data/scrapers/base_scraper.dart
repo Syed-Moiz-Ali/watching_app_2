@@ -41,7 +41,7 @@ abstract class BaseScraper {
   }
 
   Future<List<VideoSource>> scrapeVideos(String data) async {
-    // log("this is videoSelector and ${source.config!.videoSelector!.selector}");
+    log("this is videoSelector and ${source.config!.videoSelector!.selector}");
     if (source.config!.videoSelector == null) return [];
     final document = parse(data);
     final elements =
@@ -84,7 +84,7 @@ abstract class BaseScraper {
 
   Future<List<VideoSource>> getVideos(String url) =>
       _fetchAndScrape(url, (html) async {
-        await scrapeSimilarContent(html);
+        // await scrapeSimilarContent(html);
         return scrapeVideos(html);
       });
 
@@ -99,6 +99,7 @@ abstract class BaseScraper {
         _logError('Error parsing element: $e');
       }
     }
+    // log("items is ${items.map((i) => i.toJson())}");
     return items;
   }
 
@@ -149,28 +150,52 @@ abstract class BaseScraper {
     Element? element,
     Document? document,
   }) async {
-    // log('selector is ${selector!.selector}');
-    // if (selector!.selector == null) return "";
+    if (selector == null || selector.selector?.isEmpty != false) {
+      log("⚠️ Selector is null or empty.");
+      return "";
+    }
+
     try {
-      if (selector!.customExtraction == true) {
-        return await extractCustomValue(selector,
-            element: element, document: document);
+      log("🔍 Running getAttributeValue for selector: '${selector.selector}' and attribute: '${selector.attribute}'");
+
+      // Use custom extraction logic if provided
+      if (selector.customExtraction == true) {
+        log("🛠️ Using custom extraction.");
+        return await extractCustomValue(
+          selector,
+          element: element,
+          document: document,
+        );
       }
 
+      // Handle "this" special keyword
       if (selector.selector == "this") {
+        log("🔄 Selector is 'this'; using current element.");
         return selector.attribute != null
             ? element?.attributes[selector.attribute]?.trim()
             : element?.text.trim();
       }
-      final target = document?.querySelector(selector.selector ?? '') ??
-          element?.querySelector(selector.selector ?? '');
-      // log("target is ${target!.outerHtml}");
-      return selector.attribute != null
-          ? target?.attributes[selector.attribute]?.trim()
-          : target?.text.trim();
-    } catch (e) {
+
+      // Search full document and/or current element
+      Element? target = document?.querySelector(selector.selector!) ??
+          element?.querySelector(selector.selector!);
+
+      if (target == null) {
+        log("❌ No element found for selector: '${selector.selector}'");
+        return null;
+      }
+
+      final result = selector.attribute != null
+          ? target.attributes[selector.attribute!]?.trim()
+          : target.text.trim();
+
+      log("✅ Extracted value: '$result' from selector: '${selector.selector}'");
+
+      return result;
+    } catch (e, stack) {
       _logDebug(
-          'Error getting single attribute from ${selector!.selector}: $e');
+        '❌ Error getting attribute from selector: ${selector.selector}: $e\n$stack',
+      );
       return null;
     }
   }
@@ -424,17 +449,39 @@ abstract class BaseScraper {
   }
 
   Future<VideoSource> _parseVideoSource(
-      Document document, Element element) async {
-    return VideoSource(
+    Document document,
+    Element element,
+  ) async {
+    log("⚙️ Parsing video source...");
+    log("🔍 source.config!.watchingLinkSelector is ${source.config!.watchingLinkSelector.selector}");
+
+    // Optional: log a preview of the document
+    // log("📄 document.head: ${document.head?.outerHtml}"); // log first 500 chars
+    // log("📄 document.body: ${document.body?.outerHtml.substring(0, 500)}");
+
+    final watchingLink = await getAttributeValue(
+          source.config!.watchingLinkSelector,
+          element: element,
+          document: document,
+        ) ??
+        '';
+
+    final keywords = await getAttributeValue(
+          source.config!.keywordsSelector,
+          element: element,
+          document: document,
+        ) ??
+        '';
+
+    var videoSource = VideoSource(
       scrapedAt: DateTime.now(),
       source: source,
-      watchingLink: await getAttributeValue(source.config!.watchingLinkSelector,
-              element: element) ??
-          '',
-      keywords: await getAttributeValue(source.config!.keywordsSelector,
-              document: document) ??
-          '',
+      watchingLink: watchingLink.trim(),
+      keywords: keywords.trim(),
     );
+
+    log("✅ videoSource created: ${videoSource.toJson()}");
+    return videoSource;
   }
 
   Future<Chapter> _chapterParse(Document document, Element element) async {

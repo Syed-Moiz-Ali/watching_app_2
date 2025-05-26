@@ -152,10 +152,14 @@ class _SourceCardState extends State<SourceCard> with TickerProviderStateMixin {
                           provider.selectedQuery =
                               widget.source.query.entries.first.value;
                           provider.updateState();
-                          if (widget.source.type == '1') {
+                          if (widget.source.type == '1' ) {
                             NH.nameNavigateTo(AppRoutes.videoList,
                                 arguments: {"source": widget.source});
-                          } else if (widget.source.type == '3') {
+                          }  else if (widget.source.type == '5') {
+                            NH.nameNavigateTo(AppRoutes.videoList,
+                                arguments: {"source": widget.source});
+                          }
+                          else if (widget.source.type == '3') {
                             NH.nameNavigateTo(AppRoutes.wallpapers,
                                 arguments: {"source": widget.source});
                           } else if (widget.source.type == '2') {
@@ -329,6 +333,8 @@ class _SourceCardState extends State<SourceCard> with TickerProviderStateMixin {
         return 'Wallpaper';
       case '4':
         return 'Manga';
+      case '5':
+        return 'Anime';
       default:
         return 'Type: $type';
     }

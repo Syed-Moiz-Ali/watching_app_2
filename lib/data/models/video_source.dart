@@ -21,4 +21,13 @@ class VideoSource {
       scrapedAt: json['scrapedAt'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'watchingLink': watchingLink,
+      'keywords': keywords,
+      // 'source': source,
+      'scrapedAt': scrapedAt,
+    };
+  }
 }

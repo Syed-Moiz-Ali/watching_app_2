@@ -4,6 +4,7 @@ import 'package:sizer/sizer.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:watching_app_2/data/models/content_source.dart';
 import 'package:watching_app_2/shared/widgets/appbars/app_bar.dart';
+import '../../../data/database/local_database.dart';
 import '../../../data/models/tab_model.dart';
 import '../../../core/services/source_manager.dart';
 import '../../widgets/misc/tabbar.dart';
@@ -35,7 +36,8 @@ class _SourcesState extends State<Sources> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController =
+        TabController(length: ContentTypes.ALL_TYPES.length, vsync: this);
     _tabController.addListener(_handleTabSelection);
 
     // Initialize fade animation
@@ -46,9 +48,9 @@ class _SourcesState extends State<Sources> with TickerProviderStateMixin {
   Future<void> loadAllSources() async {
     setState(() => isLoading = true);
 
-    List<String> contentTypes = ["videos", "tiktok", "photos", "manga"];
+    // List<String> contentTypes = ["videos", "tiktok", "photos", "manga","anime"];
 
-    for (String category in contentTypes) {
+    for (String category in ContentTypes.ALL_TYPES) {
       final loadedSources = await sourceManager.loadSources(category);
       allSources[category] =
           loadedSources.where((s) => s.enabled == true).toList();
@@ -105,6 +107,7 @@ class _SourcesState extends State<Sources> with TickerProviderStateMixin {
               TabContent(title: 'TikTok', icon: Icons.music_note),
               TabContent(title: 'Photos', icon: Icons.photo),
               TabContent(title: 'Manga', icon: Icons.book),
+              TabContent(title: 'Anime', icon: Icons.book),
             ],
             onTabChanged: (index) {
               _tabController.animateTo(index);
@@ -136,6 +139,10 @@ class _SourcesState extends State<Sources> with TickerProviderStateMixin {
                 ContentList(
                   sources: allSources["manga"] ?? [],
                   key: const ValueKey('content-list-manga'),
+                ),
+                ContentList(
+                  sources: allSources["anime"] ?? [],
+                  key: const ValueKey('content-list-anime'),
                 ),
               ],
             ),
