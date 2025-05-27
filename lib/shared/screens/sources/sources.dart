@@ -4,150 +4,204 @@ import 'package:sizer/sizer.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:watching_app_2/data/models/content_source.dart';
 import 'package:watching_app_2/shared/widgets/appbars/app_bar.dart';
-import '../../../data/database/local_database.dart';
+import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 import '../../../data/models/tab_model.dart';
 import '../../../core/services/source_manager.dart';
 import '../../widgets/misc/tabbar.dart';
 import 'components/content_list.dart';
 
+// Constants for better maintainability
+class SourcesConstants {
+  static const Duration shimmerPeriod = Duration(milliseconds: 1500);
+  static const int shimmerItemCount = 8;
+  static const double borderRadius = 12.0;
+  static const double shadowOpacity = 0.05;
+  static const double shadowBlurRadius = 10.0;
+  static const Offset shadowOffset = Offset(0, 2);
+}
+
+// Data class for content type configuration
+class ContentTypeConfig {
+  final String key;
+  final String title;
+  final IconData icon;
+
+  const ContentTypeConfig({
+    required this.key,
+    required this.title,
+    required this.icon,
+  });
+}
+
+// Configuration for all content types
+class ContentTypeConfigs {
+  static const List<ContentTypeConfig> all = [
+    ContentTypeConfig(
+        key: 'videos', title: 'Videos', icon: Icons.video_collection),
+    ContentTypeConfig(key: 'tiktok', title: 'TikTok', icon: Icons.music_note),
+    ContentTypeConfig(key: 'photos', title: 'Photos', icon: Icons.photo),
+    ContentTypeConfig(key: 'manga', title: 'Manga', icon: Icons.book),
+    ContentTypeConfig(key: 'anime', title: 'Anime', icon: Icons.book),
+  ];
+
+  static ContentTypeConfig getByIndex(int index) {
+    return all[index.clamp(0, all.length - 1)];
+  }
+
+  static int getIndexByKey(String key) {
+    return all.indexWhere((config) => config.key == key);
+  }
+}
+
 class Sources extends StatefulWidget {
   const Sources({super.key});
 
   @override
-  _SourcesState createState() => _SourcesState();
+  State<Sources> createState() => _SourcesState();
 }
 
 class _SourcesState extends State<Sources> with TickerProviderStateMixin {
-  Map<String, List<ContentSource>> allSources = {};
-  bool isLoading = true;
-  final SourceManager sourceManager = SourceManager();
-
-  String _currentCategory = "videos";
+  final Map<String, List<ContentSource>> _allSources = {};
+  final SourceManager _sourceManager = SourceManager();
   late TabController _tabController;
+
+  bool _isLoading = true;
+  String _currentCategory = ContentTypeConfigs.all.first.key;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeTabController();
+    _loadAllSources();
+  }
 
   @override
   void dispose() {
     _tabController.removeListener(_handleTabSelection);
     _tabController.dispose();
-
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController =
-        TabController(length: ContentTypes.ALL_TYPES.length, vsync: this);
+  void _initializeTabController() {
+    _tabController = TabController(
+      length: ContentTypeConfigs.all.length,
+      vsync: this,
+    );
     _tabController.addListener(_handleTabSelection);
-
-    // Initialize fade animation
-
-    loadAllSources();
   }
 
-  Future<void> loadAllSources() async {
-    setState(() => isLoading = true);
+  Future<void> _loadAllSources() async {
+    if (!mounted) return;
 
-    // List<String> contentTypes = ["videos", "tiktok", "photos", "manga","anime"];
+    setState(() => _isLoading = true);
 
-    for (String category in ContentTypes.ALL_TYPES) {
-      final loadedSources = await sourceManager.loadSources(category);
-      allSources[category] =
-          loadedSources.where((s) => s.enabled == true).toList();
+    try {
+      for (final config in ContentTypeConfigs.all) {
+        final loadedSources = await _sourceManager.loadSources(config.key);
+        _allSources[config.key] =
+            loadedSources.where((source) => source.enabled == true).toList();
+      }
+    } catch (e) {
+      // Handle error appropriately - could show snackbar, etc.
+      debugPrint('Error loading sources: $e');
     }
 
     if (mounted) {
-      setState(() => isLoading = false);
-      // Start initial animations
+      setState(() => _isLoading = false);
     }
   }
 
   void _handleTabSelection() {
-    if (!_tabController.indexIsChanging) {
-      String category;
-      switch (_tabController.index) {
-        case 0:
-          category = "videos";
-          break;
-        case 1:
-          category = "tiktok";
-          break;
-        case 2:
-          category = "photos";
-          break;
-        case 3:
-          category = "manga";
-          break;
-        default:
-          category = "videos";
-      }
-      if (_currentCategory != category) {
-        setState(() {
-          _currentCategory = category;
-          isLoading = false;
-        });
-        // Restart animations for tab switch
-      }
+    if (_tabController.indexIsChanging) return;
+
+    final newConfig = ContentTypeConfigs.getByIndex(_tabController.index);
+    if (_currentCategory != newConfig.key) {
+      setState(() {
+        _currentCategory = newConfig.key;
+      });
     }
+  }
+
+  int get _totalSourcesCount {
+    return _allSources.values.fold(0, (sum, sources) => sum + sources.length);
+  }
+
+  List<TabContent> get _tabContents {
+    return ContentTypeConfigs.all.map((config) {
+      final sources = _allSources[config.key] ?? [];
+      return TabContent(
+        title: config.title,
+        icon: config.icon,
+        length: sources.length.toString(),
+      );
+    }).toList();
+  }
+
+  List<Widget> get _tabViews {
+    return ContentTypeConfigs.all.map((config) {
+      final sources = _allSources[config.key] ?? [];
+      return ContentList(
+        sources: sources,
+        key: ValueKey('content-list-${config.key}'),
+      );
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
-        appBarHeight: 15.h,
-        elevation: 0,
-        title: 'Content Sources',
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(10.h),
-          child: CustomTabBar(
-            tabController: _tabController,
-            tabContents: [
-              TabContent(title: 'Videos', icon: Icons.video_collection),
-              TabContent(title: 'TikTok', icon: Icons.music_note),
-              TabContent(title: 'Photos', icon: Icons.photo),
-              TabContent(title: 'Manga', icon: Icons.book),
-              TabContent(title: 'Anime', icon: Icons.book),
-            ],
-            onTabChanged: (index) {
-              _tabController.animateTo(index);
-            },
-          ),
-        ),
-      ),
-      body: Stack(
+      appBar: _buildAppBar(),
+      body: _buildBody(),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar() {
+    return CustomAppBar(
+      appBarHeight: 15.h,
+      elevation: 0,
+      title: 'Content Sources',
+      actions: [_buildSourcesCounter()],
+      bottom: _buildTabBar(),
+      appBarStyle: AppBarStyle.standard,
+    );
+  }
+
+  Widget _buildSourcesCounter() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 2.w),
+      child: Row(
         children: [
-          if (isLoading)
-            const EnhancedShimmerLoadingList()
-          else
-            TabBarView(
-              controller: _tabController,
-              physics: const BouncingScrollPhysics(),
-              children: [
-                ContentList(
-                  sources: allSources["videos"] ?? [],
-                  key: const ValueKey('content-list-videos'),
-                ),
-                ContentList(
-                  sources: allSources["tiktok"] ?? [],
-                  key: const ValueKey('content-list-tiktok'),
-                ),
-                ContentList(
-                  sources: allSources["photos"] ?? [],
-                  key: const ValueKey('content-list-photos'),
-                ),
-                ContentList(
-                  sources: allSources["manga"] ?? [],
-                  key: const ValueKey('content-list-manga'),
-                ),
-                ContentList(
-                  sources: allSources["anime"] ?? [],
-                  key: const ValueKey('content-list-anime'),
-                ),
-              ],
-            ),
+          const Icon(Icons.cloud_done, size: 20),
+          SizedBox(width: 1.w),
+          TextWidget(
+            text: 'Active Sources: $_totalSourcesCount',
+            fontSize: 15.sp,
+          ),
         ],
       ),
+    );
+  }
+
+  PreferredSize _buildTabBar() {
+    return PreferredSize(
+      preferredSize: Size.fromHeight(10.h),
+      child: CustomTabBarHorizontal(
+        tabController: _tabController,
+        tabContents: _tabContents,
+        onTabChanged: (index) => _tabController.animateTo(index),
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    if (_isLoading) {
+      return const EnhancedShimmerLoadingList();
+    }
+
+    return TabBarView(
+      controller: _tabController,
+      physics: const BouncingScrollPhysics(),
+      children: _tabViews,
     );
   }
 }
@@ -160,78 +214,81 @@ class EnhancedShimmerLoadingList extends StatelessWidget {
     return Shimmer.fromColors(
       baseColor: Colors.grey[300]!,
       highlightColor: Colors.grey[100]!,
-      period: const Duration(
-          milliseconds: 1500), // Slightly slower for smoother effect
+      period: SourcesConstants.shimmerPeriod,
       child: ListView.builder(
         padding: EdgeInsets.all(2.h),
-        itemCount: 8,
-        itemBuilder: (_, __) => Padding(
-          padding: EdgeInsets.only(bottom: 2.h),
-          child: Container(
-            height: 15.h,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12), // Slightly larger radius
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 30.w,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      bottomLeft: Radius.circular(12),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 3.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 40.w,
-                        height: 2.h,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                      SizedBox(height: 1.h),
-                      Container(
-                        width: 60.w,
-                        height: 1.5.h,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                      SizedBox(height: 1.h),
-                      Container(
-                        width: 30.w,
-                        height: 1.5.h,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 2.w),
-              ],
-            ),
-          ),
+        itemCount: SourcesConstants.shimmerItemCount,
+        itemBuilder: (context, index) => _buildShimmerItem(),
+      ),
+    );
+  }
+
+  Widget _buildShimmerItem() {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 2.h),
+      child: Container(
+        height: 15.h,
+        decoration: _buildShimmerItemDecoration(),
+        child: Row(
+          children: [
+            _buildShimmerImage(),
+            SizedBox(width: 3.w),
+            Expanded(child: _buildShimmerContent()),
+            SizedBox(width: 2.w),
+          ],
         ),
+      ),
+    );
+  }
+
+  BoxDecoration _buildShimmerItemDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(SourcesConstants.borderRadius),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(SourcesConstants.shadowOpacity),
+          blurRadius: SourcesConstants.shadowBlurRadius,
+          offset: SourcesConstants.shadowOffset,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildShimmerImage() {
+    return Container(
+      width: 30.w,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(SourcesConstants.borderRadius),
+          bottomLeft: Radius.circular(SourcesConstants.borderRadius),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildShimmerLine(width: 40.w, height: 2.h),
+        SizedBox(height: 1.h),
+        _buildShimmerLine(width: 60.w, height: 1.5.h),
+        SizedBox(height: 1.h),
+        _buildShimmerLine(width: 30.w, height: 1.5.h),
+      ],
+    );
+  }
+
+  Widget _buildShimmerLine({required double width, required double height}) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(4),
       ),
     );
   }

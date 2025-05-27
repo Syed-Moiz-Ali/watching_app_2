@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:flutter/services.dart';
@@ -60,9 +62,11 @@ class _WallpaperCardState extends State<WallpaperCard>
 
   // Preload image to handle loading state
   void _preloadImage() {
-    final imageProvider = NetworkImage(SMA.formatImage(
-        image: widget.item.thumbnailUrl.toString(),
-        baseUrl: widget.item.source.url));
+    final imageProvider = NetworkImage(widget.item.source.cdn != null
+        ? widget.item.source.cdn! + widget.item.thumbnailUrl
+        : SMA.formatImage(
+            image: widget.item.thumbnailUrl.toString(),
+            baseUrl: widget.item.source.url));
     imageProvider.resolve(const ImageConfiguration()).addListener(
           ImageStreamListener(
             (info, _) {
@@ -224,10 +228,13 @@ class _WallpaperCardState extends State<WallpaperCard>
 
   // Wallpaper image with cached network image
   Widget _buildWallpaperImage() {
+    log("widget.item.source.cdn is ${widget.item.source.cdn}");
     return ImageWidget(
-      imagePath: SMA.formatImage(
-          image: widget.item.thumbnailUrl.toString(),
-          baseUrl: widget.item.source.url),
+      imagePath: widget.item.source.cdn != null
+          ? widget.item.source.cdn! + widget.item.thumbnailUrl
+          : SMA.formatImage(
+              image: widget.item.thumbnailUrl.toString(),
+              baseUrl: widget.item.source.url),
       fit: BoxFit.cover,
     );
   }

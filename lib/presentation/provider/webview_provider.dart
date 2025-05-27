@@ -61,14 +61,16 @@ class WebviewProvider with ChangeNotifier {
   /// Initializes the WebView with the provided [videoUrl].
   Future<void> _initializeWebView(String videoUrl) async {
     _log('Initializing WebView with URL: $videoUrl');
-    if (_isWebViewInitialized) {
-      _log('WebView already initialized. Reinitializing...');
-      disposeWebView();
-      _webViewController = WebViewController();
-    }
+    // if (_isWebViewInitialized) {
+    _log('WebView already initialized. Reinitializing...');
+    disposeWebView();
+    _webViewController = WebViewController();
+    // }
 
     _configureWebViewController(videoUrl);
-    await _webViewController.loadRequest(Uri.parse(videoUrl)).catchError((e) {
+    await _webViewController
+        .loadRequest(Uri.parse(videoUrl.trim()))
+        .catchError((e) {
       _log('Failed to load URL: $e', error: e);
     });
 
@@ -160,7 +162,7 @@ class WebviewProvider with ChangeNotifier {
           }
         }
 
-        return NavigationDecision.navigate;
+        return NavigationDecision.prevent;
       },
       onWebResourceError: (error) {
         _log('WebView resource error: ${error.description}', error: error);

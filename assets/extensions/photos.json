@@ -1,6 +1,6 @@
 [
   {
-    "url": "https://x-pictures.io/aiporn/gallery",
+    "url": "https://x-pictures.ai/gallery",
     "searchUrl": "https://x-pictures.io/aiporn/gallery?query={search}&page={page}",
     "type": "3",
     "decodeType": "1",
@@ -410,31 +410,72 @@
     "isEmbed": "0",
     "icon": "https://static.pornpics.com/favicon/apple-touch-icon.png?v=1",
     "query": {
-      "recent": "recent/?limit=20&offset={offset}",
+      "recent": "popular/api/galleries/list/?category_id=2587&period=0&lang=en&limit=20&offset={offset}",
 
-      "popular": "popular/?limit=20&offset={offset}"
-    }
+      "popular": "popular/api/galleries/list/?category_id=2586&period=0&lang=en&limit=20&offset={offset}",
+      "most liked": "popular/api/galleries/list/?category_id=3297&period=0&lang=en&limit=20&offset={offset}",
+      "top rated": "popular/api/galleries/list/?category_id=3296&period=0&lang=en&limit=20&offset={offset}",
+      "top viewed": "popular/api/galleries/list/?category_id=3295&period=0&lang=en&limit=20&offset={offset}",
+      "most commented": "popular/api/galleries/list/?category_id=3294&period=0&lang=en&limit=20&offset={offset}"
+    },
+    "config": {
+      "title_selector": {
+        "selector": "desc",
+        "attribute": ""
+      },
+      "thumbnail_selector": {
+        "selector": "t_url",
+        "attribute": ""
+      },
+      "content_url_selector": {
+        "selector": "g_url",
+        "attribute": ""
+      },
+
+      "content_selector": {
+        "selector": "data"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://www.sex.com/",
     "type": "3",
     "NSFW": "1",
     "getType": "1",
-    "decodeType": "1",
+    "decodeType": "2",
     "isPreview": "0",
     "name": "sex",
     "pageType": "mpage/",
     "isEmbed": "0",
-    "icon": "https://sximagex1.sxccdn.com/sex/Logo.webp",
+    "cdn": "https://imagex1.sx.cdn.live",
+    "icon": "https://staticp.sxccdn.com/static/media/logo-light.svg?v=1743638400000",
     "query": {
-      "all": "pins",
-      "pics recent": "pics/?sort=latest&sub=all&page={page}",
+      "recent": "portal/api/pictures?sexual-orientation=straight&order=publishedAt&page=1&limit={offset}",
 
-      "pics popular": "pics/?sort=popular&sub=all&page={page}",
-      "gifs recent": "videos/?sort=latest&sub=all&page={page}",
-      "gifs popular": "videos/?sort=popular&sub=all&page={page}"
-    }
+      "popular": "portal/api/pictures?sexual-orientation=straight&order=likeCount&page=1&limit={offset}"
+    },
+    "config": {
+      "title_selector": {
+        "selector": "title",
+        "attribute": ""
+      },
+      "thumbnail_selector": {
+        "selector": "uri",
+        "attribute": ""
+      },
+      "content_url_selector": {
+        "selector": "id",
+        "attribute": ""
+      },
+
+      "content_selector": {
+        "selector": "data"
+      }
+    },
+    "enabled": true
   },
+
   {
     "url": "https://www.definebabe.com/",
     "type": "3",
@@ -544,6 +585,424 @@
 
       "content_selector": {
         "selector": "data"
+      }
+    },
+    "enabled": true
+  },
+  {
+    "url": "https://api.createporn.com/",
+    "type": "3",
+
+    "NSFW": "0",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "name": "createhentai",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://cdn6.imgpog.com/hentaiLogoShort.webp",
+    "searchUrl": "https://api.createporn.com/post/search?limit=20&searchQuery={search}&sort=hot&type=image&bucket=3&skip={offset}",
+
+    "query": {
+      "hot": "post/feed?include=userLikes&type=hot&cursor={page}",
+      "top": "post/feed?type=top15&include=userLikes&cursor={page}"
+    },
+    "header": {
+      "x-origin": "https://www.createhentai.com"
+    },
+    "config": {
+      "title_selector": {
+        "selector": "_id"
+      },
+      "thumbnail_selector": {
+        "selector": "imageUrl"
+      },
+      "content_url_selector": {
+        "selector": "_id"
+      },
+
+      "content_selector": {
+        "selector": "results"
+      }
+    },
+    "enabled": true
+  },
+  {
+    "url": "https://api.createporn.com/",
+    "type": "3",
+
+    "NSFW": "0",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "name": "createporn",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://cdn6.imgpog.com/newLogoShort.svg",
+    "searchUrl": "https://api.createporn.com/post/search?limit=20&searchQuery={search}&sort=hot&type=image&bucket=3&skip={offset}",
+
+    "query": {
+      "hot": "post/feed?include=userLikes&type=hot&cursor={page}",
+      "top": "post/feed?type=top15&include=userLikes&cursor={page}"
+    },
+    "header": {
+      "x-origin": "https://www.createporn.com"
+    },
+    "config": {
+      "title_selector": {
+        "selector": "_id"
+      },
+      "thumbnail_selector": {
+        "selector": "imageUrl"
+      },
+      "content_url_selector": {
+        "selector": "_id"
+      },
+
+      "content_selector": {
+        "selector": "results"
+      }
+    },
+    "enabled": true
+  },
+  {
+    "url": "https://api.createporn.com/",
+    "type": "3",
+
+    "NSFW": "0",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "name": "createaishemale",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://cdn6.imgpog.com/shemaleLogoShort.svg",
+    "searchUrl": "https://api.createporn.com/post/search?limit=20&searchQuery={search}&sort=hot&type=image&bucket=3&skip={offset}",
+
+    "query": {
+      "hot": "post/feed?include=userLikes&type=hot&cursor={page}",
+      "top": "post/feed?type=top15&include=userLikes&cursor={page}"
+    },
+    "header": {
+      "x-origin": "https://www.createaishemale.com"
+    },
+    "config": {
+      "title_selector": {
+        "selector": "_id"
+      },
+      "thumbnail_selector": {
+        "selector": "imageUrl"
+      },
+      "content_url_selector": {
+        "selector": "_id"
+      },
+
+      "content_selector": {
+        "selector": "results"
+      }
+    },
+    "enabled": true
+  },
+  {
+    "url": "https://api.createporn.com/",
+    "type": "3",
+
+    "NSFW": "0",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "name": "createaifurry",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "http://cdn6.imgpog.com/furryLogoShort.svg",
+    "searchUrl": "https://api.createporn.com/post/search?limit=20&searchQuery={search}&sort=hot&type=image&bucket=3&skip={offset}",
+
+    "query": {
+      "hot": "post/feed?include=userLikes&type=hot&cursor={page}",
+      "top": "post/feed?type=top15&include=userLikes&cursor={page}"
+    },
+    "header": {
+      "x-origin": "https://www.createaifurry.com"
+    },
+    "config": {
+      "title_selector": {
+        "selector": "_id"
+      },
+      "thumbnail_selector": {
+        "selector": "imageUrl"
+      },
+      "content_url_selector": {
+        "selector": "_id"
+      },
+
+      "content_selector": {
+        "selector": "results"
+      }
+    },
+    "enabled": true
+  },
+  {
+    "url": "https://api.createporn.com/",
+    "type": "3",
+
+    "NSFW": "0",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "name": "createaiasian",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://cdn6.imgpog.com/asianLogoShort.svg",
+    "searchUrl": "https://api.createporn.com/post/search?limit=20&searchQuery={search}&sort=hot&type=image&bucket=3&skip={offset}",
+
+    "query": {
+      "hot": "post/feed?include=userLikes&type=hot&cursor={page}",
+      "top": "post/feed?type=top15&include=userLikes&cursor={page}"
+    },
+    "header": {
+      "x-origin": "https://www.createaiasian.com"
+    },
+    "config": {
+      "title_selector": {
+        "selector": "_id"
+      },
+      "thumbnail_selector": {
+        "selector": "imageUrl"
+      },
+      "content_url_selector": {
+        "selector": "_id"
+      },
+
+      "content_selector": {
+        "selector": "results"
+      }
+    },
+    "enabled": true
+  },
+  {
+    "url": "https://api.createporn.com/",
+    "type": "3",
+
+    "NSFW": "0",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "name": "createaigayporn",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://cdn6.imgpog.com/boyfriendLogoShort.svg",
+    "searchUrl": "https://api.createporn.com/post/search?limit=20&searchQuery={search}&sort=hot&type=image&bucket=3&skip={offset}",
+
+    "query": {
+      "hot": "post/feed?include=userLikes&type=hot&cursor={page}",
+      "top": "post/feed?type=top15&include=userLikes&cursor={page}"
+    },
+    "header": {
+      "x-origin": "https://www.createaigayporn.com"
+    },
+    "config": {
+      "title_selector": {
+        "selector": "_id"
+      },
+      "thumbnail_selector": {
+        "selector": "imageUrl"
+      },
+      "content_url_selector": {
+        "selector": "_id"
+      },
+
+      "content_selector": {
+        "selector": "results"
+      }
+    },
+    "enabled": true
+  },
+  {
+    "url": "https://api.createporn.com/",
+    "type": "3",
+
+    "NSFW": "0",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "name": "createaiebony",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "https://cdn6.imgpog.com/ebonyLogoShort.svg",
+    "searchUrl": "https://api.createporn.com/post/search?limit=20&searchQuery={search}&sort=hot&type=image&bucket=3&skip={offset}",
+
+    "query": {
+      "hot": "post/feed?include=userLikes&type=hot&cursor={page}",
+      "top": "post/feed?type=top15&include=userLikes&cursor={page}"
+    },
+    "header": {
+      "x-origin": "https://www.createaiebony.com"
+    },
+    "config": {
+      "title_selector": {
+        "selector": "_id"
+      },
+      "thumbnail_selector": {
+        "selector": "imageUrl"
+      },
+      "content_url_selector": {
+        "selector": "_id"
+      },
+
+      "content_selector": {
+        "selector": "results"
+      }
+    },
+    "enabled": true
+  },
+  {
+    "url": "https://api.createporn.com/",
+    "type": "3",
+
+    "NSFW": "0",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "name": "createaibbw",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "http://cdn6.imgpog.com/bbwLogoShort.svg",
+    "searchUrl": "https://api.createporn.com/post/search?limit=20&searchQuery={search}&sort=hot&type=image&bucket=3&skip={offset}",
+
+    "query": {
+      "hot": "post/feed?include=userLikes&type=hot&cursor={page}",
+      "top": "post/feed?type=top15&include=userLikes&cursor={page}"
+    },
+    "header": {
+      "x-origin": "https://www.createaibbw.com"
+    },
+    "config": {
+      "title_selector": {
+        "selector": "_id"
+      },
+      "thumbnail_selector": {
+        "selector": "imageUrl"
+      },
+      "content_url_selector": {
+        "selector": "_id"
+      },
+
+      "content_selector": {
+        "selector": "results"
+      }
+    },
+    "enabled": true
+  },
+  {
+    "url": "https://api.createporn.com/",
+    "type": "3",
+
+    "NSFW": "0",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "name": "createailatina",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "http://cdn6.imgpog.com/latinaLogoShort.svg",
+    "searchUrl": "https://api.createporn.com/post/search?limit=20&searchQuery={search}&sort=hot&type=image&bucket=3&skip={offset}",
+
+    "query": {
+      "hot": "post/feed?include=userLikes&type=hot&cursor={page}",
+      "top": "post/feed?type=top15&include=userLikes&cursor={page}"
+    },
+    "header": {
+      "x-origin": "https://www.createailatina.com"
+    },
+    "config": {
+      "title_selector": {
+        "selector": "_id"
+      },
+      "thumbnail_selector": {
+        "selector": "imageUrl"
+      },
+      "content_url_selector": {
+        "selector": "_id"
+      },
+
+      "content_selector": {
+        "selector": "results"
+      }
+    },
+    "enabled": true
+  },
+  {
+    "url": "https://api.createporn.com/",
+    "type": "3",
+
+    "NSFW": "0",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "name": "createaindian",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "http://cdn6.imgpog.com/indianLogoShort.svg",
+    "searchUrl": "https://api.createporn.com/post/search?limit=20&searchQuery={search}&sort=hot&type=image&bucket=3&skip={offset}",
+
+    "query": {
+      "hot": "post/feed?include=userLikes&type=hot&cursor={page}",
+      "top": "post/feed?type=top15&include=userLikes&cursor={page}"
+    },
+    "header": {
+      "x-origin": "https://www.createaiindian.com"
+    },
+    "config": {
+      "title_selector": {
+        "selector": "_id"
+      },
+      "thumbnail_selector": {
+        "selector": "imageUrl"
+      },
+      "content_url_selector": {
+        "selector": "_id"
+      },
+
+      "content_selector": {
+        "selector": "results"
+      }
+    },
+    "enabled": true
+  },
+  {
+    "url": "https://api.createporn.com/",
+    "type": "3",
+
+    "NSFW": "0",
+    "getType": "1",
+    "decodeType": "2",
+    "isPreview": "0",
+    "name": "createaimilf",
+    "pageType": "mpage/",
+    "isEmbed": "0",
+    "icon": "http://cdn6.imgpog.com/milfLogoShort.svg",
+    "searchUrl": "https://api.createporn.com/post/search?limit=20&searchQuery={search}&sort=hot&type=image&bucket=3&skip={offset}",
+
+    "query": {
+      "hot": "post/feed?include=userLikes&type=hot&cursor={page}",
+      "top": "post/feed?type=top15&include=userLikes&cursor={page}"
+    },
+    "header": {
+      "x-origin": "https://www.createaimilf.com"
+    },
+    "config": {
+      "title_selector": {
+        "selector": "_id"
+      },
+      "thumbnail_selector": {
+        "selector": "imageUrl"
+      },
+      "content_url_selector": {
+        "selector": "_id"
+      },
+
+      "content_selector": {
+        "selector": "results"
       }
     },
     "enabled": true

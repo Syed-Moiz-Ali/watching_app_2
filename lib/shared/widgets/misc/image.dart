@@ -1,11 +1,13 @@
 import 'dart:convert';
-import 'dart:math';
+import 'dart:developer';
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 
 import '../loading/loading_indicator.dart';
@@ -81,7 +83,7 @@ class _ImageWidgetState extends State<ImageWidget>
       final String jsonString =
           await rootBundle.loadString('assets/json/stars2.json');
       final List<dynamic> jsonData = json.decode(jsonString);
-      final random = Random();
+      final random = math.Random();
       final randomImage = jsonData[random.nextInt(jsonData.length)];
 
       setState(() {
@@ -171,6 +173,7 @@ class _ImageWidgetState extends State<ImageWidget>
 
   @override
   Widget build(BuildContext context) {
+    // log("imagePath is ${widget.imagePath}");
     return LayoutBuilder(
       builder: (context, constraints) {
         return MouseRegion(
@@ -194,6 +197,7 @@ class _ImageWidgetState extends State<ImageWidget>
                   margin: widget.margin,
                   padding: widget.padding,
                   decoration: BoxDecoration(
+                    // color: AppColors.disabledColor,
                     borderRadius: widget.customBorderRadius ??
                         (widget.borderRadius is double
                             ? BorderRadius.circular(widget.borderRadius)
@@ -244,7 +248,7 @@ class _ImageWidgetState extends State<ImageWidget>
                         ),
 
                         // Loading indicator overlay when image is loading
-                        if (!_isLoaded && !_isError) _buildPlaceholder(),
+                        // if (!_isLoaded && !_isError) _buildPlaceholder(),
 
                         // Color overlay with adjustable opacity
                         if (widget.overlayColor != null &&
@@ -414,6 +418,7 @@ class _ImageWidgetState extends State<ImageWidget>
   }
 
   Widget _buildSvgImage(String imageUrl) {
+    log("this is svg image");
     try {
       return SvgPicture.network(
         imageUrl,
@@ -589,13 +594,13 @@ class _ImageWidgetState extends State<ImageWidget>
             Icon(
               Icons.broken_image_rounded,
               color: Colors.grey,
-              size: min(40, (widget.width ?? 80) / 4),
+              size: math.min(40, (widget.width ?? 80) / 4),
             ),
             const SizedBox(height: 8),
             TextWidget(
               text: 'Image not available',
               color: Colors.grey[600],
-              fontSize: min(14, (widget.width ?? 80) / 8),
+              fontSize: math.min(14, (widget.width ?? 80) / 8),
             ),
           ],
         ),

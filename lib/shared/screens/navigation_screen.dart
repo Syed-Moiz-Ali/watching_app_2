@@ -5,573 +5,588 @@ import 'dart:ui';
 import 'package:provider/provider.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/presentation/provider/navigation_provider.dart';
-
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 
+// Import your pages
 import 'browse_content/browse_content.dart';
-
 import 'categories/categories.dart';
 import 'favorites/favorites.dart';
 import 'settings.dart';
 import 'sources/sources.dart';
 
-// Create a provider class to manage the navigation state
-
-class UltraPremiumNavBar extends StatefulWidget {
-  final List<String> labels;
-  final List<IconData> icons;
+class MinimalistNavBar extends StatefulWidget {
+  final List<NavItem> items;
   final Color? accentColor;
   final Color? backgroundColor;
-  final bool enableBlur;
+  final bool enableHaptics;
+  final bool enableAnimations;
+  final NavBarStyle style;
 
-  const UltraPremiumNavBar({
+  const MinimalistNavBar({
     super.key,
-    this.labels = const [
-      'Home',
-      'Categories',
-      'Websites',
-      'Favorites',
-      'Profile'
-    ],
-    this.icons = const [
-      Icons.home_rounded,
-      Icons.category_rounded,
-      Icons.language_rounded,
-      Icons.favorite_rounded,
-      Icons.person_rounded
+    this.items = const [
+      NavItem(icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Home'),
+      NavItem(
+          icon: Icons.grid_view_outlined,
+          activeIcon: Icons.grid_view,
+          label: 'Categories'),
+      NavItem(
+          icon: Icons.language_outlined,
+          activeIcon: Icons.language,
+          label: 'Sources'),
+      NavItem(
+          icon: Icons.favorite_outline,
+          activeIcon: Icons.favorite,
+          label: 'Favorites'),
+      NavItem(
+          icon: Icons.person_outline,
+          activeIcon: Icons.person,
+          label: 'Profile'),
     ],
     this.accentColor,
     this.backgroundColor,
-    this.enableBlur = true,
+    this.enableHaptics = true,
+    this.enableAnimations = true,
+    this.style = NavBarStyle.floating,
   });
 
   @override
-  State<UltraPremiumNavBar> createState() => _UltraPremiumNavBarState();
+  State<MinimalistNavBar> createState() => _MinimalistNavBarState();
 }
 
-class _UltraPremiumNavBarState extends State<UltraPremiumNavBar>
+class NavItem {
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+  final bool showBadge;
+  final String? badgeText;
+
+  const NavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+    this.showBadge = false,
+    this.badgeText,
+  });
+}
+
+enum NavBarStyle { floating, docked, minimal }
+
+class _MinimalistNavBarState extends State<MinimalistNavBar>
     with TickerProviderStateMixin {
-  // Animation controllers for each animation type
-  late final AnimationController _entryAnimController;
-  late final AnimationController _pulseAnimController;
-  late final List<AnimationController> _iconAnimControllers;
-  late final AnimationController _indicatorAnimController;
-  late final List<AnimationController> _hoverControllers;
+  late AnimationController _slideController;
+  late AnimationController _scaleController;
+  late AnimationController _indicatorController;
 
-  // Animations
-  late final Animation<double> _entryAnimation;
-  late final Animation<double> _pulseAnimation;
-  late final List<Animation<double>> _iconScaleAnimations;
-  late final List<Animation<double>> _iconRotateAnimations;
-  late final List<Animation<double>> _iconOpacityAnimations;
-  late Animation<Offset> _indicatorPosition;
-  late Animation<double> _indicatorWidth;
-  late final List<Animation<double>> _hoverAnimations;
+  late Animation<Offset> _slideAnimation;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _indicatorAnimation;
 
-  // Other state variables
+  List<AnimationController> _itemControllers = [];
+  List<Animation<double>> _itemAnimations = [];
+
   int _previousIndex = 0;
-  bool _didInitializeAnimations = false;
 
   @override
   void initState() {
     super.initState();
-    final navProvider = Provider.of<NavigationProvider>(context, listen: false);
-    _previousIndex = navProvider.currentIndex;
     _initializeAnimations();
-    _didInitializeAnimations = true;
-
-    // Start entry animation
-    _entryAnimController.forward();
-
-    // Start pulse animation for continuous effect
-    _pulseAnimController.repeat(reverse: true);
-
-    // Initialize current tab animation
-    _iconAnimControllers[navProvider.currentIndex].forward();
-
-    // Position the indicator at the current index
-    _updateIndicatorPosition(navProvider.currentIndex, animate: false);
+    _startEntryAnimation();
   }
 
   void _initializeAnimations() {
-    // Entry animation (bottom to top with bounce)
-    _entryAnimController = AnimationController(
+    // Main slide animation for entry
+    _slideController = AnimationController(
+      duration: const Duration(milliseconds: 800),
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
     );
 
-    _entryAnimation = CurvedAnimation(
-      parent: _entryAnimController,
-      curve: Curves.elasticOut,
-    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
 
-    // Subtle background pulse animation
-    _pulseAnimController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2000),
-    );
-
-    _pulseAnimation = Tween<double>(begin: 0.95, end: 1.05).animate(
-      CurvedAnimation(
-        parent: _pulseAnimController,
-        curve: Curves.easeInOut,
-      ),
-    );
-
-    // Icon animations for each tab
-    _iconAnimControllers = List.generate(
-      widget.icons.length,
-      (index) => AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 400),
-      ),
-    );
-
-    // Multiple animations per icon for rich visual effect
-    _iconScaleAnimations = _iconAnimControllers
-        .map(
-          (controller) => Tween<double>(begin: 1.0, end: 1.2).animate(
-            CurvedAnimation(
-              parent: controller,
-              curve: Curves.easeOutBack,
-            ),
-          ),
-        )
-        .toList();
-
-    _iconRotateAnimations = _iconAnimControllers
-        .map(
-          (controller) => Tween<double>(begin: 0.0, end: 0.05).animate(
-            CurvedAnimation(
-              parent: controller,
-              curve: Curves.easeInOutSine,
-            ),
-          ),
-        )
-        .toList();
-
-    _iconOpacityAnimations = _iconAnimControllers
-        .map(
-          (controller) => Tween<double>(begin: 0.7, end: 1.0).animate(
-            CurvedAnimation(
-              parent: controller,
-              curve: Curves.easeOut,
-            ),
-          ),
-        )
-        .toList();
-
-    // Sliding indicator animation
-    _indicatorAnimController = AnimationController(
-      vsync: this,
+    // Scale animation for entry
+    _scaleController = AnimationController(
       duration: const Duration(milliseconds: 600),
+      vsync: this,
     );
 
-    // Initial indicator setup will happen in updateIndicatorPosition
-    _indicatorPosition = Tween<Offset>(
-      begin: Offset(_previousIndex.toDouble(), 0),
-      end: Offset(_previousIndex.toDouble(), 0),
-    ).animate(
-      CurvedAnimation(
-        parent: _indicatorAnimController,
-        curve: Curves.easeOutCubic,
-      ),
-    );
-
-    _indicatorWidth = Tween<double>(
-      begin: 1.0,
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
       end: 1.0,
-    ).animate(
-      CurvedAnimation(
-        parent: _indicatorAnimController,
-        curve: Curves.easeOutCubic,
-      ),
+    ).animate(CurvedAnimation(
+      parent: _scaleController,
+      curve: Curves.easeOutBack,
+    ));
+
+    // Indicator animation
+    _indicatorController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
     );
 
-    // Hover animations
-    _hoverControllers = List.generate(
-      widget.icons.length,
+    _indicatorAnimation = CurvedAnimation(
+      parent: _indicatorController,
+      curve: Curves.easeOutCubic,
+    );
+
+    // Individual item animations
+    _itemControllers = List.generate(
+      widget.items.length,
       (index) => AnimationController(
+        duration: Duration(milliseconds: 300 + (index * 50)),
         vsync: this,
-        duration: const Duration(milliseconds: 200),
       ),
     );
 
-    _hoverAnimations = _hoverControllers
+    _itemAnimations = _itemControllers
         .map(
           (controller) => Tween<double>(begin: 0.0, end: 1.0).animate(
-            CurvedAnimation(
-              parent: controller,
-              curve: Curves.easeOut,
-            ),
+            CurvedAnimation(parent: controller, curve: Curves.easeOut),
           ),
         )
         .toList();
   }
 
-  void _updateIndicatorPosition(int index, {bool animate = true}) {
-    // Update the indicator position animation
-    _indicatorPosition = Tween<Offset>(
-      begin: Offset(_previousIndex.toDouble(), 0),
-      end: Offset(index.toDouble(), 0),
-    ).animate(
-      CurvedAnimation(
-        parent: _indicatorAnimController,
-        curve: Curves.easeOutCubic,
-      ),
-    );
+  void _startEntryAnimation() async {
+    // Staggered entry animation
+    _slideController.forward();
+    await Future.delayed(const Duration(milliseconds: 100));
+    _scaleController.forward();
 
-    // Update indicator width for stretch effect
-    _indicatorWidth = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 1.0, end: 1.5)
-            .chain(CurveTween(curve: Curves.easeOut)),
-        weight: 40,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 1.5, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeIn)),
-        weight: 60,
-      ),
-    ]).animate(_indicatorAnimController);
+    // Animate items with stagger
+    for (int i = 0; i < _itemControllers.length; i++) {
+      await Future.delayed(const Duration(milliseconds: 80));
+      _itemControllers[i].forward();
+    }
+  }
 
-    if (animate) {
-      _indicatorAnimController.reset();
-      _indicatorAnimController.forward();
+  void _onItemTapped(int index) {
+    if (widget.enableHaptics) {
+      HapticFeedback.lightImpact();
     }
 
-    _previousIndex = index;
+    final navProvider = Provider.of<NavigationProvider>(context, listen: false);
+    if (navProvider.currentIndex != index) {
+      navProvider.setIndex(index);
+      _animateIndicator(index);
+    }
+  }
+
+  void _animateIndicator(int index) {
+    _indicatorController.reset();
+    _indicatorController.forward();
+    setState(() => _previousIndex = index);
   }
 
   @override
   void dispose() {
-    _entryAnimController.dispose();
-    _pulseAnimController.dispose();
-    for (final controller in _iconAnimControllers) {
+    _slideController.dispose();
+    _scaleController.dispose();
+    _indicatorController.dispose();
+    for (var controller in _itemControllers) {
       controller.dispose();
     }
-    for (final controller in _hoverControllers) {
-      controller.dispose();
-    }
-    _indicatorAnimController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+    final isDark = theme.brightness == Brightness.dark;
 
-    final accentColor = widget.accentColor ?? theme.primaryColor;
+    final accentColor = widget.accentColor ?? AppColors.secondaryColor;
     final backgroundColor = widget.backgroundColor ??
-        (isDarkMode
-            ? Colors.grey[900]!.withOpacity(0.7)
-            : Colors.white.withOpacity(0.7));
-
-    final itemWidth = 95.w / widget.icons.length;
+        (isDark
+            ? Colors.black.withOpacity(0.8)
+            : Colors.white.withOpacity(0.9));
 
     return Consumer<NavigationProvider>(
-      builder: (context, navProvider, child) {
-        // Check if the index has changed since our last build
-        if (_previousIndex != navProvider.currentIndex &&
-            _didInitializeAnimations) {
-          // Reverse previous animation
-          _iconAnimControllers[_previousIndex].reverse();
-
-          // Start new animation
-          _iconAnimControllers[navProvider.currentIndex].forward();
-
-          // Update indicator position
-          _updateIndicatorPosition(navProvider.currentIndex);
-
-          // Haptic feedback
-          HapticFeedback.mediumImpact();
-        }
-
+      builder: (context, navProvider, _) {
         return AnimatedBuilder(
-          animation: Listenable.merge([_entryAnimation, _pulseAnimation]),
+          animation: Listenable.merge([_slideAnimation, _scaleAnimation]),
           builder: (context, child) {
-            return Padding(
-              padding: EdgeInsets.fromLTRB(2.w, 0, 2.w, 2.h),
-              child: Transform.translate(
-                offset: Offset(0, 100 * (1 - _entryAnimation.value)),
-                child: Transform.scale(
-                  scale: 0.97 + (0.03 * _entryAnimation.value),
-                  child: child,
-                ),
+            return SlideTransition(
+              position: _slideAnimation,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: _buildNavBar(
+                    context, navProvider, accentColor, backgroundColor, isDark),
               ),
             );
           },
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(30),
-            child: BackdropFilter(
-              filter: widget.enableBlur
-                  ? ImageFilter.blur(sigmaX: 10, sigmaY: 10)
-                  : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
-              child: Container(
-                height: 12.h,
-                decoration: BoxDecoration(
-                  color: backgroundColor,
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 20,
-                      spreadRadius: 5,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                  border: Border.all(
-                    color: isDarkMode
-                        ? Colors.white.withOpacity(0.1)
-                        : Colors.black.withOpacity(0.05),
-                    width: 1.5,
-                  ),
-                ),
-                child: Stack(
-                  children: [
-                    // Animated indicator
-                    AnimatedBuilder(
-                      animation: _indicatorAnimController,
-                      builder: (context, _) {
-                        return Positioned(
-                          bottom: 0,
-                          left: _indicatorPosition.value.dx * itemWidth +
-                              (itemWidth -
-                                      (itemWidth *
-                                          0.6 *
-                                          _indicatorWidth.value)) /
-                                  2,
-                          child: Container(
-                            width: itemWidth * 0.6 * _indicatorWidth.value,
-                            height: 0.4.h,
-                            decoration: BoxDecoration(
-                              color: accentColor,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: accentColor.withOpacity(0.5),
-                                  blurRadius: 6,
-                                  spreadRadius: -1,
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-
-                    // Navigation items
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: List.generate(
-                        widget.icons.length,
-                        (index) => _buildNavItem(
-                          index,
-                          widget.icons[index],
-                          widget.labels[index],
-                          accentColor,
-                          isDarkMode,
-                          hasNotification:
-                              navProvider.hasNotification && index == 3,
-                          isSelected: navProvider.currentIndex == index,
-                          onTap: () => navProvider.setIndex(index),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
         );
       },
     );
   }
 
-  Widget _buildNavItem(
-    int index,
-    IconData icon,
-    String label,
-    Color accentColor,
-    bool isDarkMode, {
-    required bool hasNotification,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    // Calculate base colors
-    final baseColor = isDarkMode ? Colors.white : Colors.grey[800]!;
-    final selectedColor = accentColor;
-    final unselectedColor = baseColor.withOpacity(0.7);
+  Widget _buildNavBar(BuildContext context, NavigationProvider navProvider,
+      Color accentColor, Color backgroundColor, bool isDark) {
+    switch (widget.style) {
+      case NavBarStyle.floating:
+        return _buildFloatingNavBar(
+            context, navProvider, accentColor, backgroundColor, isDark);
+      case NavBarStyle.docked:
+        return _buildDockedNavBar(
+            context, navProvider, accentColor, backgroundColor, isDark);
+      case NavBarStyle.minimal:
+        return _buildMinimalNavBar(
+            context, navProvider, accentColor, backgroundColor, isDark);
+    }
+  }
 
-    return GestureDetector(
-      onTap: onTap,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (_) => _hoverControllers[index].forward(),
-        onExit: (_) => _hoverControllers[index].reverse(),
-        child: AnimatedBuilder(
-          animation: Listenable.merge([
-            _iconAnimControllers[index],
-            _hoverControllers[index],
-          ]),
-          builder: (context, _) {
-            final scaleValue = _iconScaleAnimations[index].value;
-            final rotateValue = _iconRotateAnimations[index].value;
-            final opacityValue = _iconOpacityAnimations[index].value;
-            final hoverValue = _hoverAnimations[index].value;
-
-            final currentColor = isSelected
-                ? selectedColor
-                : Color.lerp(unselectedColor, selectedColor, hoverValue)!;
-
-            return Container(
-              width: 90.w / widget.icons.length,
-              padding: EdgeInsets.symmetric(vertical: 1.h),
-              decoration: BoxDecoration(
-                // color: isSelected || hoverValue > 0
-                //     ? (isDarkMode
-                //         ? selectedColor
-                //             .withOpacity(0.1 * (isSelected ? 1.0 : hoverValue))
-                //         : selectedColor.withOpacity(
-                //             0.08 * (isSelected ? 1.0 : hoverValue)))
-                //     : Colors.transparent,
-                borderRadius: BorderRadius.circular(20),
+  Widget _buildFloatingNavBar(
+      BuildContext context,
+      NavigationProvider navProvider,
+      Color accentColor,
+      Color backgroundColor,
+      bool isDark) {
+    return Container(
+      margin: EdgeInsets.fromLTRB(4.w, 0, 4.w, 3.h),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(25),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            height: 10.h,
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(
+                color: isDark
+                    ? Colors.white.withOpacity(0.1)
+                    : Colors.black.withOpacity(0.05),
+                width: 1,
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Icon with animations
-                  SizedBox(
-                    height: 6.h,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      clipBehavior: Clip.none,
-                      children: [
-                        // Icon ripple effect (on selected)
-                        if (isSelected)
-                          AnimatedBuilder(
-                            animation: _pulseAnimController,
-                            builder: (context, _) {
-                              return Opacity(
-                                opacity: 0.1 + (0.05 * _pulseAnimation.value),
-                                child: Transform.scale(
-                                  scale: _pulseAnimation.value,
-                                  child: Container(
-                                    width: 12.w,
-                                    height: 12.w,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: selectedColor.withOpacity(0.2),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-
-                        // Main icon
-                        Transform.scale(
-                          scale: scaleValue,
-                          child: Transform.rotate(
-                            angle: rotateValue,
-                            child: Icon(
-                              icon,
-                              color: currentColor,
-                              size: 6.5.w,
-                            ),
-                          ),
-                        ),
-
-                        // Notification indicator
-                        if (hasNotification)
-                          Positioned(
-                            top: 0,
-                            right: 0,
-                            child: Container(
-                              width: 2.w,
-                              height: 2.w,
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color:
-                                      isDarkMode ? Colors.black : Colors.white,
-                                  width: 0.3.w,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
-                                    blurRadius: 4,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-
-                  // Label
-                  Opacity(
-                    opacity: opacityValue,
-                    child: TextWidget(
-                      text: label,
-                      color: currentColor,
-                      fontSize: 13.sp,
-                      fontWeight:
-                          isSelected ? FontWeight.w600 : FontWeight.normal,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
+            ),
+            child: _buildNavItems(navProvider, accentColor, isDark),
+          ),
         ),
       ),
     );
   }
-}
 
-// Usage Example
-class NavigationScreen extends StatelessWidget {
-  const NavigationScreen({super.key});
+  Widget _buildDockedNavBar(
+      BuildContext context,
+      NavigationProvider navProvider,
+      Color accentColor,
+      Color backgroundColor,
+      bool isDark) {
+    return Container(
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        border: Border(
+          top: BorderSide(
+            color: isDark
+                ? Colors.white.withOpacity(0.1)
+                : Colors.black.withOpacity(0.05),
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: SafeArea(
+        child: Container(
+          height: 9.h,
+          child: _buildNavItems(navProvider, accentColor, isDark),
+        ),
+      ),
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => NavigationProvider()..setNotification(true),
-      child: const _NavigationExampleContent(),
+  Widget _buildMinimalNavBar(
+      BuildContext context,
+      NavigationProvider navProvider,
+      Color accentColor,
+      Color backgroundColor,
+      bool isDark) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+      child: Container(
+        height: 9.h,
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withOpacity(0.1)
+                : Colors.black.withOpacity(0.05),
+            width: 1,
+          ),
+        ),
+        child: _buildNavItems(navProvider, accentColor, isDark),
+      ),
+    );
+  }
+
+  Widget _buildNavItems(
+      NavigationProvider navProvider, Color accentColor, bool isDark) {
+    return Stack(
+      children: [
+        // Animated indicator
+        // AnimatedBuilder(
+        //   animation: _indicatorAnimation,
+        //   builder: (context, _) {
+        //     final itemWidth = 100.w / widget.items.length;
+        //     return Positioned(
+        //       top: 1.h,
+        //       left: navProvider.currentIndex *
+        //               itemWidth /
+        //               widget.items.length *
+        //               100.w /
+        //               100 +
+        //           itemWidth * 0.2,
+        //       child: AnimatedContainer(
+        //         duration: const Duration(milliseconds: 300),
+        //         width: itemWidth * 0.6,
+        //         height: 0.5.h,
+        //         decoration: BoxDecoration(
+        //           color: accentColor,
+        //           borderRadius: BorderRadius.circular(10),
+        //         ),
+        //       ),
+        //     );
+        //   },
+        // ),
+
+        // Navigation items
+        Row(
+          children: List.generate(widget.items.length, (index) {
+            return Expanded(
+              child: GestureDetector(
+                onTap: () => _onItemTapped(index),
+                child: AnimatedBuilder(
+                  animation: _itemAnimations[index],
+                  builder: (context, _) {
+                    return Transform.translate(
+                      offset:
+                          Offset(0, 20 * (1 - _itemAnimations[index].value)),
+                      child: Opacity(
+                        opacity: _itemAnimations[index].value,
+                        child: _buildNavItem(
+                          index,
+                          widget.items[index],
+                          navProvider.currentIndex == index,
+                          accentColor,
+                          isDark,
+                          navProvider.hasNotification && index == 3,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            );
+          }),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNavItem(int index, NavItem item, bool isSelected,
+      Color accentColor, bool isDark, bool hasNotification) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 1.h),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Icon with badge
+          SizedBox(
+            height: 5.h,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Animated icon
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: Icon(
+                    isSelected ? item.activeIcon : item.icon,
+                    key: ValueKey(isSelected),
+                    color: isSelected
+                        ? accentColor
+                        : (isDark
+                            ? Colors.white.withOpacity(0.6)
+                            : Colors.grey[600]),
+                    size: isSelected ? 6.w : 5.5.w,
+                  ),
+                ),
+
+                // Notification badge
+                if (hasNotification || item.showBadge)
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Container(
+                      constraints:
+                          BoxConstraints(minWidth: 3.w, minHeight: 3.w),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: isDark ? Colors.black : Colors.white,
+                          width: 1,
+                        ),
+                      ),
+                      child: item.badgeText != null
+                          ? Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 1.w),
+                              child: TextWidget(
+                                text: item.badgeText!,
+                                color: Colors.white,
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            )
+                          : null,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+
+          // Label
+          AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 200),
+            style: TextStyle(
+              color: isSelected
+                  ? accentColor
+                  : (isDark ? Colors.white.withOpacity(0.6) : Colors.grey[600]),
+              fontSize: 10.sp,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
+            child: TextWidget(
+              text: item.label,
+              fontSize: 14.sp,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _NavigationExampleContent extends StatelessWidget {
-  const _NavigationExampleContent();
+// Enhanced Navigation Screen with advanced features
+class NavigationScreen extends StatefulWidget {
+  const NavigationScreen({super.key});
+
+  @override
+  State<NavigationScreen> createState() => _NavigationScreenState();
+}
+
+class _NavigationScreenState extends State<NavigationScreen>
+    with WidgetsBindingObserver {
+  late NavigationProvider _navProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _navProvider = NavigationProvider();
+    _setupAdvancedFeatures();
+  }
+
+  void _setupAdvancedFeatures() {
+    // Simulate notification system
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted) _navProvider.setNotification(true);
+    });
+
+    // Auto-clear notifications when favorites tab is visited
+    _navProvider.addListener(() {
+      if (_navProvider.currentIndex == 3 && _navProvider.hasNotification) {
+        Future.delayed(const Duration(seconds: 1), () {
+          if (mounted) _navProvider.setNotification(false);
+        });
+      }
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Advanced feature: Handle app lifecycle
+    switch (state) {
+      case AppLifecycleState.paused:
+        // Save current state when app goes to background
+        break;
+      case AppLifecycleState.resumed:
+        // Restore state when app comes to foreground
+        break;
+      default:
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _navProvider.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final navProvider = Provider.of<NavigationProvider>(context);
-
-    return Scaffold(
-      backgroundColor: Colors.blueGrey[50],
-      extendBody: true,
-      body: IndexedStack(
-        index: navProvider.currentIndex,
-        children: const [
-          BrowseContent(),
-          Categories(),
-          // _buildPage('Categories Page', Colors.teal),
-          // _buildPage('Websites Page', Colors.blue),
-          Sources(),
-          Favorites(),
-          Settings(),
-        ],
-      ),
-      bottomNavigationBar: const UltraPremiumNavBar(
-        accentColor:
-            AppColors.secondaryColor, // Change to match your brand color
-        enableBlur: true,
+    return ChangeNotifierProvider.value(
+      value: _navProvider,
+      child: Scaffold(
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.black
+            : Colors.grey[50],
+        extendBody: true,
+        body: Consumer<NavigationProvider>(
+          builder: (context, navProvider, _) {
+            return IndexedStack(
+              index: navProvider.currentIndex,
+              children: const [
+                BrowseContent(),
+                Categories(),
+                Sources(),
+                Favorites(),
+                Settings(),
+              ],
+            );
+          },
+        ),
+        bottomNavigationBar: MinimalistNavBar(
+          accentColor: AppColors.secondaryColor,
+          style: NavBarStyle.docked, // Change to docked or minimal as needed
+          items: [
+            const NavItem(
+                icon: Icons.home_outlined,
+                activeIcon: Icons.home,
+                label: 'Home'),
+            const NavItem(
+                icon: Icons.grid_view_outlined,
+                activeIcon: Icons.grid_view,
+                label: 'Categories'),
+            const NavItem(
+                icon: Icons.language_outlined,
+                activeIcon: Icons.language,
+                label: 'Sources'),
+            NavItem(
+              icon: Icons.favorite_outline,
+              activeIcon: Icons.favorite,
+              label: 'Favorites',
+              showBadge: _navProvider.hasNotification,
+            ),
+            const NavItem(
+                icon: Icons.person_outline,
+                activeIcon: Icons.person,
+                label: 'Profile'),
+          ],
+        ),
       ),
     );
   }

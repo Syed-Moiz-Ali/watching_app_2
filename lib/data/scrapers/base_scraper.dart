@@ -109,7 +109,7 @@ abstract class BaseScraper {
     try {
       for (var element in elements) {
         // log("eelement is $element");
-        log("element is ${element is Map} and lenght is ${elements.length}");
+        // log("element is ${element is Map} and lenght is ${elements.length}");
 
         var item = await _parseTiTokContentItem(element);
         items.add(item);
@@ -150,7 +150,7 @@ abstract class BaseScraper {
     Element? element,
     Document? document,
   }) async {
-    if (selector == null || selector.selector?.isEmpty != false) {
+    if (selector == null) {
       log("⚠️ Selector is null or empty.");
       return "";
     }
@@ -274,7 +274,8 @@ abstract class BaseScraper {
       var decoded = jsonDecode(jsonString);
       Map jsonData = decoded is List ? {'data': decoded} : decoded;
       // log("jsonData is $jsonData");
-      final elements = _extractJsonElements(jsonData, selector?.selector ?? '');
+      final elements =
+          _extractJsonElements(jsonData, selector?.selector ?? 'data');
       return elements.isEmpty ? [] : await parser(elements);
     } catch (e) {
       _logError('Error parsing JSON: $e');
@@ -285,6 +286,7 @@ abstract class BaseScraper {
   List _extractJsonElements(Map jsonData, String selector) {
     try {
       log(selector.contains('.').toString());
+      log(selector.toString());
       if (!selector.contains('.')) {
         return jsonData[selector] ?? [];
       }
@@ -294,6 +296,7 @@ abstract class BaseScraper {
       for (final key in keys) {
         value = value[key];
       }
+      log("value is $value");
       return (value is List) ? value : [value];
     } catch (e) {
       _logDebug('Error extracting JSON elements for $selector: $e');
@@ -443,7 +446,7 @@ abstract class BaseScraper {
         return value?.toString();
       }
     }
-    log("paths is ${paths} and value is ${value}");
+    // log("paths is ${paths} and value is ${value}");
 
     return value?.toString();
   }

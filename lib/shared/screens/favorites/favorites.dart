@@ -66,9 +66,7 @@ class _FavoritesState extends State<Favorites>
 
     List<TabContent> tabList = ContentTypes.ALL_TYPES.map((entry) {
       return TabContent(
-        title: entry,
-        icon: _getIconForType(entry),
-      );
+          title: entry, icon: _getIconForType(entry), length: '0');
     }).toList();
 
     return Scaffold(
@@ -76,6 +74,7 @@ class _FavoritesState extends State<Favorites>
         preferredSize: Size.fromHeight(15.h),
         child: CustomAppBar(
           title: 'My Favorites',
+          appBarStyle: AppBarStyle.standard,
           actions: [
             ValueListenableBuilder<bool>(
               valueListenable: _isGridView,

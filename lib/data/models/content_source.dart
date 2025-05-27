@@ -94,9 +94,11 @@ class ContentSource {
   }
 
   String getQueryUrl(String queryType, int page) {
+    final offset = (page * 20).toString();
     return url +
         queryType
             .replaceAll('{page}', page.toString())
+            .replaceAll('{offset}', offset)
             .replaceAll('?{filter}', '');
   }
 

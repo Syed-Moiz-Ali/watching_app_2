@@ -1,1255 +1,927 @@
 import 'dart:ui';
-import 'package:flutter/foundation.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:watching_app_2/data/models/content_item.dart';
-import 'package:watching_app_2/features/manga/presentation/screens/manga_reader/constants/manga_reader_constants.dart';
-import 'package:watching_app_2/features/manga/presentation/screens/manga_reader/widgets/control_button.dart';
-import 'package:watching_app_2/features/manga/presentation/screens/manga_reader/widgets/control_hub.dart';
-import 'package:watching_app_2/features/manga/presentation/screens/manga_reader/widgets/page_turn_indicator.dart';
-import 'package:watching_app_2/features/manga/presentation/screens/manga_reader/widgets/quick_action_item.dart';
-import 'package:watching_app_2/features/manga/presentation/screens/manga_reader/widgets/settings_tile.dart';
-import 'package:watching_app_2/presentation/provider/manga_detail_provider.dart';
+import 'package:sizer/sizer.dart';
 
 import '../../../../../core/constants/colors.dart';
+import '../../../../../data/models/content_item.dart';
+import '../../../../../presentation/provider/manga_detail_provider.dart';
+import '../../../../../shared/widgets/loading/loading_indicator.dart';
+import '../../../../../shared/widgets/misc/text_widget.dart';
 
 class MangaReaderScreen extends StatefulWidget {
   final ContentItem item;
   final Chapter chapter;
 
-  const MangaReaderScreen(
-      {super.key, required this.item, required this.chapter});
+  const MangaReaderScreen({
+    super.key,
+    required this.item,
+    required this.chapter,
+  });
 
   @override
   State<MangaReaderScreen> createState() => _MangaReaderScreenState();
 }
 
 class _MangaReaderScreenState extends State<MangaReaderScreen>
-    with SingleTickerProviderStateMixin {
-  late PageController _pageController;
-  late AnimationController _animationController;
-  final ScrollController _verticalScrollController = ScrollController();
-  final DateTime _startReadingTime = DateTime.now();
-  int _currentPage = 0;
+    with TickerProviderStateMixin {
   bool _isUIVisible = true;
-  bool _isVerticalReading = true;
-  bool _isRightToLeft = false;
-  bool _isFullscreen = false;
-  double _brightness = 1.0;
+  int _currentPage = 0;
   bool _isAutoScroll = false;
   double _autoScrollSpeed = 1.0;
-  double _pageMargin = 0.0;
-  bool _isLightTheme = false;
-  bool _isOffline = false;
-  String _themeMode = MangaReaderConstants.nightTheme;
-  List<String> _notes = [];
+  late AnimationController _autoScrollAnimationController;
+  late AnimationController _uiAnimationController;
+  late AnimationController _pageTransitionController;
+  late AnimationController _fabAnimationController;
+  late Animation<double> _uiSlideAnimation;
+  late Animation<double> _uiOpacityAnimation;
+  late Animation<double> _fabScaleAnimation;
+  late Animation<Offset> _fabSlideAnimation;
+  final ScrollController _scrollController = ScrollController();
+
+  // Enhanced UI state
+  bool _isMenuExpanded = false;
+  bool _showPageIndicator = false;
+  double _brightness = 1.0;
+  PageController? _pageController;
+  bool _isPageView = false;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
-    _animationController = AnimationController(
+    _initializeAnimations();
+    _initializeSystemUI();
+    _loadChapterDetails();
+    _autoScrollAnimationController = AnimationController(
       vsync: this,
-      duration: MangaReaderConstants.animationDuration,
+      duration: const Duration(milliseconds: 50),
+    )..addListener(_handleAutoScroll);
+    _scrollController.addListener(_onScrollUpdate);
+
+    // Auto-hide UI after 3 seconds
+    _autoHideUI();
+  }
+
+  void _initializeAnimations() {
+    // UI Animation Controller
+    _uiAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
     );
 
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    SystemChrome.setPreferredOrientations(
-        MangaReaderConstants.allowedOrientations);
+    _uiSlideAnimation = Tween<double>(
+      begin: 10.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(
+      parent: _uiAnimationController,
+      curve: Curves.easeOutCubic,
+    ));
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context
+    _uiOpacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _uiAnimationController,
+      curve: Curves.easeOut,
+    ));
+
+    // Page Transition Controller
+    _pageTransitionController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+
+    // FAB Animation Controller
+    _fabAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+
+    _fabScaleAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _fabAnimationController,
+      curve: Curves.elasticOut,
+    ));
+
+    _fabSlideAnimation = Tween<Offset>(
+      begin: const Offset(0, 1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _fabAnimationController,
+      curve: Curves.easeOutBack,
+    ));
+  }
+
+  void _initializeSystemUI() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+      systemNavigationBarColor: Colors.black,
+      systemNavigationBarIconBrightness: Brightness.light,
+    ));
+  }
+
+  void _autoHideUI() {
+    Future.delayed(const Duration(seconds: 3), () {
+      if (_isUIVisible && mounted) {
+        _toggleUI();
+      }
+    });
+  }
+
+  void _onScrollUpdate() {
+    if (_scrollController.hasClients) {
+      final provider = context.read<MangaDetailProvider>();
+      if (provider.chapterDetail != null) {
+        final totalPages = provider.chapterDetail!.length;
+        final scrollProgress = _scrollController.offset /
+            _scrollController.position.maxScrollExtent;
+        final newPage =
+            (scrollProgress * totalPages).round().clamp(0, totalPages - 1);
+
+        if (newPage != _currentPage) {
+          setState(() {
+            _currentPage = newPage;
+            _showPageIndicator = true;
+          });
+
+          // Auto-hide page indicator
+          Future.delayed(const Duration(seconds: 2), () {
+            if (mounted) {
+              setState(() {
+                _showPageIndicator = false;
+              });
+            }
+          });
+        }
+      }
+    }
+  }
+
+  void _loadChapterDetails() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await context
           .read<MangaDetailProvider>()
           .loadChapterDetails(widget.item, widget.chapter);
-      _loadReaderSettings();
-      _startAutoScrollTimerIfEnabled();
-      _fetchRecommendations();
     });
   }
 
   @override
   void dispose() {
-    _pageController.dispose();
-    _animationController.dispose();
-    _verticalScrollController.dispose();
+    _scrollController.dispose();
+    _uiAnimationController.dispose();
+    _pageTransitionController.dispose();
+    _fabAnimationController.dispose();
+    _autoScrollAnimationController.dispose();
+    _pageController?.dispose();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    _saveReadingProgress();
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     super.dispose();
   }
 
-  Future<void> _loadReaderSettings() async {
-    setState(() {
-      _isRightToLeft = true;
-      _isVerticalReading = false;
-      _brightness = 1.0;
-      _pageMargin = 0.0;
-      _themeMode = MangaReaderConstants.nightTheme;
-    });
-  }
+  void _handleAutoScroll() {
+    if (!_isAutoScroll || !_scrollController.hasClients) return;
 
-  Future<void> _saveReaderSettings() async {
-    // Placeholder for saving to shared preferences
-  }
-
-  Future<void> _saveReadingProgress() async {
-    final readDuration = DateTime.now().difference(_startReadingTime);
-    final pageCount = _getPageCount(context);
-    final readPercentage =
-        pageCount > 0 ? (_currentPage + 1) / pageCount * 100 : 0;
-
-    if (kDebugMode) {
-      print('Reading session stats:');
-      print('- Duration: ${readDuration.inMinutes} minutes');
-      print('- Progress: ${readPercentage.toStringAsFixed(1)}%');
-      print('- Last page: ${_currentPage + 1} of $pageCount');
-    }
-  }
-
-  void _fetchRecommendations() {
-    if (kDebugMode) {
-      print('Fetching manga recommendations for ${widget.item.title}');
-    }
-  }
-
-  void _toggleUI() {
-    setState(() => _isUIVisible = !_isUIVisible);
-    HapticFeedback.lightImpact();
-  }
-
-  void _toggleFullscreen() {
-    setState(() => _isFullscreen = !_isFullscreen);
-    SystemChrome.setEnabledSystemUIMode(
-      _isFullscreen ? SystemUiMode.immersiveSticky : SystemUiMode.edgeToEdge,
-    );
-  }
-
-  void _toggleReadingDirection() {
-    setState(() {
-      _isRightToLeft = !_isRightToLeft;
-      if (!_isVerticalReading) {
-        _pageController.jumpToPage(_getPageCount(context) - _currentPage - 1);
-      }
-    });
-    HapticFeedback.mediumImpact();
-    _saveReaderSettings();
-  }
-
-  void _toggleReadingOrientation() {
-    setState(() => _isVerticalReading = !_isVerticalReading);
-    HapticFeedback.mediumImpact();
-    _saveReaderSettings();
-  }
-
-  void _toggleTheme() {
-    setState(() {
-      _isLightTheme = !_isLightTheme;
-    });
-    _saveReaderSettings();
-  }
-
-  void _setThemeMode(String mode) {
-    setState(() => _themeMode = mode);
-    _saveReaderSettings();
-  }
-
-  void _resetZoom(TransformationController controller) {
-    final animation =
-        Tween<double>(begin: controller.value.getMaxScaleOnAxis(), end: 1.0)
-            .animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutExpo),
-    );
-    _animationController.reset();
-    animation.addListener(() {
-      controller.value = Matrix4.identity()..scale(animation.value);
-    });
-    _animationController.forward();
-    HapticFeedback.lightImpact();
-  }
-
-  void _startAutoScrollTimerIfEnabled() {
-    if (_isAutoScroll &&
-        _isVerticalReading &&
-        _verticalScrollController.hasClients) {
-      Future.delayed(const Duration(milliseconds: 50), () {
-        if (_isAutoScroll) {
-          final maxScrollExtent =
-              _verticalScrollController.position.maxScrollExtent;
-          _verticalScrollController.animateTo(
-            maxScrollExtent,
-            duration: Duration(seconds: (15 / _autoScrollSpeed).toInt()),
-            curve: Curves.linear,
-          );
-        }
-      });
+    final newOffset = _scrollController.offset + (_autoScrollSpeed * 1.5);
+    if (newOffset >= _scrollController.position.maxScrollExtent) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeOut,
+      );
+      _stopAutoScroll();
+    } else {
+      _scrollController.animateTo(
+        newOffset,
+        duration: const Duration(milliseconds: 50),
+        curve: Curves.linear,
+      );
     }
   }
 
   void _toggleAutoScroll() {
     setState(() {
       _isAutoScroll = !_isAutoScroll;
-      if (_isAutoScroll && _isVerticalReading) {
-        _startAutoScrollTimerIfEnabled();
-      } else if (!_isAutoScroll && _verticalScrollController.hasClients) {
-        _verticalScrollController.jumpTo(_verticalScrollController.offset);
-      }
     });
-  }
-
-  void _adjustBrightness(double value) {
-    setState(() => _brightness = value);
-    _saveReaderSettings();
-  }
-
-  void _setAutoScrollSpeed(double value) {
-    setState(() => _autoScrollSpeed = value);
-    if (_isAutoScroll && _isVerticalReading) {
-      _verticalScrollController.jumpTo(_verticalScrollController.offset);
-      _startAutoScrollTimerIfEnabled();
-    }
-    _saveReaderSettings();
-  }
-
-  void _setPageMargin(double value) {
-    setState(() => _pageMargin = value);
-    _saveReaderSettings();
-  }
-
-  void _toggleOfflineMode() {
-    setState(() => _isOffline = !_isOffline);
-    if (_isOffline) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Downloading chapter for offline reading...'),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.primaryColor,
-        ),
-      );
-    }
-  }
-
-  void _addNote(String note) {
-    setState(() => _notes.add('Page ${_currentPage + 1}: $note'));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Note added for page ${_currentPage + 1}'),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.primaryColor,
-      ),
-    );
-  }
-
-  int _getPageCount(BuildContext context) {
-    final provider = context.read<MangaDetailProvider>();
-    return provider.chapterDetail?.length ?? 0;
-  }
-
-  void _goToPage(int page) {
-    if (!_isVerticalReading) {
-      _pageController.animateToPage(
-        page,
-        duration: MangaReaderConstants.pageTransitionDuration,
-        curve: Curves.easeInOutCubic,
-      );
+    if (_isAutoScroll) {
+      _autoScrollAnimationController.repeat();
+      _fabAnimationController.forward();
     } else {
-      final scrollPercentage = page / _getPageCount(context);
-      final targetOffset =
-          _verticalScrollController.position.maxScrollExtent * scrollPercentage;
-      _verticalScrollController.animateTo(
-        targetOffset,
-        duration: MangaReaderConstants.scrollTransitionDuration,
-        curve: Curves.easeInOutCubic,
-      );
+      _autoScrollAnimationController.stop();
+      _fabAnimationController.reverse();
     }
+    HapticFeedback.mediumImpact();
   }
 
-  void _shareCurrentPage() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Sharing page with custom overlay...'),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.primaryColor,
-      ),
-    );
+  void _stopAutoScroll() {
+    setState(() {
+      _isAutoScroll = false;
+    });
+    _autoScrollAnimationController.stop();
+    _fabAnimationController.reverse();
   }
 
-  void _bookmarkCurrentPage() {
-    final pageCount = _getPageCount(context);
-    final progress = pageCount > 0 ? (_currentPage + 1) / pageCount * 100 : 0;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-            'Page ${_currentPage + 1} bookmarked (${progress.toStringAsFixed(0)}%)'),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.primaryColor,
-        action: SnackBarAction(
-          label: 'VIEW',
-          textColor: Colors.white,
-          onPressed: () {},
-        ),
-      ),
-    );
+  void _adjustAutoScrollSpeed(double value) {
+    setState(() {
+      _autoScrollSpeed = value;
+    });
+    HapticFeedback.selectionClick();
+  }
+
+  void _toggleUI() {
+    setState(() {
+      _isUIVisible = !_isUIVisible;
+    });
+
+    if (_isUIVisible) {
+      _uiAnimationController.forward();
+      _autoHideUI();
+    } else {
+      _uiAnimationController.reverse();
+    }
+
+    HapticFeedback.lightImpact();
+  }
+
+  void _toggleReadingMode() {
+    setState(() {
+      _isPageView = !_isPageView;
+    });
+
+    if (_isPageView) {
+      _pageController = PageController(initialPage: _currentPage);
+    } else {
+      _pageController?.dispose();
+      _pageController = null;
+    }
+
+    HapticFeedback.mediumImpact();
+  }
+
+  void _handleTapNavigation(TapDownDetails details) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final tapPosition = details.localPosition.dx;
+    final leftZone = screenWidth * 0.3;
+    final rightZone = screenWidth * 0.7;
+
+    if (_isPageView && _pageController != null) {
+      if (tapPosition < leftZone) {
+        _pageController!.previousPage(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      } else if (tapPosition > rightZone) {
+        _pageController!.nextPage(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      } else {
+        _toggleUI();
+      }
+    } else {
+      if (_scrollController.hasClients) {
+        if (tapPosition < leftZone) {
+          _scrollController.animateTo(
+            (_scrollController.offset -
+                    MediaQuery.of(context).size.height * 0.8)
+                .clamp(0.0, _scrollController.position.maxScrollExtent),
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeOutCubic,
+          );
+        } else if (tapPosition > rightZone) {
+          _scrollController.animateTo(
+            (_scrollController.offset +
+                    MediaQuery.of(context).size.height * 0.8)
+                .clamp(0.0, _scrollController.position.maxScrollExtent),
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeOutCubic,
+          );
+        } else {
+          _toggleUI();
+        }
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GestureDetector(
-        onTap: _toggleUI,
-        onDoubleTap: () {},
-        onHorizontalDragEnd: (details) {
-          if (details.primaryVelocity! > 0) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Previous chapter'),
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: AppColors.primaryColor,
-              ),
-            );
-          } else if (details.primaryVelocity! < 0) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Next chapter'),
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: AppColors.primaryColor,
-              ),
-            );
+      backgroundColor: Colors.black,
+      body: Consumer<MangaDetailProvider>(
+        builder: (context, provider, _) {
+          if (provider.isLoading) {
+            return _buildLoadingState();
           }
-        },
-        child: Stack(
-          children: [
-            if (_themeMode == MangaReaderConstants.nightTheme)
-              Positioned.fill(child: _buildNightBackground()),
-            Positioned.fill(child: _buildBrightnessOverlay()),
-            Positioned.fill(child: _buildReader(context)),
-            if (_isUIVisible) _buildUIOverlay(context),
-            if (!_isUIVisible && !_isVerticalReading)
-              PageTurnIndicator(
-                  isRightToLeft: _isRightToLeft,
-                  pageController: _pageController),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNightBackground() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.backgroundColorDark.withOpacity(0.8),
-            AppColors.backgroundColorDark.withOpacity(0.8),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBrightnessOverlay() {
-    return Container(color: Colors.black.withOpacity(1 - _brightness));
-  }
-
-  Widget _buildReader(BuildContext context) {
-    return _isVerticalReading
-        ? _buildVerticalReader(context)
-        : _buildHorizontalReader(context);
-  }
-
-  Widget _buildHorizontalReader(BuildContext context) {
-    final provider = context.watch<MangaDetailProvider>();
-    return PageView.builder(
-      controller: _pageController,
-      reverse: _isRightToLeft,
-      physics: const BouncingScrollPhysics(),
-      itemCount: provider.chapterDetail?.length ?? 0,
-      onPageChanged: (index) {
-        setState(() => _currentPage = index);
-        HapticFeedback.selectionClick();
-      },
-      itemBuilder: (context, index) {
-        final controller = TransformationController();
-        return InteractiveViewer(
-          transformationController: controller,
-          maxScale: MangaReaderConstants.maxScale,
-          minScale: MangaReaderConstants.minScale,
-          child: Container(
-            margin: EdgeInsets.symmetric(horizontal: _pageMargin),
-            decoration: BoxDecoration(
-              borderRadius:
-                  BorderRadius.circular(MangaReaderConstants.borderRadius),
-              boxShadow: MangaReaderConstants.boxShadow,
-            ),
-            child: ClipRRect(
-              borderRadius:
-                  BorderRadius.circular(MangaReaderConstants.borderRadius),
-              child: CachedNetworkImage(
-                imageUrl: provider.chapterDetail![index].chapterImage!,
-                fit: BoxFit.contain,
-                placeholder: (context, url) => Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primaryColor,
-                    strokeWidth: 2,
-                  ),
-                ),
-                errorWidget: (context, url, error) => const Icon(
-                  Icons.broken_image,
-                  size: 64,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-          ),
-        ).animate().fadeIn(duration: MangaReaderConstants.fadeDuration).scale(
-            curve: Curves.easeOutBack,
-            duration: MangaReaderConstants.animationDuration);
-      },
-    );
-  }
-
-  Widget _buildVerticalReader(BuildContext context) {
-    final provider = context.watch<MangaDetailProvider>();
-    return ListView.builder(
-      controller: _verticalScrollController,
-      physics: _isAutoScroll
-          ? const NeverScrollableScrollPhysics()
-          : const BouncingScrollPhysics(),
-      cacheExtent: MediaQuery.of(context).size.height * 3,
-      itemCount: provider.chapterDetail?.length ?? 0,
-      itemBuilder: (context, index) {
-        final controller = TransformationController();
-        return InteractiveViewer(
-          transformationController: controller,
-          maxScale: MangaReaderConstants.maxScale,
-          minScale: MangaReaderConstants.minScale,
-          child: Column(
+          if (provider.chapterDetail == null ||
+              provider.chapterDetail!.isEmpty) {
+            return _buildErrorState(provider);
+          }
+          return Stack(
             children: [
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: _pageMargin),
-                decoration: BoxDecoration(
-                  borderRadius:
-                      BorderRadius.circular(MangaReaderConstants.borderRadius),
-                  boxShadow: MangaReaderConstants.boxShadow,
-                ),
-                child: CachedNetworkImage(
-                  imageUrl: provider.chapterDetail![index].chapterImage!,
-                  fit: BoxFit.fitWidth,
-                  placeholder: (context, url) => SizedBox(
-                    height: MediaQuery.of(context).size.width * 1.5,
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primaryColor,
-                        strokeWidth: 2,
-                      ),
-                    ),
-                  ),
-                  errorWidget: (context, url, error) => const Icon(
-                    Icons.broken_image,
-                    size: 64,
-                    color: Colors.grey,
-                  ),
-                ),
+              ColorFiltered(
+                colorFilter: ColorFilter.matrix([
+                  _brightness,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  _brightness,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  _brightness,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                ]),
+                child: _buildReaderContent(provider),
               ),
+              // if (_isUIVisible) _buildUIOverlay(provider),
+              _buildPageIndicator(provider),
+              if (_isUIVisible) ...[
+                _buildTopBar(),
+                _buildBottomBar(provider),
+              ],
+              _buildFloatingControls(),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CustomLoadingIndicator(),
+          const SizedBox(height: 16),
+          TextWidget(
+            text: 'Loading chapter...',
+            fontSize: 14.sp,
+            color: Colors.white70,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(MangaDetailProvider provider) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: const Duration(milliseconds: 800),
+            builder: (context, value, child) {
+              return Transform.scale(
+                scale: value,
+                child: const Icon(
+                  Icons.error_outline,
+                  color: Colors.white54,
+                  size: 64,
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          TextWidget(
+            text: 'Unable to load chapter',
+            fontSize: 16.sp,
+            color: Colors.white,
+          ),
+          const SizedBox(height: 8),
+          TextWidget(
+            text: provider.error ?? 'Please try again',
+            fontSize: 12.sp,
+            color: Colors.white54,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () {
+              context
+                  .read<MangaDetailProvider>()
+                  .loadChapterDetails(widget.item, widget.chapter);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 8,
+            ),
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUIOverlay(MangaDetailProvider provider) {
+    return AnimatedBuilder(
+      animation: _uiAnimationController,
+      builder: (context, child) {
+        return Opacity(
+          opacity: _uiOpacityAnimation.value,
+          child: Stack(
+            children: [
+              _buildTopBar(),
+              _buildBottomBar(provider),
             ],
           ),
-        ).animate().fadeIn(duration: MangaReaderConstants.fadeDuration).slideY(
-            begin: 0.1,
-            end: 0,
-            duration: MangaReaderConstants.animationDuration);
+        );
       },
     );
   }
 
-  Widget _buildUIOverlay(BuildContext context) {
-    final provider = context.watch<MangaDetailProvider>();
-    final pageCount = _getPageCount(context);
-    return Stack(
-      children: [
-        _buildTopBar(context),
-        _buildBottomBar(context, pageCount),
-        Positioned(
-          right: MangaReaderConstants.controlHubRightMargin,
-          bottom: MangaReaderConstants.controlHubBottomMargin,
-          child: ControlHub(onPressed: () => _showQuickActionsSheet(context)),
-        ),
-      ],
-    ).animate().fadeIn(duration: MangaReaderConstants.fadeDuration);
-  }
-
-  Widget _buildTopBar(BuildContext context) {
+  Widget _buildTopBar() {
     return Positioned(
       top: 0,
       left: 0,
       right: 0,
-      child: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            padding: MangaReaderConstants.topBarPadding,
-            decoration: BoxDecoration(
-              color: _isLightTheme
-                  ? Colors.white.withOpacity(0.2)
-                  : AppColors.backgroundColorDark.withOpacity(0.3),
-              borderRadius: MangaReaderConstants.topBarBorderRadius,
-              border:
-                  Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+      child: Container(
+        padding:
+            const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.black.withOpacity(0.9),
+              Colors.black.withOpacity(0.7),
+              Colors.transparent,
+            ],
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
+              ),
             ),
-            child: SafeArea(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ControlButton(
-                    icon: Icons.arrow_back_ios_new,
-                    onPressed: () => Navigator.pop(context),
-                    tooltip: 'Back',
-                    color: _isLightTheme ? Colors.black87 : Colors.white,
+                  TextWidget(
+                    text: widget.item.title,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                    maxLine: 1,
                   ),
-                  Expanded(child: _buildTitleSection()),
-                  ControlButton(
-                    icon: Icons.settings_outlined,
-                    onPressed: () => _showSettingsBottomSheet(context),
-                    tooltip: 'Settings',
-                    color: _isLightTheme ? Colors.black87 : Colors.white,
+                  const SizedBox(height: 4),
+                  TextWidget(
+                    text: widget.chapter.chapterName ?? 'Chapter',
+                    fontSize: 13.sp,
+                    color: Colors.white70,
                   ),
                 ],
               ),
             ),
-          ),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: IconButton(
+                icon: Icon(
+                  _isPageView ? Icons.view_stream : Icons.view_agenda,
+                  color: Colors.white,
+                ),
+                onPressed: _toggleReadingMode,
+              ),
+            ),
+          ],
         ),
-      )
-          .animate()
-          .fadeIn(duration: MangaReaderConstants.fadeDuration)
-          .slideY(begin: -0.1, end: 0, curve: Curves.easeOutCubic),
+      ),
     );
   }
 
-  Widget _buildTitleSection() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          widget.item.title ?? 'Manga Title',
-          style: MangaReaderConstants.titleStyle
-              .copyWith(color: _isLightTheme ? Colors.black87 : Colors.white),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        Text(
-          widget.chapter.chapterName ?? 'Chapter',
-          style: MangaReaderConstants.subtitleStyle.copyWith(
-              color: _isLightTheme
-                  ? Colors.black54
-                  : AppColors.backgroundColorLight),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ],
-    );
-  }
+  Widget _buildBottomBar(MangaDetailProvider provider) {
+    final totalPages = provider.chapterDetail?.length ?? 0;
+    final progress = totalPages > 0 ? (_currentPage + 1) / totalPages : 0.0;
 
-  Widget _buildBottomBar(BuildContext context, int pageCount) {
     return Positioned(
       bottom: 0,
       left: 0,
       right: 0,
-      child: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            padding: MangaReaderConstants.bottomBarPadding,
-            decoration: BoxDecoration(
-              color: _isLightTheme
-                  ? Colors.white.withOpacity(0.2)
-                  : AppColors.backgroundColorDark.withOpacity(0.3),
-              borderRadius: MangaReaderConstants.bottomBarBorderRadius,
-              border:
-                  Border.all(color: Colors.white.withOpacity(0.1), width: 1),
-            ),
-            child: SafeArea(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildProgressBar(context, pageCount),
-                  const SizedBox(height: MangaReaderConstants.spacing),
-                  _buildControlButtons(),
-                  if (_isVerticalReading) _buildAutoScrollControls(),
-                ],
-              ),
-            ),
-          ),
-        ),
-      )
-          .animate()
-          .fadeIn(duration: MangaReaderConstants.fadeDuration)
-          .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
-    );
-  }
-
-  Widget _buildProgressBar(BuildContext context, int pageCount) {
-    return Row(
-      children: [
-        Text(
-          '${_currentPage + 1}',
-          style: MangaReaderConstants.pageNumberStyle
-              .copyWith(color: _isLightTheme ? Colors.black87 : Colors.white),
-        ),
-        const SizedBox(width: MangaReaderConstants.spacing),
-        Expanded(child: _buildProgressIndicator(context, pageCount)),
-        const SizedBox(width: MangaReaderConstants.spacing),
-        Text(
-          '$pageCount',
-          style: MangaReaderConstants.pageCountStyle.copyWith(
-              color: _isLightTheme
-                  ? Colors.black54
-                  : AppColors.backgroundColorLight),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildProgressIndicator(BuildContext context, int pageCount) {
-    return Stack(
-      children: [
-        Container(
-          height: 6,
-          decoration: BoxDecoration(
-            color: _isLightTheme ? Colors.grey[300] : AppColors.primaryColor,
-            borderRadius: BorderRadius.circular(3),
-          ),
-        ),
-        Container(
-          height: 6,
-          width: pageCount > 0
-              ? MediaQuery.of(context).size.width *
-                  0.8 *
-                  (_currentPage + 1) /
-                  pageCount
-              : 0,
-          decoration: BoxDecoration(
-            gradient: MangaReaderConstants.progressGradient,
-            borderRadius: BorderRadius.circular(3),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildControlButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        ControlButton(
-          icon: _isRightToLeft
-              ? Icons.arrow_back_ios_new
-              : Icons.arrow_forward_ios,
-          onPressed: _toggleReadingDirection,
-          tooltip: _isRightToLeft ? 'Right to Left' : 'Left to Right',
-          color: _isLightTheme ? Colors.black87 : Colors.white,
-        ),
-        ControlButton(
-          icon: Icons.bookmark_border,
-          onPressed: _bookmarkCurrentPage,
-          tooltip: 'Bookmark Page',
-          color: _isLightTheme ? Colors.black87 : Colors.white,
-        ),
-        ControlButton(
-          icon: _isVerticalReading ? Icons.view_day : Icons.view_carousel,
-          onPressed: _toggleReadingOrientation,
-          tooltip: _isVerticalReading ? 'Vertical Mode' : 'Paged Mode',
-          color: _isLightTheme ? Colors.black87 : Colors.white,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAutoScrollControls() {
-    return Padding(
-      padding: const EdgeInsets.only(top: MangaReaderConstants.spacing),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ControlButton(
-            icon: _isAutoScroll ? Icons.pause : Icons.play_arrow,
-            onPressed: _toggleAutoScroll,
-            tooltip: _isAutoScroll ? 'Pause Auto-scroll' : 'Auto-scroll',
-            isActive: _isAutoScroll,
-            color: _isLightTheme ? Colors.black87 : Colors.white,
-            activeColor: AppColors.primaryColor,
-          ),
-          if (_isAutoScroll)
-            Expanded(
-              child: SliderTheme(
-                data: MangaReaderConstants.sliderTheme,
-                child: Slider(
-                  value: _autoScrollSpeed,
-                  min: 0.5,
-                  max: 3.0,
-                  divisions: 5,
-                  onChanged: _setAutoScrollSpeed,
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  void _showQuickActionsSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: MangaReaderConstants.sheetPadding,
-          decoration: BoxDecoration(
-            color: _isLightTheme
-                ? Colors.white.withOpacity(0.9)
-                : AppColors.backgroundColorDark.withOpacity(0.9),
-            borderRadius: MangaReaderConstants.sheetBorderRadius,
-            border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: _isLightTheme ? Colors.grey[400] : Colors.grey[600],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              const SizedBox(height: MangaReaderConstants.spacing),
-              Wrap(
-                spacing: MangaReaderConstants.spacing,
-                runSpacing: MangaReaderConstants.spacing,
-                alignment: WrapAlignment.center,
-                children: [
-                  QuickActionItem(
-                    icon: Icons.share,
-                    label: 'Share',
-                    onTap: _shareCurrentPage,
-                    isLightTheme: _isLightTheme,
-                  ),
-                  QuickActionItem(
-                    icon: Icons.fullscreen,
-                    label: 'Fullscreen',
-                    onTap: _toggleFullscreen,
-                    isLightTheme: _isLightTheme,
-                  ),
-                  QuickActionItem(
-                    icon: Icons.brightness_6,
-                    label: 'Brightness',
-                    onTap: () => _showBrightnessSlider(context),
-                    isLightTheme: _isLightTheme,
-                  ),
-                  QuickActionItem(
-                    icon: Icons.info_outline,
-                    label: 'Info',
-                    onTap: () => _showChapterInfoDialog(context),
-                    isLightTheme: _isLightTheme,
-                  ),
-                  QuickActionItem(
-                    icon: Icons.download,
-                    label: 'Offline',
-                    onTap: _toggleOfflineMode,
-                    isLightTheme: _isLightTheme,
-                  ),
-                  QuickActionItem(
-                    icon: Icons.note_add,
-                    label: 'Add Note',
-                    onTap: () => _showNoteDialog(context),
-                    isLightTheme: _isLightTheme,
-                  ),
-                ],
-              ),
-              const SizedBox(height: MangaReaderConstants.spacing),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+            colors: [
+              Colors.black.withOpacity(0.9),
+              Colors.black.withOpacity(0.7),
+              Colors.transparent,
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  void _showBrightnessSlider(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: AlertDialog(
-          backgroundColor: _isLightTheme
-              ? Colors.white.withOpacity(0.9)
-              : AppColors.backgroundColorDark.withOpacity(0.9),
-          shape: RoundedRectangleBorder(
-              borderRadius:
-                  BorderRadius.circular(MangaReaderConstants.borderRadius)),
-          content: StatefulBuilder(
-            builder: (context, setDialogState) => Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('Screen Brightness',
-                    style: MangaReaderConstants.dialogTitleStyle.copyWith(
-                        color: _isLightTheme ? Colors.black87 : Colors.white)),
-                const SizedBox(height: MangaReaderConstants.spacing),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.brightness_low,
-                      color: _isLightTheme
-                          ? Colors.black54
-                          : AppColors.backgroundColorLight,
-                      size: 24,
-                    ),
-                    Expanded(
-                      child: Slider(
-                        value: _brightness,
-                        min: 0.1,
-                        max: 1.0,
-                        divisions: 9,
-                        onChanged: (value) =>
-                            setDialogState(() => _adjustBrightness(value)),
-                        activeColor: AppColors.primaryColor,
-                        inactiveColor: _isLightTheme
-                            ? Colors.grey[300]
-                            : AppColors.primaryColor,
-                      ),
-                    ),
-                    Icon(
-                      Icons.brightness_high,
-                      color: _isLightTheme ? Colors.black87 : Colors.white,
-                      size: 24,
-                    ),
-                  ],
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Enhanced Progress bar
+              Container(
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(2),
                 ),
-                Text(
-                  '${(_brightness * 100).toInt()}%',
-                  style: MangaReaderConstants.subtitleStyle.copyWith(
-                      color: _isLightTheme
-                          ? Colors.black54
-                          : AppColors.backgroundColorLight),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('DONE', style: MangaReaderConstants.actionTextStyle),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showChapterInfoDialog(BuildContext context) {
-    final provider = context.read<MangaDetailProvider>();
-    if (provider.chapterDetail == null) return;
-    final pageCount = _getPageCount(context);
-    final progress = pageCount > 0 ? (_currentPage + 1) / pageCount * 100 : 0;
-
-    showDialog(
-      context: context,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: AlertDialog(
-          backgroundColor: _isLightTheme
-              ? Colors.white.withOpacity(0.9)
-              : AppColors.backgroundColorDark.withOpacity(0.9),
-          shape: RoundedRectangleBorder(
-              borderRadius:
-                  BorderRadius.circular(MangaReaderConstants.borderRadius)),
-          title: Text(
-            widget.item.title ?? 'Manga Title',
-            style: MangaReaderConstants.dialogTitleStyle
-                .copyWith(color: _isLightTheme ? Colors.black87 : Colors.white),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildInfoRow('Series', widget.item.title ?? 'Unknown'),
-                _buildInfoRow(
-                    'Chapter', widget.chapter.chapterName ?? 'Unknown'),
-                _buildInfoRow('Pages', pageCount.toString()),
-                _buildInfoRow('Progress', '${progress.toStringAsFixed(1)}%'),
-                _buildInfoRow(
-                    'Current Page', '${_currentPage + 1} of $pageCount'),
-                if (_notes.isNotEmpty) ...[
-                  const SizedBox(height: MangaReaderConstants.spacing),
-                  Text('Notes',
-                      style: MangaReaderConstants.sectionTitleStyle.copyWith(
-                          color:
-                              _isLightTheme ? Colors.black87 : Colors.white)),
-                  ..._notes.map((note) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Text(note,
-                            style: MangaReaderConstants.subtitleStyle.copyWith(
-                                color: _isLightTheme
-                                    ? Colors.black54
-                                    : AppColors.backgroundColorLight)),
-                      )),
-                ],
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('CLOSE', style: MangaReaderConstants.actionTextStyle),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showNoteDialog(BuildContext context) {
-    final controller = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: AlertDialog(
-          backgroundColor: _isLightTheme
-              ? Colors.white.withOpacity(0.9)
-              : AppColors.backgroundColorDark.withOpacity(0.9),
-          shape: RoundedRectangleBorder(
-              borderRadius:
-                  BorderRadius.circular(MangaReaderConstants.borderRadius)),
-          title: Text('Add Note',
-              style: MangaReaderConstants.dialogTitleStyle.copyWith(
-                  color: _isLightTheme ? Colors.black87 : Colors.white)),
-          content: TextField(
-            controller: controller,
-            maxLines: 3,
-            decoration: InputDecoration(
-              hintText: 'Enter your note...',
-              hintStyle: MangaReaderConstants.subtitleStyle.copyWith(
-                  color: _isLightTheme ? Colors.black54 : Colors.grey[600]),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                    color:
-                        _isLightTheme ? Colors.grey[300]! : Colors.grey[700]!),
-              ),
-            ),
-            style: MangaReaderConstants.textStyle
-                .copyWith(color: _isLightTheme ? Colors.black87 : Colors.white),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child:
-                  Text('CANCEL', style: MangaReaderConstants.cancelTextStyle),
-            ),
-            TextButton(
-              onPressed: () {
-                if (controller.text.isNotEmpty) {
-                  _addNote(controller.text);
-                  Navigator.pop(context);
-                }
-              },
-              child: Text('SAVE', style: MangaReaderConstants.actionTextStyle),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text('$label:',
-                style: MangaReaderConstants.subtitleStyle.copyWith(
-                    color: _isLightTheme
-                        ? Colors.black54
-                        : AppColors.backgroundColorLight)),
-          ),
-          Expanded(
-              child: Text(value,
-                  style: MangaReaderConstants.textStyle.copyWith(
-                      color: _isLightTheme ? Colors.black87 : Colors.white))),
-        ],
-      ),
-    );
-  }
-
-  void _showSettingsBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: DraggableScrollableSheet(
-          initialChildSize: 0.6,
-          minChildSize: 0.3,
-          maxChildSize: 0.9,
-          builder: (context, scrollController) => Container(
-            decoration: BoxDecoration(
-              color: _isLightTheme
-                  ? Colors.white.withOpacity(0.9)
-                  : AppColors.backgroundColorDark.withOpacity(0.9),
-              borderRadius: MangaReaderConstants.sheetBorderRadius,
-              border:
-                  Border.all(color: Colors.white.withOpacity(0.2), width: 1),
-            ),
-            child: Column(
-              children: [
-                Container(
-                  margin: const EdgeInsets.symmetric(vertical: 12),
-                  width: 40,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: _isLightTheme ? Colors.grey[400] : Colors.grey[600],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                Expanded(
-                  child: ListView(
-                    controller: scrollController,
-                    padding: MangaReaderConstants.sheetPadding,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(2),
+                  child: Stack(
                     children: [
-                      Text('Reading Settings',
-                          style: MangaReaderConstants.sectionTitleStyle
-                              .copyWith(
-                                  color: _isLightTheme
-                                      ? Colors.black87
-                                      : Colors.white)),
-                      const SizedBox(height: MangaReaderConstants.spacing),
-                      SettingsTile(
-                        title: 'Reading Direction',
-                        child: SegmentedButton<bool>(
-                          segments: const [
-                            ButtonSegment(value: false, label: Text('L→R')),
-                            ButtonSegment(value: true, label: Text('R→L')),
-                          ],
-                          selected: {_isRightToLeft},
-                          onSelectionChanged: (newSelection) {
-                            setState(() => _isRightToLeft = newSelection.first);
-                          },
-                          style: MangaReaderConstants.segmentedButtonStyle
-                              .copyWith(
-                            backgroundColor: WidgetStatePropertyAll(
-                                _isLightTheme
-                                    ? Colors.grey[200]
-                                    : AppColors.primaryColor),
-                            foregroundColor: WidgetStatePropertyAll(
-                                _isLightTheme ? Colors.black87 : Colors.white),
-                          ),
+                      LinearProgressIndicator(
+                        value: progress,
+                        backgroundColor: Colors.transparent,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.primaryColor,
                         ),
                       ),
-                      SettingsTile(
-                        title: 'Reading Mode',
-                        child: SegmentedButton<bool>(
-                          segments: const [
-                            ButtonSegment(
-                                value: false,
-                                label: Text('Paged'),
-                                icon: Icon(Icons.view_carousel, size: 20)),
-                            ButtonSegment(
-                                value: true,
-                                label: Text('Vertical'),
-                                icon: Icon(Icons.view_day, size: 20)),
-                          ],
-                          selected: {_isVerticalReading},
-                          onSelectionChanged: (newSelection) {
-                            setState(
-                                () => _isVerticalReading = newSelection.first);
-                          },
-                          style: MangaReaderConstants.segmentedButtonStyle
-                              .copyWith(
-                            backgroundColor: WidgetStatePropertyAll(
-                                _isLightTheme
-                                    ? Colors.grey[200]
-                                    : AppColors.primaryColor),
-                            foregroundColor: WidgetStatePropertyAll(
-                                _isLightTheme ? Colors.black87 : Colors.white),
-                          ),
-                        ),
-                      ),
-                      SettingsTile(
-                        title: 'Theme',
-                        child: SegmentedButton<String>(
-                          segments: const [
-                            ButtonSegment(value: 'Night', label: Text('Night')),
-                            ButtonSegment(
-                                value: 'Sakura', label: Text('Sakura')),
-                            ButtonSegment(value: 'Ocean', label: Text('Ocean')),
-                          ],
-                          selected: {_themeMode},
-                          onSelectionChanged: (newSelection) {
-                            _setThemeMode(newSelection.first);
-                          },
-                          style: MangaReaderConstants.segmentedButtonStyle
-                              .copyWith(
-                            backgroundColor: WidgetStatePropertyAll(
-                                _isLightTheme
-                                    ? Colors.grey[200]
-                                    : AppColors.primaryColor),
-                            foregroundColor: WidgetStatePropertyAll(
-                                _isLightTheme ? Colors.black87 : Colors.white),
-                          ),
-                        ),
-                      ),
-                      SettingsTile(
-                        title: 'Light Theme',
-                        child: Switch(
-                          value: _isLightTheme,
-                          onChanged: (value) => _toggleTheme(),
-                          activeColor: AppColors.primaryColor,
-                          inactiveTrackColor: _isLightTheme
-                              ? Colors.grey[300]
-                              : AppColors.primaryColor,
-                        ),
-                      ),
-                      SettingsTile(
-                        title: 'Page Margins',
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Slider(
-                                value: _pageMargin,
-                                min: 0,
-                                max: 40,
-                                divisions: 8,
-                                onChanged: _setPageMargin,
-                                activeColor: AppColors.primaryColor,
-                                inactiveColor: _isLightTheme
-                                    ? Colors.grey[300]
-                                    : AppColors.primaryColor,
+                      // Glowing effect
+                      Positioned.fill(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(2),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primaryColor.withOpacity(0.3),
+                                blurRadius: 8,
+                                spreadRadius: 0,
                               ),
-                            ),
-                            Text(
-                              '${_pageMargin.toInt()} px',
-                              style: MangaReaderConstants.subtitleStyle
-                                  .copyWith(
-                                      color: _isLightTheme
-                                          ? Colors.black54
-                                          : AppColors.backgroundColorLight),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SettingsTile(
-                        title: 'Brightness',
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.brightness_low,
-                              color: _isLightTheme
-                                  ? Colors.black54
-                                  : AppColors.backgroundColorLight,
-                              size: 24,
-                            ),
-                            Expanded(
-                              child: Slider(
-                                value: _brightness,
-                                min: 0.1,
-                                max: 1.0,
-                                divisions: 9,
-                                onChanged: _adjustBrightness,
-                                activeColor: AppColors.primaryColor,
-                                inactiveColor: _isLightTheme
-                                    ? Colors.grey[300]
-                                    : AppColors.primaryColor,
-                              ),
-                            ),
-                            Icon(
-                              Icons.brightness_high,
-                              color:
-                                  _isLightTheme ? Colors.black87 : Colors.white,
-                              size: 24,
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (_isVerticalReading)
-                        SettingsTile(
-                          title: 'Auto-scroll',
-                          child: Column(
-                            children: [
-                              Switch(
-                                value: _isAutoScroll,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _isAutoScroll = value;
-                                    if (_isAutoScroll) {
-                                      _startAutoScrollTimerIfEnabled();
-                                    }
-                                  });
-                                },
-                                activeColor: AppColors.primaryColor,
-                                inactiveTrackColor: _isLightTheme
-                                    ? Colors.grey[300]
-                                    : AppColors.primaryColor,
-                              ),
-                              if (_isAutoScroll)
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.speed,
-                                      color: _isLightTheme
-                                          ? Colors.black54
-                                          : AppColors.backgroundColorLight,
-                                      size: 24,
-                                    ),
-                                    Expanded(
-                                      child: Slider(
-                                        value: _autoScrollSpeed,
-                                        min: 0.5,
-                                        max: 3.0,
-                                        divisions: 5,
-                                        onChanged: _setAutoScrollSpeed,
-                                        activeColor: AppColors.primaryColor,
-                                        inactiveColor: _isLightTheme
-                                            ? Colors.grey[300]
-                                            : AppColors.greyColor,
-                                      ),
-                                    ),
-                                    Icon(
-                                      Icons.speed,
-                                      color: _isLightTheme
-                                          ? Colors.black87
-                                          : Colors.white,
-                                      size: 24,
-                                    ),
-                                  ],
-                                ),
                             ],
                           ),
-                        ),
-                      SettingsTile(
-                        title: 'High Contrast Mode',
-                        child: Switch(
-                          value: false,
-                          onChanged: (value) {},
-                          activeColor: AppColors.primaryColor,
-                          inactiveTrackColor: _isLightTheme
-                              ? Colors.grey[300]
-                              : AppColors.primaryColor,
                         ),
                       ),
                     ],
                   ),
                 ),
+              ),
+              // Controls Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Page counter with enhanced styling
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: TextWidget(
+                      text: '${_currentPage + 1} / $totalPages',
+                      fontSize: 12.sp,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  // Control buttons
+                  Row(
+                    children: [
+                      _buildControlButton(
+                        icon: _isAutoScroll
+                            ? Icons.pause_circle_filled
+                            : Icons.play_circle_filled,
+                        isActive: _isAutoScroll,
+                        onPressed: _toggleAutoScroll,
+                      ),
+                      const SizedBox(width: 8),
+                      _buildControlButton(
+                        icon: Icons.skip_previous,
+                        onPressed: () {
+                          // Navigate to previous chapter
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      _buildControlButton(
+                        icon: Icons.skip_next,
+                        onPressed: () {
+                          // Navigate to next chapter
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              // Brightness and Speed Controls
+              if (_isAutoScroll || _showBrightnessControl) ...[
+                const SizedBox(height: 12),
+                _buildAdvancedControls(),
               ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  bool get _showBrightnessControl => _brightness != 1.0;
+
+  Widget _buildControlButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+    bool isActive = false,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isActive
+            ? AppColors.primaryColor.withOpacity(0.2)
+            : Colors.black.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(20),
+        border: isActive
+            ? Border.all(color: AppColors.primaryColor.withOpacity(0.5))
+            : null,
+      ),
+      child: IconButton(
+        icon: Icon(
+          icon,
+          color: isActive ? AppColors.primaryColor : Colors.white70,
+          size: 20,
+        ),
+        onPressed: onPressed,
+      ),
+    );
+  }
+
+  Widget _buildAdvancedControls() {
+    return Column(
+      children: [
+        if (_isAutoScroll) ...[
+          Row(
+            children: [
+              const Icon(Icons.speed, color: Colors.white70, size: 16),
+              const SizedBox(width: 8),
+              Expanded(
+                child: SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    activeTrackColor: AppColors.primaryColor,
+                    inactiveTrackColor: Colors.white30,
+                    thumbColor: AppColors.primaryColor,
+                    overlayColor: AppColors.primaryColor.withOpacity(0.2),
+                    trackHeight: 3,
+                  ),
+                  child: Slider(
+                    value: _autoScrollSpeed,
+                    min: 0.5,
+                    max: 3.0,
+                    divisions: 5,
+                    onChanged: _adjustAutoScrollSpeed,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '${_autoScrollSpeed.toStringAsFixed(1)}x',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 11.sp,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+        if (_showBrightnessControl) ...[
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Icon(Icons.brightness_6, color: Colors.white70, size: 16),
+              const SizedBox(width: 8),
+              Expanded(
+                child: SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    activeTrackColor: Colors.amber,
+                    inactiveTrackColor: Colors.white30,
+                    thumbColor: Colors.amber,
+                    overlayColor: Colors.amber.withOpacity(0.2),
+                    trackHeight: 3,
+                  ),
+                  child: Slider(
+                    value: _brightness,
+                    min: 0.3,
+                    max: 1.2,
+                    onChanged: (value) {
+                      setState(() {
+                        _brightness = value;
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildPageIndicator(MangaDetailProvider provider) {
+    final totalPages = provider.chapterDetail?.length ?? 0;
+
+    return Positioned(
+      // duration: const Duration(milliseconds: 300),
+      // curve: Curves.easeOutCubic,
+      top: 20,
+      right: 16,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: TextWidget(
+          text: '${_currentPage + 1}/$totalPages',
+          fontSize: 12.sp,
+          color: Colors.white,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFloatingControls() {
+    return Positioned(
+      right: 16,
+      bottom: 100,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Brightness control FAB
+          FloatingActionButton(
+            mini: true,
+            backgroundColor: Colors.black.withOpacity(0.7),
+            foregroundColor: Colors.white,
+            onPressed: () {
+              setState(() {
+                _brightness = _brightness == 1.0 ? 0.6 : 1.0;
+              });
+            },
+            child: Icon(
+              _brightness < 1.0 ? Icons.brightness_low : Icons.brightness_high,
+              size: 20,
+            ),
+          ),
+          const SizedBox(height: 8),
+          // Auto-scroll FAB (shows when active)
+          if (_isAutoScroll)
+            FloatingActionButton(
+              mini: true,
+              backgroundColor: AppColors.primaryColor.withOpacity(0.9),
+              foregroundColor: Colors.white,
+              onPressed: _toggleAutoScroll,
+              child: const Icon(Icons.pause, size: 20),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReaderContent(MangaDetailProvider provider) {
+    return Container(
+      height: 100.h,
+      child: GestureDetector(
+        onTapDown: _handleTapNavigation,
+        child: _isPageView
+            ? _buildPageViewReader(provider)
+            : _buildScrollViewReader(provider),
+      ),
+    );
+  }
+
+  Widget _buildPageViewReader(MangaDetailProvider provider) {
+    return PageView.builder(
+      controller: _pageController,
+      itemCount: provider.chapterDetail?.length ?? 0,
+      onPageChanged: (index) {
+        setState(() {
+          _currentPage = index;
+        });
+      },
+      itemBuilder: (context, index) {
+        return _buildMangaPage(provider, index);
+      },
+    );
+  }
+
+  Widget _buildScrollViewReader(MangaDetailProvider provider) {
+    return ListView.builder(
+      controller: _scrollController,
+      physics: _isAutoScroll
+          ? const NeverScrollableScrollPhysics()
+          : const BouncingScrollPhysics(),
+      itemCount: provider.chapterDetail?.length ?? 0,
+      itemBuilder: (context, index) {
+        return _buildMangaPage(provider, index);
+      },
+    );
+  }
+
+  Widget _buildMangaPage(MangaDetailProvider provider, int index) {
+    return Hero(
+      tag: 'manga_page_$index',
+      child: InteractiveViewer(
+        maxScale: 3.0,
+        minScale: 1.0,
+        child: CachedNetworkImage(
+          imageUrl: provider.chapterDetail![index].chapterImage!,
+          fit: BoxFit.fitWidth,
+          placeholder: (context, url) => Container(
+            height: MediaQuery.of(context).size.width * 1.4,
+            color: Colors.grey[900],
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white54),
+                  ),
+                  const SizedBox(height: 12),
+                  TextWidget(
+                    text: 'Loading page ${index + 1}...',
+                    fontSize: 12.sp,
+                    color: Colors.white54,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          errorWidget: (context, url, error) => Container(
+            height: MediaQuery.of(context).size.width * 1.4,
+            color: Colors.grey[900],
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.broken_image_outlined,
+                    size: 48,
+                    color: Colors.white54,
+                  ),
+                  const SizedBox(height: 12),
+                  TextWidget(
+                    text: 'Failed to load page ${index + 1}',
+                    fontSize: 12.sp,
+                    color: Colors.white54,
+                  ),
+                  const SizedBox(height: 8),
+                  TextButton(
+                    onPressed: () {
+                      // Retry loading this specific page
+                      setState(() {});
+                    },
+                    child: Text(
+                      'Retry',
+                      style: TextStyle(
+                        color: AppColors.primaryColor,
+                        fontSize: 12.sp,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
