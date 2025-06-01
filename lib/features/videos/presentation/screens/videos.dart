@@ -196,7 +196,7 @@ class _VideosState extends State<Videos> {
                   ),
                 )
               : error != null
-                  ? Center(child: Text(error!))
+                  ? Center(child: TextWidget(text: error!))
                   : videos.isEmpty
                       ? const Center(
                           child: TextWidget(

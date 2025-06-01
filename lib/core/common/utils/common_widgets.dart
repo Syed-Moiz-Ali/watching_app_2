@@ -174,12 +174,12 @@ class CommonWidgets {
   }
 
   static Widget buildRatingAndTime(String rating, String data,
-      {Color color = AppColors.secondaryColor, double? fontSize}) {
+      {Color? color, double? fontSize = 15}) {
     return Row(
       children: [
         TextWidget(
           text: rating,
-          color: color,
+          color: color ?? AppColors.primaryColor,
           fontWeight: FontWeight.w700,
           fontSize: fontSize ?? 15.sp,
         ),
@@ -194,7 +194,7 @@ class CommonWidgets {
         ),
         TextWidget(
           text: data,
-          color: color,
+          color: color ?? AppColors.primaryColor,
           fontWeight: FontWeight.w700,
           fontSize: fontSize ?? 15.sp,
         ),
@@ -208,24 +208,24 @@ class CommonWidgets {
       child: Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            color: AppColors.secondaryColor,
+            color: AppColors.primaryColor,
             gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  // AppColors.secondaryColor.withOpacity(.6),
-                  AppColors.secondaryColor.withOpacity(.9),
-                  AppColors.secondaryColor.withOpacity(.8),
-                  AppColors.secondaryColor.withOpacity(.8),
-                  AppColors.secondaryColor.withOpacity(.9),
+                  // AppColors.primaryColor.withOpacity(.6),
+                  AppColors.primaryColor.withOpacity(.9),
+                  AppColors.primaryColor.withOpacity(.8),
+                  AppColors.primaryColor.withOpacity(.8),
+                  AppColors.primaryColor.withOpacity(.9),
                   // AppColors.primaryColor.withOpacity(.),
-                  AppColors.secondaryColor,
+                  AppColors.primaryColor,
                 ])),
         height: 8.h,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            const Row(
+            Row(
               children: [
                 TextWidget(
                   text: 'Subscrbe to get ',
@@ -260,7 +260,7 @@ class CommonWidgets {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: bgColor ?? AppColors.secondaryColor.withOpacity(.5),
+        color: bgColor ?? AppColors.primaryColor.withOpacity(.5),
         borderRadius: BorderRadius.circular(borderRadius),
       ),
       padding: padding,
@@ -289,7 +289,7 @@ class CommonWidgets {
             alignment: Alignment.bottomRight,
             child: InkWell(
               onTap: onDetailPressed,
-              child: const TextWidget(
+              child: TextWidget(
                 text: 'Details',
                 color: AppColors.primaryColor,
               ),

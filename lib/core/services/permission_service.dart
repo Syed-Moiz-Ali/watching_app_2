@@ -3,6 +3,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:watching_app_2/core/global/globals.dart';
 
+import '../../shared/widgets/misc/text_widget.dart';
+
 class PermissionService {
   factory PermissionService() => _instance;
 
@@ -71,9 +73,10 @@ class PermissionService {
           context: SMA.navigationKey.currentContext!,
           builder: (context) {
             return AlertDialog(
-              title: const Text('Permission Denied'),
-              content: Text(
-                'The following permissions are required: $deniedPermissions. Please grant them in settings.',
+              title: const TextWidget(text: 'Permission Denied'),
+              content: TextWidget(
+                text:
+                    'The following permissions are required: $deniedPermissions. Please grant them in settings.',
               ),
               actions: [
                 TextButton(
@@ -81,14 +84,14 @@ class PermissionService {
                     Navigator.pop(
                         context, false); // User chooses not to go to settings
                   },
-                  child: const Text('Cancel'),
+                  child: const TextWidget(text: 'Cancel'),
                 ),
                 TextButton(
                   onPressed: () async {
                     Navigator.pop(context, true); // User wants to open settings
                     openAppSettings();
                   },
-                  child: const Text('Open Settings'),
+                  child: const TextWidget(text: 'Open Settings'),
                 ),
               ],
             );

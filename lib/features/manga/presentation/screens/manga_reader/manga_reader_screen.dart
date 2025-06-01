@@ -427,7 +427,7 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
               ),
               elevation: 8,
             ),
-            child: const Text('Retry'),
+            child: const TextWidget(text: 'Retry'),
           ),
         ],
       ),
@@ -705,12 +705,10 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
                   color: Colors.black.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(
-                  '${_autoScrollSpeed.toStringAsFixed(1)}x',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 11.sp,
-                  ),
+                child: TextWidget(
+                  text: '${_autoScrollSpeed.toStringAsFixed(1)}x',
+                  color: Colors.white70,
+                  fontSize: 11.sp,
                 ),
               ),
             ],
@@ -912,12 +910,10 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
                       // Retry loading this specific page
                       setState(() {});
                     },
-                    child: Text(
-                      'Retry',
-                      style: TextStyle(
-                        color: AppColors.primaryColor,
-                        fontSize: 12.sp,
-                      ),
+                    child: TextWidget(
+                      text: 'Retry',
+                      color: AppColors.primaryColor,
+                      fontSize: 12.sp,
                     ),
                   ),
                 ],

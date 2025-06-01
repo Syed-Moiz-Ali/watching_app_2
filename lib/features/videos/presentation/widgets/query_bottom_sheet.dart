@@ -245,7 +245,7 @@ class _QueryBottomsheetState extends State<QueryBottomsheet>
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? AppColors.secondaryColor.withOpacity(0.0)
+                        ? AppColors.primaryColor.withOpacity(0.0)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
@@ -280,7 +280,7 @@ class _QueryBottomsheetState extends State<QueryBottomsheet>
                         ),
                       ),
                       if (isSelected)
-                        const Icon(
+                        Icon(
                           Icons.check,
                           color: AppColors.primaryColor,
                         ),
@@ -370,7 +370,7 @@ class _QueryBottomsheetState extends State<QueryBottomsheet>
           //         borderRadius: BorderRadius.circular(12),
           //       ),
           //     ),
-          //     child: const Text('Apply'),
+          //     child: const TextWidget(text:'Apply'),
           //   ),
           // ),
           PrimaryButton(

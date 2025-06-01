@@ -33,6 +33,7 @@ abstract class BaseScraper {
       _scrapeHtml(data, source.config!.detailSelector, parseElements);
 
   Future<List<Chapter>> scrapeChapterContent(String data) async {
+    log("data is $data and source.config!.chapterImagesByIdSelectionSelector is ${source.config!.chapterImagesByIdSelectionSelector}");
     if (source.config!.chapterImagesByIdSelectionSelector == null) return [];
     final document = parse(data);
     final elements = document.querySelectorAll(
@@ -41,7 +42,7 @@ abstract class BaseScraper {
   }
 
   Future<List<VideoSource>> scrapeVideos(String data) async {
-    log("this is videoSelector and ${source.config!.videoSelector!.selector}");
+    // log("this is videoSelector and ${source.config!.videoSelector!.selector}");
     if (source.config!.videoSelector == null) return [];
     final document = parse(data);
     final elements =
@@ -133,6 +134,7 @@ abstract class BaseScraper {
   Future<List<Chapter>> chapterParseElement(
       Document document, List<Element> elements) async {
     List<Chapter> chaps = [];
+    log("elements is $elements");
     try {
       for (var element in elements) {
         chaps.add(await _chapterParse(document, element));
@@ -151,7 +153,7 @@ abstract class BaseScraper {
     Document? document,
   }) async {
     if (selector == null) {
-      log("⚠️ Selector is null or empty.");
+      // log("⚠️ Selector is null or empty.");
       return "";
     }
 
@@ -189,7 +191,7 @@ abstract class BaseScraper {
           ? target.attributes[selector.attribute!]?.trim()
           : target.text.trim();
 
-      log("✅ Extracted value: '$result' from selector: '${selector.selector}'");
+      log("✅ Extracted value: '$result' from selector: '${selector.selector} and ${selector.attribute}'");
 
       return result;
     } catch (e, stack) {
@@ -217,6 +219,7 @@ abstract class BaseScraper {
       final targets = document?.querySelectorAll(selectorStr) ??
           element?.querySelectorAll(selectorStr);
       if (targets == null || targets.isEmpty) return null;
+      log("targets is $targets");
       return targets;
       // final values = targets.map((target) => selector.attribute != null
       //     ? target.attributes[selector.attribute]?.trim()
@@ -296,7 +299,7 @@ abstract class BaseScraper {
       for (final key in keys) {
         value = value[key];
       }
-      log("value is $value");
+      // log("value is $value");
       return (value is List) ? value : [value];
     } catch (e) {
       _logDebug('Error extracting JSON elements for $selector: $e');
@@ -305,7 +308,7 @@ abstract class BaseScraper {
   }
 
   Future<ContentItem> _parseContentItem(Element element) async {
-    // log("config is ${element.outerHtml}");
+    log("config is ${element.outerHtml}");
     return ContentItem(
       title: await getAttributeValue(source.config!.titleSelector,
               element: element) ??

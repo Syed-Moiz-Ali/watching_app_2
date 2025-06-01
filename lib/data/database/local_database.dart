@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -27,6 +28,13 @@ class ContentTypes {
     '3': IMAGE,
     '4': MANGA,
     '5': ANIME,
+  };
+  static const Map<String, String> TYPE_TO_CATEGORY2 = {
+    VIDEO: '1',
+    TIKTOK: '2',
+    IMAGE: '3',
+    MANGA: '4',
+    ANIME: '5',
   };
 }
 
@@ -183,6 +191,7 @@ class LocalDatabase {
     if (!ContentTypes.isValidType(contentType)) {
       throw ArgumentError('Invalid content type: $contentType');
     }
+    log("contentType in bd is $contentType");
 
     final db = await database;
     final favorites = await db.query(

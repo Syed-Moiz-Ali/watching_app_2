@@ -262,18 +262,18 @@ class _CustomAppBarState extends State<CustomAppBar>
     // Add null check for context
     if (!mounted) return;
 
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: widget.brightness ??
-          (Theme.of(context).brightness == Brightness.dark
-              ? Brightness.light
-              : Brightness.dark),
-      systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarIconBrightness: widget.brightness ??
-          (Theme.of(context).brightness == Brightness.dark
-              ? Brightness.light
-              : Brightness.dark),
-    ));
+    // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    //   statusBarColor: Colors.transparent,
+    //   statusBarIconBrightness: widget.brightness ??
+    //       (Theme.of(context).brightness == Brightness.dark
+    //           ? Brightness.light
+    //           : Brightness.dark),
+    //   systemNavigationBarColor: Colors.transparent,
+    //   systemNavigationBarIconBrightness: widget.brightness ??
+    //       (Theme.of(context).brightness == Brightness.dark
+    //           ? Brightness.light
+    //           : Brightness.dark),
+    // ));
   }
 
   void _scrollListener() {

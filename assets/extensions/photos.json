@@ -1,7 +1,7 @@
 [
   {
-    "url": "https://x-pictures.ai/gallery",
-    "searchUrl": "https://x-pictures.io/aiporn/gallery?query={search}&page={page}",
+    "url": "https://xpicture.ai/",
+    "searchUrl": "https://xpicture.ai/gallery/{page}?query={search}",
     "type": "3",
     "decodeType": "1",
     "NSFW": "1",
@@ -12,8 +12,128 @@
     "icon": "https://ik.imagekit.io/ienxzh4c2/image.png?updatedAt=1715758617289",
     "pageType": "page=",
     "query": {
-      "all": "?page={page}"
-    }
+      "all": "/{page}"
+    },"config": {
+      "title_selector": {
+        "selector": "a > picture > img",
+        "attribute": "alt"
+      },
+      "thumbnail_selector": {
+        "selector": "a > picture > img",
+        "attribute": "src"
+      },
+      "content_url_selector": {
+        "selector": " this",
+        "attribute": "href"
+      },
+
+    
+      "content_selector": {
+        "selector": ".container-fluid > div > .grid  > a"
+      }
+    },
+    "enabled": true
+  },
+  {
+    "url": "https://spicy.porn/",
+    "type": "3",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "1",
+    "name": "spicyporn",
+    "icon": "https://spicy.porn/static/Logo_light_bcg.svg",
+    "pageType": "page=",
+    "query": {
+      "random": "random?page={page}",
+      "top": "top?page={page}"
+    },"config": {
+      "title_selector": {
+       "selector": "a > img",
+        "attribute": "src"
+      },
+      "thumbnail_selector": {
+        "selector": "a > img",
+        "attribute": "src"
+      },
+      "content_url_selector": {
+        "selector": " a",
+        "attribute": "href"
+      },
+
+    
+      "content_selector": {
+        "selector": "#masonry-grid > .grid-item "
+      }
+    },
+    "enabled": true
+  },
+  {
+    "url": "https://ai-porn.ai/",
+    "type": "3",
+    "decodeType": "1",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "1",
+    "name": "aiporn",
+    "icon": "https://ai-porn.ai/favicon.ico",
+    "pageType": "page=",
+    "query": {
+      "all": "ai-porn-pics.htm?p={page}"
+    },"config": {
+      "title_selector": {
+       "selector": "a > img",
+        "attribute": "alt"
+      },
+      "thumbnail_selector": {
+        "selector": "a > img",
+        "attribute": "alt"
+      },
+      "content_url_selector": {
+        "selector": " a",
+        "attribute": "href"
+      },
+
+    
+      "content_selector": {
+        "selector": "#gallery > .gallery-item "
+      }
+    },
+    "enabled": true
+  },
+  {
+    "url": "https://made.porn/",
+    "type": "3",
+    "decodeType": "2",
+    "NSFW": "1",
+    "getType": "1",
+    "isPreview": "0",
+    "isEmbed": "1",
+    "name": "madeporn",
+    "icon": "https://made.porn/images/favicon.svg",
+    "pageType": "page=",
+    "query": {
+      "new": "endpoint/api/json/get-last-imgs?limit=20&top=month&from={offset}",
+      "top": "endpoint/api/json/get-last-imgs?limit=20&top=all&from={offset}"
+    },"config": {
+      "title_selector": {
+        "selector": "Style"
+      },
+      "thumbnail_selector": {
+        "selector": "URL"
+      },
+      "content_url_selector": {
+        "selector": " ID"
+      },
+
+    
+      "content_selector": {
+        "selector": "data"
+      }
+    },
+    "enabled": true
   },
   {
     "url": "https://www.peakpx.com/",
@@ -518,7 +638,7 @@
 
     "NSFW": "0",
     "getType": "1",
-    "decodeType": "2",
+    "decodeType": "1",
     "isPreview": "0",
     "name": "wallpapercat",
     "pageType": "mpage/",
@@ -535,8 +655,8 @@
         "attribute": "alt"
       },
       "thumbnail_selector": {
-        "selector": "._thumb > img",
-        "attribute": "data-srcset"
+        "selector": "a",
+        "attribute": "href"
       },
       "content_url_selector": {
         "selector": "a",
@@ -593,7 +713,7 @@
     "url": "https://api.createporn.com/",
     "type": "3",
 
-    "NSFW": "0",
+    "NSFW": "1",
     "getType": "1",
     "decodeType": "2",
     "isPreview": "0",
@@ -631,7 +751,7 @@
     "url": "https://api.createporn.com/",
     "type": "3",
 
-    "NSFW": "0",
+        "NSFW": "1",
     "getType": "1",
     "decodeType": "2",
     "isPreview": "0",
@@ -669,7 +789,7 @@
     "url": "https://api.createporn.com/",
     "type": "3",
 
-    "NSFW": "0",
+        "NSFW": "1",
     "getType": "1",
     "decodeType": "2",
     "isPreview": "0",
@@ -707,7 +827,7 @@
     "url": "https://api.createporn.com/",
     "type": "3",
 
-    "NSFW": "0",
+     "NSFW": "1",
     "getType": "1",
     "decodeType": "2",
     "isPreview": "0",
@@ -745,7 +865,7 @@
     "url": "https://api.createporn.com/",
     "type": "3",
 
-    "NSFW": "0",
+     "NSFW": "1",
     "getType": "1",
     "decodeType": "2",
     "isPreview": "0",
@@ -783,7 +903,7 @@
     "url": "https://api.createporn.com/",
     "type": "3",
 
-    "NSFW": "0",
+    "NSFW": "1",
     "getType": "1",
     "decodeType": "2",
     "isPreview": "0",
@@ -821,7 +941,7 @@
     "url": "https://api.createporn.com/",
     "type": "3",
 
-    "NSFW": "0",
+    "NSFW": "1",
     "getType": "1",
     "decodeType": "2",
     "isPreview": "0",
@@ -859,7 +979,7 @@
     "url": "https://api.createporn.com/",
     "type": "3",
 
-    "NSFW": "0",
+    "NSFW": "1",
     "getType": "1",
     "decodeType": "2",
     "isPreview": "0",
@@ -897,7 +1017,7 @@
     "url": "https://api.createporn.com/",
     "type": "3",
 
-    "NSFW": "0",
+    "NSFW": "1",
     "getType": "1",
     "decodeType": "2",
     "isPreview": "0",
@@ -935,7 +1055,7 @@
     "url": "https://api.createporn.com/",
     "type": "3",
 
-    "NSFW": "0",
+    "NSFW": "1",
     "getType": "1",
     "decodeType": "2",
     "isPreview": "0",
@@ -973,7 +1093,7 @@
     "url": "https://api.createporn.com/",
     "type": "3",
 
-    "NSFW": "0",
+    "NSFW": "1",
     "getType": "1",
     "decodeType": "2",
     "isPreview": "0",

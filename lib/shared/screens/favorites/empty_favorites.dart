@@ -184,7 +184,7 @@ class _AnimatedEmptyStateState extends State<AnimatedEmptyState>
                         width: 20,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.secondaryColor.withOpacity(0.7),
+                          color: AppColors.primaryColor.withOpacity(0.7),
                         ),
                       )
                           .animate(

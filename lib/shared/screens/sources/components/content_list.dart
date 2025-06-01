@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:watching_app_2/data/models/content_source.dart';
 import 'package:watching_app_2/shared/widgets/misc/padding.dart';
 
+import '../../../widgets/misc/text_widget.dart';
 import 'source_card.dart';
 
 class ContentList extends StatelessWidget {
@@ -17,9 +18,9 @@ class ContentList extends StatelessWidget {
     // If the sources list is empty, display a placeholder or error message
     if (sources.isEmpty) {
       return const Center(
-        child: Text(
-          'No content available.',
-          style: TextStyle(fontSize: 16, color: Colors.grey),
+        child: TextWidget(
+          text: 'No content available.',
+          color: Colors.grey,
         ),
       );
     }

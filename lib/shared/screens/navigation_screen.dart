@@ -199,7 +199,7 @@ class _MinimalistNavBarState extends State<MinimalistNavBar>
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final accentColor = widget.accentColor ?? AppColors.secondaryColor;
+    final accentColor = widget.accentColor ?? AppColors.primaryColor;
     final backgroundColor = widget.backgroundColor ??
         (isDark
             ? Colors.black.withOpacity(0.8)
@@ -433,7 +433,7 @@ class _MinimalistNavBarState extends State<MinimalistNavBar>
                       constraints:
                           BoxConstraints(minWidth: 3.w, minHeight: 3.w),
                       decoration: BoxDecoration(
-                        color: Colors.red,
+                        color: AppColors.primaryColor,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: isDark ? Colors.black : Colors.white,
@@ -560,7 +560,7 @@ class _NavigationScreenState extends State<NavigationScreen>
           },
         ),
         bottomNavigationBar: MinimalistNavBar(
-          accentColor: AppColors.secondaryColor,
+          accentColor: AppColors.primaryColor,
           style: NavBarStyle.docked, // Change to docked or minimal as needed
           items: [
             const NavItem(

@@ -153,7 +153,7 @@
         "selector": "html"
       },
       "detail": {
-        "discription_selector": {
+        "description_selector": {
           "selector": ".synopsis",
           "attribute": ""
         },

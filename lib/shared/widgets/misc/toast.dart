@@ -79,7 +79,7 @@
 //       case ToastType.warning:
 //         return Colors.orange;
 //       case ToastType.info:
-//         return AppColors.secondaryColor.withOpacity(.9);
+//         return AppColors.primaryColor.withOpacity(.9);
 //       default:
 //         return Aio.theme.colorScheme.primaryColor;
 //     }

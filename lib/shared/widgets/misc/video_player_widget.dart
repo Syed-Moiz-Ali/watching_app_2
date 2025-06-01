@@ -117,7 +117,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget>
                         borderRadius: BorderRadius.circular(12.0),
                         color: isPlaying == false
                             ? AppColors.primaryColor.withOpacity(0.7)
-                            : AppColors.secondaryColor,
+                            : AppColors.primaryColor,
                       ),
                       child: Center(
                         child: GestureDetector(
@@ -129,10 +129,10 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget>
                               });
                             });
                           },
-                          child: const Icon(
+                          child: Icon(
                             Icons.replay_rounded,
                             size: 40,
-                            color: AppColors.secondaryColor,
+                            color: AppColors.primaryColor,
                           ),
                         ),
                       ))

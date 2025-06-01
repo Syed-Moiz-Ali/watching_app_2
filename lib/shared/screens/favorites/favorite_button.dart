@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
+import '../../widgets/misc/text_widget.dart';
 import 'remove_favorite_dialog.dart';
 import 'dart:math' as math;
 
@@ -252,7 +253,10 @@ class FavoriteButtonState extends State<FavoriteButton>
     log("errorMessage is ${errorMessage}");
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Error updating favorites: $errorMessage'),
+        content: TextWidget(
+          text: 'Error updating favorites: $errorMessage',
+          maxLine: 10,
+        ),
         backgroundColor: widget.errorColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

@@ -6,6 +6,7 @@ import '../../core/global/globals.dart'; // For SMA.pref
 class ThemeProvider extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system; // Default to system theme
   bool _isDarkTheme = false;
+  Color? tempColor;
 
   // Getter for current ThemeMode
   ThemeMode get themeMode => _themeMode;
@@ -25,6 +26,11 @@ class ThemeProvider extends ChangeNotifier {
     if (SMA.pref != null) {
       SMA.pref!.setBool('_isDarkTheme', _isDarkTheme);
     }
+    notifyListeners();
+  }
+
+  setTempColor(Color color) {
+    tempColor = color;
     notifyListeners();
   }
 

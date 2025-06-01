@@ -10,6 +10,7 @@ import '../../data/scrapers/sources/photos/peakpx.dart';
 import '../../data/scrapers/sources/photos/pmatehunter.dart';
 import '../../data/scrapers/sources/photos/wallpaper.mob.dart';
 import '../../data/scrapers/sources/photos/wallpaperporn.dart';
+import '../../data/scrapers/sources/videos/crazyporn.dart';
 import '../../data/scrapers/sources/videos/pandamovies.dart';
 import '../../data/scrapers/sources/videos/baddies.dart';
 import '../../data/scrapers/sources/videos/bdsm.dart';
@@ -75,6 +76,7 @@ class ScraperFactory {
       'tranny': (source) => Tranny(source),
       'whorehub': (source) => WhoreHub(source),
       'porntop': (source) => Porntop(source),
+      'crazyporn': (source) => Crazyporn(source),
       'bdsm': (source) => Bdsm(source),
       'pandamovies': (source) => Pandamovies(source),
       'interntchicks': (source) => Interntchicks(source),

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
+import '../../shared/widgets/misc/text_widget.dart';
 import '../global/globals.dart';
 import '../utils/file_utils.dart';
 import '../../data/models/content_item.dart';
@@ -65,8 +66,8 @@ class WallpaperService {
   void showWallpaperResult(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          message,
+        content: TextWidget(
+          text: message,
           textAlign: TextAlign.center,
         ),
         backgroundColor: Colors.black.withOpacity(0.7),

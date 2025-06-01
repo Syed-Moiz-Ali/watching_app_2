@@ -184,7 +184,7 @@ class _WallpapersState extends State<TikTok> {
                   ),
                 )
               : error != null
-                  ? Center(child: Text(error!))
+                  ? Center(child: TextWidget(text: error!))
                   : tiktok.isEmpty
                       ? const Center(
                           child: TextWidget(

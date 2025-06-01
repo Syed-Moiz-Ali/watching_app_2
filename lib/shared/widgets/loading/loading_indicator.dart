@@ -1,7 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 import 'dart:math' as math;
+
+import '../misc/text_widget.dart';
 
 class CustomLoadingIndicator extends StatefulWidget {
   final String loadingText;
@@ -282,14 +285,12 @@ class _PaginationLoadingIndicatorState extends State<CustomLoadingIndicator>
                         math.sin(
                             (_waveController.value * 2 * math.pi + i * 0.5) %
                                 math.pi),
-                child: Text(
-                  text[i],
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: i % 3 == 0 ? FontWeight.bold : FontWeight.w500,
-                    letterSpacing: 0.5,
-                    color: Theme.of(context).textTheme.bodyMedium?.color,
-                  ),
+                child: TextWidget(
+                  text: text[i],
+                  fontSize: 14.sp,
+                  fontWeight: i % 3 == 0 ? FontWeight.bold : FontWeight.w500,
+                  letterSpacing: 0.5,
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
                 ),
               ),
             );

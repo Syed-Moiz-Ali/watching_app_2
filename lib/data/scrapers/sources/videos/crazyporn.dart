@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:html/dom.dart';
 
 import '../../../../core/global/globals.dart';
@@ -6,8 +7,8 @@ import '../../../models/content_source.dart';
 import '../../../models/scraper_config.dart';
 import '../../base_scraper.dart';
 
-class Porntop extends BaseScraper {
-  Porntop(ContentSource source)
+class Crazyporn extends BaseScraper {
+  Crazyporn(ContentSource source)
       : super(
           source,
         );
@@ -21,13 +22,12 @@ class Porntop extends BaseScraper {
         Map watchingLink = {};
 
         List<Element> scriptTags = element!.querySelectorAll('script');
-
         // Find the script tag containing '<![CDATA[' in its content
         Element? cdataScriptTag = scriptTags.firstWhere(
-          (scriptTag) => scriptTag.text.startsWith('let vpage_data='),
+          (scriptTag) => scriptTag.text.contains('<![CDATA['),
           // orElse: () => null,
         );
-        // print('cdataScriptTag is $cdataScriptTag');
+        print('cdataScriptTag is $cdataScriptTag');
         Map<String, String> dataMap = extractDataFromScript(cdataScriptTag);
 
         // Print the extracted data map
@@ -51,7 +51,7 @@ class Porntop extends BaseScraper {
     String jsContent = scriptTag.text;
     // print('jsContent is ${jsContent.replaceAll('let vpage_data={', '')}');
     // Define regular expressions to extract key-value pairs from the JavaScript content
-    RegExp regex = RegExp(r'vid:(\d+)');
+    RegExp regex = RegExp(r'video_id:(\d+)');
 
     Match? match = regex.firstMatch(jsContent);
     if (match != null) {

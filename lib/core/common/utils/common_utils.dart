@@ -74,7 +74,8 @@ class CommonFunctions {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return AnimatedPadding(
+        return AnimatedContainer(
+          width: 100.w,
           padding: addPadding
               ? EdgeInsets.only(
                   top: 20, left: 16, right: 16, bottom: SMA.size.height * .1)
@@ -115,6 +116,16 @@ class CommonFunctions {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
+                      PrimaryButton(
+                        onTap: () => onTap!(),
+                        text: btnText,
+                        width: .4,
+                        borderRadius: 12,
+
+                        elevation: 5, // Slightly higher elevation to stand out
+                      ),
+                      const SizedBox(width: 16), // Add space between buttons
+
                       // Cancel button with new style and icon
                       PrimaryButton(
                         onTap: () {
@@ -122,22 +133,15 @@ class CommonFunctions {
                           Navigator.of(context).pop(); // Cancel action
                         },
                         text: 'Cancel',
-                        width: SMA.size.width * .35,
+                        bgColor: AppColors.transparent,
+                        textColor: AppColors.backgroundColorDark,
+                        width: .4,
                         borderRadius: 12,
 
                         elevation:
                             3, // Adding subtle elevation for a modern button look
                       ),
-                      const SizedBox(width: 16), // Add space between buttons
                       // Logout button with accent color and elevated design
-                      PrimaryButton(
-                        onTap: () => onTap!(),
-                        text: btnText,
-                        width: SMA.size.width * .35,
-                        borderRadius: 12,
-
-                        elevation: 5, // Slightly higher elevation to stand out
-                      ),
                     ],
                   ),
                 ],

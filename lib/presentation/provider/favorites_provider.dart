@@ -108,7 +108,7 @@ class FavoritesProvider with ChangeNotifier {
 
   Stream<List<ContentItem>> watchFavoritesByType(String contentType) async* {
     while (true) {
-      await Future.delayed(const Duration(seconds: 1)); // Poll every second
+      await Future.delayed(const Duration(seconds: 2)); // Poll every second
       yield await getFavoritesByType(contentType); // Emit updated list
     }
   }

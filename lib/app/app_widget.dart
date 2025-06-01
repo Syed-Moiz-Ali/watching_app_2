@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -17,22 +18,19 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  late Future<void> _appInitialization;
+
   @override
   void initState() {
     super.initState();
-    // Enable wake lock when the app starts
-    // _futureWidget = AppInitializer.initializeApp();
-
-    WakelockPlus.enable();
-    // Add observer to monitor app lifecycle
+    _appInitialization = AppInitializer.initializeApp();
     WidgetsBinding.instance.addObserver(this);
+    _enableWakelock();
   }
 
   @override
   void dispose() {
-    // Disable wake lock when the widget is disposed
-    WakelockPlus.disable();
-    // Remove observer
+    _disableWakelock();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -40,28 +38,90 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      WakelockPlus.enable(); // Re-enable when app resumes
+      _enableWakelock();
     } else if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached) {
-      WakelockPlus.disable(); // Disable when app is paused or detached
+      _disableWakelock();
+    }
+  }
+
+  Future<void> _enableWakelock() async {
+    try {
+      if (Platform.isAndroid || Platform.isIOS) {
+        await WakelockPlus.enable();
+      }
+    } catch (e) {
+      debugPrint('Error enabling wakelock: $e');
+    }
+  }
+
+  Future<void> _disableWakelock() async {
+    try {
+      await WakelockPlus.disable();
+    } catch (e) {
+      debugPrint('Error disabling wakelock: $e');
     }
   }
 
   @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _appInitialization,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const MaterialApp(
+            home: Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ),
+          );
+        }
+        return ResponsiveSizer(builder: (context, orientation, screenType) {
+          return MaterialApp(
+            title: 'BrowseX',
+            navigatorKey: SMA.navigationKey,
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: DarkTheme.darkTheme,
+            themeMode: context.watch<ThemeProvider>().themeMode,
+            initialRoute: AppRoutes.splash,
+            onGenerateRoute: AppRoutes.generateRoute,
+            builder: (context, child) {
+              return SafeArea(
+                  child: ErrorBoundary(child: child ?? const SizedBox()));
+            },
+            navigatorObservers: [AnalyticsNavigatorObserver()],
+          );
+        });
+      },
+    );
+  }
+}
+
+class AppInitializer {
+  static Future<void> initializeApp() async {
+    // Add initialization logic (e.g., SharedPreferences, Firebase)
+    await Future.delayed(const Duration(seconds: 2));
+  }
+}
+
+class ErrorBoundary extends StatelessWidget {
+  final Widget child;
+
+  const ErrorBoundary({super.key, required this.child});
+
   @override
   Widget build(BuildContext context) {
-    var themeProvider = context.watch<ThemeProvider>();
-    return ResponsiveSizer(builder: (context, orientation, screenType) {
-      return MaterialApp(
-        title: 'BrowseX',
-        navigatorKey: SMA.navigationKey,
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme, // Light theme
-        darkTheme: DarkTheme.darkTheme, // Dark theme
-        themeMode: themeProvider.themeMode, // Use ThemeMode from provider
-        initialRoute: AppRoutes.splash,
-        onGenerateRoute: AppRoutes.generateRoute,
-      );
-    });
+    return child;
+  }
+
+  static void reportError(Object error, StackTrace? stackTrace) {
+    debugPrint('Error: $error\nStackTrace: $stackTrace');
+  }
+}
+
+class AnalyticsNavigatorObserver extends NavigatorObserver {
+  @override
+  void didPush(Route route, Route? previousRoute) {
+    debugPrint('Pushed route: ${route.settings.name}');
   }
 }

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:watching_app_2/core/global/globals.dart';
+import '../../shared/widgets/misc/text_widget.dart';
 import '../utils/file_utils.dart';
 import '../../data/models/content_item.dart';
 import 'permission_service.dart';
@@ -61,7 +62,7 @@ class DownloadService {
   /// Show a snackbar with download result
   void showDownloadResult(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(content: TextWidget(text: message)),
     );
   }
 }

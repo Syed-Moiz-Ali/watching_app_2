@@ -321,18 +321,10 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
         isShowSearchbar: true,
         onChanged: (value) {
           _filterCategories(value);
-          // searchVideos(value);
         },
       ),
       body: Stack(
         children: [
-          // Enhanced animated background
-          // _buildAnimatedBackground(),
-
-          // Elegant overlay gradient
-          // _buildOverlayGradient(),
-
-          // Main content
           SafeArea(
             child: _isLoading
                 ? _buildShimmerLoading()
@@ -342,18 +334,6 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Premium section title
-                        // Padding(
-                        //   padding: const EdgeInsets.only(bottom: 16, left: 4),
-                        //   child: TextWidget(
-                        //     text: 'Premium Collections',
-                        //     fontSize: 18.sp,
-                        //     fontWeight: FontWeight.w600,
-                        //     color: Colors.white,
-                        //   ),
-                        // ),
-
-                        // Enhanced grid view
                         Expanded(
                           child: GridView.builder(
                             physics: const BouncingScrollPhysics(),
@@ -379,5 +359,3 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
     );
   }
 }
-
-// Enhanced category detail screen with premium styling

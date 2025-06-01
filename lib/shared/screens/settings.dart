@@ -1,17 +1,21 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library Hawkins
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
-import 'package:watching_app_2/core/services/backup_service.dart';
+import 'package:watching_app_2/core/navigation/app_navigator.dart';
 import 'package:watching_app_2/shared/provider/local_auth_provider.dart';
 import 'package:watching_app_2/shared/widgets/appbars/app_bar.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 
+import '../../core/common/utils/common_utils.dart';
+import '../../core/global/globals.dart';
+import '../../core/navigation/routes.dart';
 import '../../presentation/provider/theme_provider.dart';
 
 class Settings extends StatefulWidget {
@@ -28,6 +32,7 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
   late AnimationController _floatingButtonController;
   late AnimationController _floatingMenuController;
   late AnimationController _shimmerController;
+  late AnimationController _dialogController;
 
   // Section controllers
   late List<AnimationController> _sectionControllers;
@@ -45,15 +50,14 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
   bool _explicitContentWarningEnabled = false;
   bool _incognitoModeEnabled = false;
   bool _ageVerificationEnabled = false;
-
-  // Colors for theme
-  late Color _primaryColor;
-  late Color _iconColor;
-  late Color _dividerColor;
+  int _contentFilterAge = 13; // Default age for content filtering
+  List<String> _selectedCategories = ['General', 'Kids']; // Default categories
+  // Color _customThemeColor =
+  //     AppColors.primaryColor; // Default custom theme color
 
   // Gradients
-  late List<Color> _backgroundGradient;
-  late List<Color> _accentGradient;
+  // late List<Color> _backgroundGradient;
+  // late List<Color> _accentGradient;
 
   // Particle positions for background animation
   final List<_Particle> _particles = [];
@@ -61,6 +65,9 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+
+    // Load saved preferences
+    _loadPreferences();
 
     // Create particles for background effect
     _createParticles();
@@ -91,6 +98,11 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 2000),
     )..repeat();
 
+    _dialogController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
     // Initialize section controllers
     const sectionCount = 5;
     _sectionControllers = List.generate(
@@ -115,7 +127,7 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
     );
 
     // Set initial theme
-    _updateThemeColors();
+    // _updateThemeColors();
 
     // Start animations with super premium staggered effect
     _pageEnterController.forward();
@@ -125,6 +137,46 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
     Future.delayed(const Duration(milliseconds: 300), () {
       _animateSectionsSequentially();
     });
+  }
+
+  // Load preferences from SharedPreferences
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isDarkMode = prefs.getBool('isDarkMode') ?? false;
+      _notificationsEnabled = prefs.getBool('notificationsEnabled') ?? true;
+      _contentFilteringEnabled =
+          prefs.getBool('contentFilteringEnabled') ?? false;
+      _explicitContentWarningEnabled =
+          prefs.getBool('explicitContentWarningEnabled') ?? false;
+      _incognitoModeEnabled = prefs.getBool('incognitoModeEnabled') ?? false;
+      _ageVerificationEnabled =
+          prefs.getBool('ageVerificationEnabled') ?? false;
+      _contentFilterAge = prefs.getInt('contentFilterAge') ?? 13;
+      _selectedCategories =
+          prefs.getStringList('selectedCategories') ?? ['General', 'Kids'];
+    });
+
+    // Apply dark mode to ThemeProvider
+    if (_isDarkMode) {
+      context.read<ThemeProvider>().setTheme(ThemeMode.dark);
+    }
+    // Update theme with custom color
+    // _updateThemeColors();
+  }
+
+  // Save preferences to SharedPreferences
+  Future<void> _savePreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isDarkMode', _isDarkMode);
+    await prefs.setBool('notificationsEnabled', _notificationsEnabled);
+    await prefs.setBool('contentFilteringEnabled', _contentFilteringEnabled);
+    await prefs.setBool(
+        'explicitContentWarningEnabled', _explicitContentWarningEnabled);
+    await prefs.setBool('incognitoModeEnabled', _incognitoModeEnabled);
+    await prefs.setBool('ageVerificationEnabled', _ageVerificationEnabled);
+    await prefs.setInt('contentFilterAge', _contentFilterAge);
+    await prefs.setStringList('selectedCategories', _selectedCategories);
   }
 
   void _createParticles() {
@@ -158,23 +210,32 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
     }
   }
 
-  void _updateThemeColors() {
-    _primaryColor = AppColors.primaryColor;
+  void _updateThemeColors() async {
+    var tempColor = context.read<ThemeProvider>().tempColor;
+    await SMA.pref!.setInt('customThemeColor', tempColor!.value);
 
-    _iconColor = AppColors.secondaryColor;
-    _dividerColor = Colors.grey.shade300;
+    CommonFunctions.customBottomSheet(
+        icon: Icons.restart_alt_rounded,
+        title: 'Restart',
+        description: 'To Apply Restart the App',
+        btnText: 'Restart',
+        onTap: () async {
+          NH.navigateBack();
+          NH.nameNavigateAndRemoveUntil(AppRoutes.splash);
 
-    _backgroundGradient = [
-      AppColors.backgroundColorLight.withOpacity(.5),
-      Colors.white,
-      AppColors.backgroundColorLight.withOpacity(.5)
-    ];
+          // await Turf.navigateTo(const SplashScreen());
+        });
+    // _backgroundGradient = [
+    //   _customThemeColor.withOpacity(.5),
+    //   Colors.white,
+    //   _customThemeColor.withOpacity(.5)
+    // ];
 
-    _accentGradient = [
-      AppColors.primaryColor,
-      AppColors.primaryColor.withOpacity(.8),
-      AppColors.primaryColor.withOpacity(.85)
-    ];
+    // _accentGradient = [
+    //   _customThemeColor,
+    //   _customThemeColor.withOpacity(.8),
+    //   _customThemeColor.withOpacity(.85)
+    // ];
   }
 
   @override
@@ -184,6 +245,7 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
     _floatingButtonController.dispose();
     _floatingMenuController.dispose();
     _shimmerController.dispose();
+    _dialogController.dispose();
 
     for (final controller in _sectionControllers) {
       controller.dispose();
@@ -209,21 +271,13 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
           child: Stack(
             children: [
               // Animated background
-              _buildAnimatedBackground(),
+              // _buildAnimatedBackground(),
 
               // Main content
               Scaffold(
-                // backgroundColor: Colors.transparent,
-                // extendBodyBehindAppBar: true,
                 appBar: _buildAppBar(),
                 body: _buildBody(),
-                // floatingActionButton: _buildFloatingActionButton(),
               ),
-
-              // Floating menu
-              // _buildFloatingMenu(),
-
-              // Premium floating badge
             ],
           ),
         );
@@ -231,88 +285,48 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildAnimatedBackground() {
-    return AnimatedBuilder(
-      animation: _backgroundAnimController,
-      builder: (context, _) {
-        // Update particle positions
-        for (final particle in _particles) {
-          particle.x += particle.speedX;
-          particle.y += particle.speedY;
+  // Widget _buildAnimatedBackground() {
+  //   return AnimatedBuilder(
+  //     animation: _backgroundAnimController,
+  //     builder: (context, _) {
+  //       // Update particle positions
+  //       for (final particle in _particles) {
+  //         particle.x += particle.speedX;
+  //         particle.y += particle.speedY;
 
-          // Wrap around edges
-          if (particle.x < -0.1) particle.x = 1.1;
-          if (particle.x > 1.1) particle.x = -0.1;
-          if (particle.y < -0.1) particle.y = 1.1;
-          if (particle.y > 1.1) particle.y = -0.1;
-        }
+  //         // Wrap around edges
+  //         if (particle.x < -0.1) particle.x = 1.1;
+  //         if (particle.x > 1.1) particle.x = -0.1;
+  //         if (particle.y < -0.1) particle.y = 1.1;
+  //         if (particle.y > 1.1) particle.y = -0.1;
+  //       }
 
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 500),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: _backgroundGradient,
-            ),
-          ),
-          child: CustomPaint(
-            painter: _ParticlePainter(
-              particles: _particles,
-              color: _primaryColor,
-              animationValue: _backgroundAnimController.value,
-            ),
-            child: const SizedBox.expand(),
-          ),
-        );
-      },
-    );
-  }
+  //       return AnimatedContainer(
+  //         duration: const Duration(milliseconds: 500),
+  //         decoration: BoxDecoration(
+  //           gradient: LinearGradient(
+  //             begin: Alignment.topLeft,
+  //             end: Alignment.bottomRight,
+  //             colors: _backgroundGradient,
+  //           ),
+  //         ),
+  //         child: CustomPaint(
+  //           painter: _ParticlePainter(
+  //             particles: _particles,
+  //             color: AppColors.primaryColor,
+  //             animationValue: _backgroundAnimController.value,
+  //           ),
+  //           child: const SizedBox.expand(),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
   PreferredSizeWidget _buildAppBar() {
     return CustomAppBar(
       elevation: 0,
-      // backgroundColor: Colors.transparent,
-
       title: "Settings",
-      // Row(
-      //   children: [
-      //     ScaleTransition(
-      //       scale: titleScale,
-      //       child: FadeTransition(
-      //         opacity: titleFade,
-      //         child: TweenAnimationBuilder<double>(
-      //           tween: Tween<double>(begin: 0, end: 1),
-      //           duration: const Duration(milliseconds: 1200),
-      //           curve: Curves.elasticOut,
-      //           builder: (context, value, child) {
-      //             return Transform.rotate(
-      //               angle: (1 - value) * 0.5,
-      //               child: Icon(
-      //                 Icons.settings,
-      //                 color: _primaryColor,
-      //                 size: 28,
-      //               ),
-      //             );
-      //           },
-      //         ),
-      //       ),
-      //     ),
-      //     const SizedBox(width: 16),
-      //     ScaleTransition(
-      //       scale: titleScale,
-      //       child: FadeTransition(
-      //         opacity: titleFade,
-      //         child: TextWidget(
-      //           text: 'Settings',
-      //           fontWeight: FontWeight.bold,
-      //           fontSize: 22.sp * _textSize,
-      //           // color: _textColor,
-      //         ),
-      //       ),
-      //     ),
-      //   ],
-      // ),
       actions: [
         SlideTransition(
           position: Tween<Offset>(
@@ -323,7 +337,7 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
             curve: const Interval(0.3, 0.7, curve: Curves.easeOutQuint),
           )),
           child: IconButton(
-            icon: Icon(Icons.search, color: _iconColor),
+            icon: Icon(Icons.search),
             onPressed: () {},
           ),
         ),
@@ -339,7 +353,6 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // _buildWelcomeCard(),
             const SizedBox(height: 30),
 
             // Appearance Section
@@ -359,7 +372,7 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                       context
                           .read<ThemeProvider>()
                           .setTheme(value ? ThemeMode.dark : ThemeMode.light);
-                      // _updateThemeColors();
+                      _savePreferences();
                     });
                   },
                   type: _SettingType.toggle,
@@ -369,8 +382,7 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                   subtitle: 'Choose a custom color theme for the app',
                   icon: Icons.color_lens,
                   onTap: () {
-                    // Open a color picker dialog for custom themes
-                    // _openCustomThemeDialog();
+                    _openCustomThemeDialog();
                   },
                   type: _SettingType.button,
                 ),
@@ -391,12 +403,15 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                   onChanged: (value) {
                     setState(() {
                       _notificationsEnabled = value;
+                      _savePreferences();
                     });
                   },
                   type: _SettingType.toggle,
                 ),
               ],
             ),
+
+            // Content Preferences Section
             _buildSectionWithItems(
               sectionIndex: 2,
               title: 'Content Preferences',
@@ -407,13 +422,13 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                   subtitle: 'Filter content by preferred categories',
                   icon: Icons.filter_list,
                   onTap: () {
-                    // Implement category selection screen
-                    // _openCategoryFilterDialog();
+                    _openCategoryFilterDialog();
                   },
                   type: _SettingType.button,
                 ),
               ],
             ),
+
             // Security Section
             _buildSectionWithItems(
               sectionIndex: 3,
@@ -427,12 +442,13 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                   value: context.read<LocalAuthProvider>().isProtectionEnabled,
                   onChanged: (value) {
                     context.read<LocalAuthProvider>().toggleProtection(value);
+                    _savePreferences();
                   },
                   type: _SettingType.toggle,
                 ),
                 _SettingItem(
                   title: 'Backup',
-                  subtitle: 'backup your data',
+                  subtitle: 'Backup your data',
                   icon: Icons.backup,
                   onTap: () {
                     // BackupService().createBackup();
@@ -441,7 +457,7 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                 ),
                 _SettingItem(
                   title: 'Restore',
-                  subtitle: 'restore your data',
+                  subtitle: 'Restore your data',
                   icon: Icons.backup,
                   onTap: () {
                     // BackupService().restoreBackup();
@@ -461,13 +477,10 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                   title: 'Content Filtering',
                   subtitle: 'Set content preferences based on age or category',
                   icon: Icons.filter_list,
-                  value: _contentFilteringEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      _contentFilteringEnabled = value;
-                    });
+                  onTap: () {
+                    _openContentFilterDialog();
                   },
-                  type: _SettingType.toggle,
+                  type: _SettingType.button,
                 ),
                 _SettingItem(
                   title: 'Explicit Content Warning',
@@ -477,6 +490,7 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                   onChanged: (value) {
                     setState(() {
                       _explicitContentWarningEnabled = value;
+                      _savePreferences();
                     });
                   },
                   type: _SettingType.toggle,
@@ -489,6 +503,7 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                   onChanged: (value) {
                     setState(() {
                       _incognitoModeEnabled = value;
+                      _savePreferences();
                     });
                   },
                   type: _SettingType.toggle,
@@ -501,6 +516,7 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                   onChanged: (value) {
                     setState(() {
                       _ageVerificationEnabled = value;
+                      _savePreferences();
                     });
                   },
                   type: _SettingType.toggle,
@@ -513,131 +529,382 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildWelcomeCard() {
-    final animation = CurvedAnimation(
-      parent: _pageEnterController,
-      curve: const Interval(0.1, 0.6, curve: Curves.easeOutBack),
-    );
+  void _openContentFilterDialog() {
+    _dialogController.reset();
+    _dialogController.forward();
 
-    return ScaleTransition(
-      scale: Tween(begin: 0.8, end: 1.0).animate(animation),
-      child: FadeTransition(
-        opacity: Tween(begin: 0.0, end: 1.0).animate(animation),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: _accentGradient,
-            ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: _primaryColor.withOpacity(0.3),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Stack(
-            children: [
-              // Animated shimmer effect
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  return AnimatedBuilder(
-                    animation: _shimmerController,
-                    builder: (context, child) {
-                      return Container(
-                        width: constraints.maxWidth,
-                        height: 20.h,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          gradient: LinearGradient(
-                            begin: Alignment(
-                                -1.0 + _shimmerController.value * 2, 0),
-                            end: Alignment(
-                                -0.5 + _shimmerController.value * 2, 1),
-                            colors: [
-                              Colors.white.withOpacity(0),
-                              Colors.white.withOpacity(0.2),
-                              Colors.white.withOpacity(0),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
+    showDialog(
+      context: context,
+      builder: (context) {
+        int tempAge = _contentFilterAge;
 
-              // Content
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.stars_rounded,
-                        color: Colors.white,
-                        size: 28,
+        return AnimatedBuilder(
+          animation: _dialogController,
+          builder: (context, _) {
+            return ScaleTransition(
+              scale: Tween(begin: 0.8, end: 1.0).animate(CurvedAnimation(
+                parent: _dialogController,
+                curve: Curves.easeOutBack,
+              )),
+              child: AlertDialog(
+                backgroundColor: Colors.transparent,
+                contentPadding: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                content: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.primaryColor,
+                        AppColors.primaryColor.withOpacity(.7)
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryColor.withOpacity(0.3),
+                        blurRadius: 16,
+                        offset: const Offset(0, 8),
                       ),
-                      const SizedBox(width: 12),
+                    ],
+                  ),
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       TextWidget(
-                        text: 'Welcome to Premium',
+                        text: 'Content Age Filter',
                         color: Colors.white,
                         fontSize: 18.sp * _textSize,
                         fontWeight: FontWeight.bold,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  TextWidget(
-                    text:
-                        'Enjoy exclusive premium features, advanced animations, and a truly luxurious experience.',
-                    color: Colors.white.withOpacity(0.9),
-                    maxLine: 4,
-                    fontSize: 14.sp * _textSize,
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () {},
-                        style: TextButton.styleFrom(
-                          // backgroundColor: Colors.white.withOpacity(0.25),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            TextWidget(
-                              text: 'Explore Premium',
+                      const SizedBox(height: 16),
+                      TextWidget(
+                        text: 'Select minimum age for content filtering',
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 14.sp * _textSize,
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownButton<int>(
+                        value: tempAge,
+                        dropdownColor: AppColors.primaryColor.withOpacity(0.9),
+                        items: [13, 16, 18, 21].map((age) {
+                          return DropdownMenuItem(
+                            value: age,
+                            child: TextWidget(
+                              text: '$age+',
+                              color: Colors.white,
+                              fontSize: 14.sp * _textSize,
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() {
+                              tempAge = value;
+                            });
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: TextWidget(
+                              text: 'Cancel',
                               color: Colors.white,
                               fontSize: 15.sp * _textSize,
-                              fontWeight: FontWeight.w600,
                             ),
-                            const SizedBox(width: 6),
-                            Icon(
-                              Icons.arrow_forward,
-                              color: Colors.white,
-                              size: 17.sp,
-                            ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildActionButton(
+                            onTap: () {
+                              setState(() {
+                                _contentFilteringEnabled = true;
+                                _contentFilterAge = tempAge;
+                                _savePreferences();
+                              });
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _openCategoryFilterDialog() {
+    _dialogController.reset();
+    _dialogController.forward();
+
+    List<String> tempCategories = List.from(_selectedCategories);
+    const availableCategories = [
+      'General',
+      'Kids',
+      'Teens',
+      'Adults',
+      'Educational',
+      'Entertainment',
+      'News',
+    ];
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AnimatedBuilder(
+          animation: _dialogController,
+          builder: (context, _) {
+            return ScaleTransition(
+              scale: Tween(begin: 0.8, end: 1.0).animate(CurvedAnimation(
+                parent: _dialogController,
+                curve: Curves.easeOutBack,
+              )),
+              child: AlertDialog(
+                backgroundColor: Colors.transparent,
+                contentPadding: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                content: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.primaryColor,
+                        AppColors.primaryColor.withOpacity(.7)
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryColor.withOpacity(0.3),
+                        blurRadius: 16,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextWidget(
+                        text: 'Content Categories',
+                        color: Colors.white,
+                        fontSize: 18.sp * _textSize,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      const SizedBox(height: 16),
+                      TextWidget(
+                        text: 'Select preferred content categories',
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 14.sp * _textSize,
+                      ),
+                      const SizedBox(height: 16),
+                      ...availableCategories.map((category) {
+                        return CheckboxListTile(
+                          title: TextWidget(
+                            text: category,
+                            color: Colors.white,
+                            fontSize: 14.sp * _textSize,
+                          ),
+                          value: tempCategories.contains(category),
+                          onChanged: (value) {
+                            setState(() {
+                              if (value == true) {
+                                tempCategories.add(category);
+                              } else {
+                                tempCategories.remove(category);
+                              }
+                            });
+                          },
+                          checkColor: Colors.white,
+                          activeColor: AppColors.primaryColor,
+                        );
+                      }).toList(),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: TextWidget(
+                              text: 'Cancel',
+                              color: Colors.white,
+                              fontSize: 15.sp * _textSize,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildActionButton(
+                            onTap: () {
+                              setState(() {
+                                _selectedCategories = tempCategories;
+                                _savePreferences();
+                              });
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _openCustomThemeDialog() {
+    _dialogController.reset();
+    _dialogController.forward();
+
+    // Color tempColor = _customThemeColor;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AnimatedBuilder(
+          animation: _dialogController,
+          builder: (context, _) {
+            return ScaleTransition(
+              scale: Tween(begin: 0.8, end: 1.0).animate(CurvedAnimation(
+                parent: _dialogController,
+                curve: Curves.easeOutBack,
+              )),
+              child: AlertDialog(
+                backgroundColor: Colors.transparent,
+                contentPadding: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                content: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.primaryColor.withOpacity(.7),
+                        AppColors.primaryColor.withOpacity(.7)
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryColor.withOpacity(0.3),
+                        blurRadius: 16,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextWidget(
+                        text: 'Custom Theme Color',
+                        color: Colors.white,
+                        fontSize: 18.sp * _textSize,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      const SizedBox(height: 16),
+                      TextWidget(
+                        text: 'Select a custom theme color',
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 14.sp * _textSize,
+                      ),
+                      const SizedBox(height: 16),
+                      // Simple color picker using buttons
+                      Consumer<ThemeProvider>(builder: (context, provider, _) {
+                        return Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: [
+                            Colors.red,
+                            Colors.blue,
+                            Colors.green,
+                            Colors.purple,
+                            Colors.orange,
+                            Colors.teal,
+                            Colors.pink,
+                          ].map((color) {
+                            return GestureDetector(
+                              onTap: () {
+                                provider.setTempColor(color);
+                              },
+                              child: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: color,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: provider.tempColor == color
+                                        ? Colors.white
+                                        : Colors.transparent,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      }),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: TextWidget(
+                              text: 'Cancel',
+                              color: Colors.white,
+                              fontSize: 15.sp * _textSize,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildActionButton(
+                            onTap: () {
+                              setState(() {
+                                _savePreferences();
+                              });
+                              _updateThemeColors();
+                              // Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -674,7 +941,9 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
-                          color: isHovered ? _primaryColor : Colors.transparent,
+                          color: isHovered
+                              ? AppColors.primaryColor
+                              : Colors.transparent,
                           width: 2,
                         ),
                       ),
@@ -685,12 +954,12 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: _primaryColor.withOpacity(0.1),
+                            color: AppColors.primaryColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Icon(
                             icon,
-                            // color: _primaryColor,
+                            // color: AppColors.primaryColor,
                             size: 22.sp,
                           ),
                         ),
@@ -762,15 +1031,16 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
               boxShadow: [
                 BoxShadow(
                   color: isHovered
-                      ? _primaryColor.withOpacity(0.2)
+                      ? AppColors.primaryColor.withOpacity(0.2)
                       : Colors.black.withOpacity(0.05),
                   blurRadius: isHovered ? 12 : 8,
                   offset: isHovered ? const Offset(0, 4) : const Offset(0, 3),
                 ),
               ],
               border: Border.all(
-                color:
-                    isHovered ? _primaryColor : _dividerColor.withOpacity(0.5),
+                color: isHovered
+                    ? AppColors.primaryColor
+                    : Colors.grey.shade300.withOpacity(0.5),
                 width: isHovered ? 1.5 : 1,
               ),
             ),
@@ -840,14 +1110,14 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                     value,
                   )
                 : Color.lerp(
-                    _primaryColor.withOpacity(0.1),
-                    _primaryColor.withOpacity(0.2),
+                    AppColors.primaryColor.withOpacity(0.1),
+                    AppColors.primaryColor.withOpacity(0.2),
                     value,
                   ),
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: _primaryColor.withOpacity(0.1 * value),
+                color: AppColors.primaryColor.withOpacity(0.1 * value),
                 blurRadius: 8 * value,
                 spreadRadius: 2 * value,
               ),
@@ -857,9 +1127,6 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
             scale: 1.0 + (0.1 * value),
             child: Icon(
               icon,
-              // color: !isDarkMode.isDarkTheme
-              //     ? AppColors.backgroundColorLight
-              //     : _primaryColor,
               size: 20.sp,
             ),
           ),
@@ -879,7 +1146,6 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOutBack,
         builder: (context, animationValue, _) {
-          // Ensure animation value is within valid range
           final safeAnimationValue = animationValue.clamp(0.0, 1.0);
 
           return Container(
@@ -888,12 +1154,12 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
               color: value
-                  ? _primaryColor.withOpacity(0.9)
+                  ? AppColors.primaryColor.withOpacity(0.9)
                   : AppColors.disabledColor,
               boxShadow: [
                 BoxShadow(
                   color: value
-                      ? _primaryColor.withOpacity(0.3)
+                      ? AppColors.primaryColor.withOpacity(0.3)
                       : Colors.black.withOpacity(0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
@@ -902,7 +1168,6 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
             ),
             child: Stack(
               children: [
-                // Track highlights
                 Positioned.fill(
                   child: Padding(
                     padding: const EdgeInsets.all(3),
@@ -916,7 +1181,6 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                             height: 4,
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
-                              // color: _textColor.withOpacity(0.5),
                             ),
                           ),
                         ),
@@ -927,7 +1191,6 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                             height: 4,
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
-                              // color: Colors.white,
                             ),
                           ),
                         ),
@@ -935,7 +1198,6 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
-                // Thumb
                 Positioned(
                   left: 2 + (animationValue * 24),
                   top: 2,
@@ -960,8 +1222,6 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                         value ? Icons.check : Icons.close,
                         size: 14,
                         color: AppColors.backgroundColorLight,
-                        // color:
-                        //     value ? _primaryColor : _textColor.withOpacity(0.4),
                       ),
                     ),
                   ),
@@ -983,12 +1243,15 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: _accentGradient,
+            colors: [
+              AppColors.primaryColor,
+              AppColors.primaryColor.withOpacity(.7)
+            ],
           ),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: _primaryColor.withOpacity(0.3),
+              color: AppColors.primaryColor.withOpacity(0.3),
               blurRadius: 8,
               offset: const Offset(0, 3),
             ),
@@ -1094,7 +1357,6 @@ class _ParticlePainter extends CustomPainter {
 
 enum _SettingType {
   toggle,
-
   button,
 }
 

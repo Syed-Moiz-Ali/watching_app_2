@@ -188,7 +188,7 @@ class _PremiumSearchBarState extends State<PremiumSearchBar>
             opacity: value,
             child: Icon(
               Icons.search_rounded,
-              color: AppColors.secondaryColor,
+              color: AppColors.primaryColor,
               size: 22.sp,
             ),
           ),

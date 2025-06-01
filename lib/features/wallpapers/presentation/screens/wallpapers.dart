@@ -187,7 +187,7 @@ class _WallpapersState extends State<Wallpapers> {
                   ),
                 )
               : error != null
-                  ? Center(child: Text(error!))
+                  ? Center(child: TextWidget(text: error!))
                   : wallpapers.isEmpty
                       ? const Center(
                           child: TextWidget(

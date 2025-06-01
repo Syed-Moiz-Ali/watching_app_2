@@ -152,14 +152,13 @@ class _SourceCardState extends State<SourceCard> with TickerProviderStateMixin {
                           provider.selectedQuery =
                               widget.source.query.entries.first.value;
                           provider.updateState();
-                          if (widget.source.type == '1' ) {
+                          if (widget.source.type == '1') {
                             NH.nameNavigateTo(AppRoutes.videoList,
                                 arguments: {"source": widget.source});
-                          }  else if (widget.source.type == '5') {
+                          } else if (widget.source.type == '5') {
                             NH.nameNavigateTo(AppRoutes.videoList,
                                 arguments: {"source": widget.source});
-                          }
-                          else if (widget.source.type == '3') {
+                          } else if (widget.source.type == '3') {
                             NH.nameNavigateTo(AppRoutes.wallpapers,
                                 arguments: {"source": widget.source});
                           } else if (widget.source.type == '2') {
@@ -260,7 +259,7 @@ class _SourceCardState extends State<SourceCard> with TickerProviderStateMixin {
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 10, vertical: 4),
                                             decoration: BoxDecoration(
-                                              color: AppColors.errorColor
+                                              color: AppColors.primaryColor
                                                   .withOpacity(0.1),
                                               borderRadius:
                                                   BorderRadius.circular(12),
@@ -271,13 +270,13 @@ class _SourceCardState extends State<SourceCard> with TickerProviderStateMixin {
                                                 Icon(
                                                   Icons.lock_outline,
                                                   size: 14.sp,
-                                                  color: AppColors.errorColor,
+                                                  color: AppColors.primaryColor,
                                                 ),
                                                 const SizedBox(width: 4),
                                                 TextWidget(
                                                   text: 'NSFW',
                                                   fontSize: 12.sp,
-                                                  color: AppColors.errorColor,
+                                                  color: AppColors.primaryColor,
                                                 ),
                                               ],
                                             ),

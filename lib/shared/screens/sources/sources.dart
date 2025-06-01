@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:watching_app_2/core/global/globals.dart';
 import 'package:watching_app_2/data/models/content_source.dart';
 import 'package:watching_app_2/shared/widgets/appbars/app_bar.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
@@ -91,16 +92,26 @@ class _SourcesState extends State<Sources> with TickerProviderStateMixin {
   }
 
   Future<void> _loadAllSources() async {
+    bool isNSFWEnabled = SMA.pref!.getBool("ageVerificationEnabled") ?? false;
     if (!mounted) return;
 
     setState(() => _isLoading = true);
 
     try {
-      for (final config in ContentTypeConfigs.all) {
+      final results =
+          await Future.wait(ContentTypeConfigs.all.map((config) async {
         final loadedSources = await _sourceManager.loadSources(config.key);
-        _allSources[config.key] =
-            loadedSources.where((source) => source.enabled == true).toList();
-      }
+        return MapEntry(
+          config.key,
+          loadedSources
+              .where((source) =>
+                  source.enabled == true &&
+                  (isNSFWEnabled ? true : source.nsfw == '0'))
+              .toList(),
+        );
+      }));
+
+      _allSources.addEntries(results);
     } catch (e) {
       // Handle error appropriately - could show snackbar, etc.
       debugPrint('Error loading sources: $e');

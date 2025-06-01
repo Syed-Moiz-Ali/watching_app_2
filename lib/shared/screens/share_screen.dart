@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:uni_links/uni_links.dart';
 
+import '../widgets/misc/text_widget.dart';
+
 class DeepLinkHandler extends StatefulWidget {
   const DeepLinkHandler({super.key});
 
@@ -144,7 +146,7 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Deep Link Handler'),
+        title: const TextWidget(text: 'Deep Link Handler'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -176,23 +178,21 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
                             color: _isInitialized ? Colors.green : Colors.red,
                           ),
                           const SizedBox(width: 8),
-                          Text(
-                            _isInitialized
+                          TextWidget(
+                            text: _isInitialized
                                 ? 'Deep Link Handler Initialized'
                                 : 'Initialization Failed',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
                         ],
                       ),
                       if (_errorMessage.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(
-                            _errorMessage,
-                            style: TextStyle(color: Colors.red[700]),
+                          child: TextWidget(
+                            text: _errorMessage,
+                            color: Colors.red[700],
                           ),
                         ),
                     ],
@@ -209,12 +209,10 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Deep Link Data',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          const TextWidget(
+                            text: 'Deep Link Data',
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
                           const Divider(),
                           if (_hasDeepLinkData) ...[
@@ -224,9 +222,9 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
                             _buildDataRow('Path', _path),
                             _buildDataRow('ID', _id, highlight: true),
                             const SizedBox(height: 8),
-                            const Text(
-                              'All Query Parameters:',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            const TextWidget(
+                              text: 'All Query Parameters:',
+                              fontWeight: FontWeight.bold,
                             ),
                             const SizedBox(height: 4),
                             ..._queryParams.entries.map((entry) =>
@@ -235,12 +233,10 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
                             const Center(
                               child: Padding(
                                 padding: EdgeInsets.all(32.0),
-                                child: Text(
-                                  'No deep link data received yet',
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 16,
-                                  ),
+                                child: TextWidget(
+                                  text: 'No deep link data received yet',
+                                  color: Colors.grey,
+                                  fontSize: 16,
                                 ),
                               ),
                             ),
@@ -254,7 +250,7 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 icon: const Icon(Icons.share),
-                label: const Text('Share Test Deep Link'),
+                label: const TextWidget(text: 'Share Test Deep Link'),
                 onPressed: _shareTestLink,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),
@@ -263,7 +259,7 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
               const SizedBox(height: 8),
               OutlinedButton.icon(
                 icon: const Icon(Icons.clear),
-                label: const Text('Clear Data'),
+                label: const TextWidget(text: 'Clear Data'),
                 onPressed: () {
                   setState(() {
                     _rawLink = 'No link received yet';
@@ -290,12 +286,10 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
         children: [
           SizedBox(
             width: 120,
-            child: Text(
-              '$label:',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
-              ),
+            child: TextWidget(
+              text: '$label:',
+              fontWeight: FontWeight.bold,
+              color: Colors.grey,
             ),
           ),
           Expanded(
@@ -307,12 +301,9 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler>
                       borderRadius: BorderRadius.circular(4),
                     )
                   : null,
-              child: Text(
-                value,
-                style: TextStyle(
-                  fontFamily: 'monospace',
-                  fontWeight: highlight ? FontWeight.bold : FontWeight.normal,
-                ),
+              child: TextWidget(
+                text: value,
+                fontWeight: highlight ? FontWeight.bold : FontWeight.normal,
               ),
             ),
           ),

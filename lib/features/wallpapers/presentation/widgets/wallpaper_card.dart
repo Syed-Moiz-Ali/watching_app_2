@@ -3,9 +3,12 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:flutter/services.dart';
+import 'package:sizer/sizer.dart';
+import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/core/global/globals.dart';
 import 'package:watching_app_2/shared/widgets/misc/image.dart';
 import '../../../../data/models/content_item.dart';
+import '../../../../shared/widgets/misc/text_widget.dart';
 
 class WallpaperCard extends StatefulWidget {
   final ContentItem item;
@@ -62,11 +65,15 @@ class _WallpaperCardState extends State<WallpaperCard>
 
   // Preload image to handle loading state
   void _preloadImage() {
-    final imageProvider = NetworkImage(widget.item.source.cdn != null
-        ? widget.item.source.cdn! + widget.item.thumbnailUrl
+    final imageUrl = widget.item.source.cdn != null &&
+            widget.item.source.cdn.toString().isNotEmpty
+        ? '${widget.item.source.cdn}${widget.item.thumbnailUrl}'.trim()
         : SMA.formatImage(
-            image: widget.item.thumbnailUrl.toString(),
-            baseUrl: widget.item.source.url));
+            image: widget.item.thumbnailUrl.toString().trim(),
+            baseUrl: widget.item.source.url,
+          );
+    final imageProvider = NetworkImage(imageUrl);
+    // log("imageProvider is ${imageUrl} and ${widget.item.source.cdn}");
     imageProvider.resolve(const ImageConfiguration()).addListener(
           ImageStreamListener(
             (info, _) {
@@ -192,15 +199,11 @@ class _WallpaperCardState extends State<WallpaperCard>
                                       color: Colors.black.withOpacity(0.3),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: Text(
-                                      widget.item.title,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                    child: TextWidget(
+                                      text: widget.item.title,
+                                      color: Colors.white,
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ),
@@ -229,12 +232,15 @@ class _WallpaperCardState extends State<WallpaperCard>
   // Wallpaper image with cached network image
   Widget _buildWallpaperImage() {
     log("widget.item.source.cdn is ${widget.item.source.cdn}");
+    final imageUrl = widget.item.source.cdn != null &&
+            widget.item.source.cdn.toString().isNotEmpty
+        ? '${widget.item.source.cdn}${widget.item.thumbnailUrl}'.trim()
+        : SMA.formatImage(
+            image: widget.item.thumbnailUrl.toString().trim(),
+            baseUrl: widget.item.source.url,
+          );
     return ImageWidget(
-      imagePath: widget.item.source.cdn != null
-          ? widget.item.source.cdn! + widget.item.thumbnailUrl
-          : SMA.formatImage(
-              image: widget.item.thumbnailUrl.toString(),
-              baseUrl: widget.item.source.url),
+      imagePath: imageUrl,
       fit: BoxFit.cover,
     );
   }
@@ -274,8 +280,8 @@ class _WallpaperCardState extends State<WallpaperCard>
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Colors.blue.shade700,
-              Colors.purple.shade700,
+              AppColors.primaryColor,
+              AppColors.primaryColor.withOpacity(.7),
             ],
           ),
           borderRadius: BorderRadius.circular(6),
@@ -287,13 +293,11 @@ class _WallpaperCardState extends State<WallpaperCard>
             ),
           ],
         ),
-        child: const Text(
-          'HD',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 10,
-            fontWeight: FontWeight.bold,
-          ),
+        child: TextWidget(
+          text: 'HD',
+          color: Colors.white,
+          fontSize: 12.sp,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );

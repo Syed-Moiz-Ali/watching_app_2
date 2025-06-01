@@ -574,7 +574,7 @@ class LoadingOverlay extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const CircularProgressIndicator(
+              CircularProgressIndicator(
                 valueColor:
                     AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
                 strokeWidth: 3,

@@ -545,8 +545,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
           child: Container(
             height: 50,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppColors.primaryColor, AppColors.secondaryColor],
+              gradient: LinearGradient(
+                colors: [AppColors.primaryColor, AppColors.primaryColor],
               ),
               borderRadius: BorderRadius.circular(25),
               boxShadow: [
@@ -771,10 +771,11 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                 onSelected: (value) => setState(() => _sortOrder = value),
                 itemBuilder: (context) => [
                   const PopupMenuItem(
-                      value: 'Latest', child: Text('Latest First')),
+                      value: 'Latest', child: TextWidget(text: 'Latest First')),
                   const PopupMenuItem(
-                      value: 'Oldest', child: Text('Oldest First')),
-                  const PopupMenuItem(value: 'A-Z', child: Text('A-Z')),
+                      value: 'Oldest', child: TextWidget(text: 'Oldest First')),
+                  const PopupMenuItem(
+                      value: 'A-Z', child: TextWidget(text: 'A-Z')),
                 ],
                 child: Container(
                   padding:

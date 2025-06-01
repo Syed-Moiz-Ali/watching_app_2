@@ -183,7 +183,7 @@ class _MangaState extends State<Manga> {
                   ),
                 )
               : error != null
-                  ? Center(child: Text(error!))
+                  ? Center(child: TextWidget(text: error!))
                   : mangas.isEmpty
                       ? const Center(
                           child: TextWidget(

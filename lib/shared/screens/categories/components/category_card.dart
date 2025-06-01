@@ -4,6 +4,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../../../data/models/category_model.dart';
 import '../../../widgets/misc/image.dart';
+import '../../../widgets/misc/text_widget.dart';
 
 class CategoryCard extends StatefulWidget {
   final CategoryModel category;
@@ -120,15 +121,6 @@ class _CategoryCardState extends State<CategoryCard>
                 height: 220.h,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(24),
-                  // boxShadow: [
-                  //   BoxShadow(
-                  //     color: primaryColor
-                  //         .withOpacity(0.1 + (_opacityAnimation.value * 0.2)),
-                  //     blurRadius: 15,
-                  //     offset: const Offset(0, 8),
-                  //     spreadRadius: -2,
-                  //   ),
-                  // ],
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(24),
@@ -155,7 +147,6 @@ class _CategoryCardState extends State<CategoryCard>
                         },
                       ),
 
-                      // Glassmorphism overlay with animated gradient
                       AnimatedOpacity(
                         duration: const Duration(milliseconds: 500),
                         opacity: 0.5 + (0.3 * _hoverController.value),
@@ -179,9 +170,6 @@ class _CategoryCardState extends State<CategoryCard>
                         ),
                       ),
 
-                      // Frosted glass effect on hover
-
-                      // Content container
                       Padding(
                         padding: EdgeInsets.all(3.w),
                         child: Column(
@@ -201,32 +189,25 @@ class _CategoryCardState extends State<CategoryCard>
                                   builder: (context, value, child) {
                                     return Transform.translate(
                                       offset: Offset(0, -3 * value),
-                                      child: Text(
-                                        widget.category.title,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18.sp,
-                                          fontWeight: FontWeight.w800,
-                                          height: 1.2,
-                                          letterSpacing: -0.3,
-                                          shadows: [
-                                            Shadow(
-                                              color:
-                                                  Colors.black.withOpacity(0.5),
-                                              blurRadius: 8 + (8 * value),
-                                              offset:
-                                                  Offset(0, 2 + (2 * value)),
-                                            ),
-                                          ],
-                                        ),
+                                      child: TextWidget(
+                                        text: widget.category.title,
+                                        color: Colors.white,
+                                        fontSize: 18.sp,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: -0.3,
+                                        shadows: [
+                                          Shadow(
+                                            color:
+                                                Colors.black.withOpacity(0.5),
+                                            blurRadius: 8 + (8 * value),
+                                            offset: Offset(0, 2 + (2 * value)),
+                                          ),
+                                        ],
                                       ),
                                     );
                                   },
                                 ),
 
-                                // SizedBox(height: 8.h),
-
-                                // Stats row with animated highlight
                                 Row(
                                   children: [
                                     Icon(
@@ -235,14 +216,14 @@ class _CategoryCardState extends State<CategoryCard>
                                       size: 16.sp,
                                     ),
                                     // SizedBox(width: 6.w),
-                                    Text(
-                                      '${(widget.index + 1) * 1250}+ views',
-                                      style: TextStyle(
-                                        color: Colors.white.withOpacity(0.8),
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                    TextWidget(
+                                      text:
+                                          '${(widget.index + 1) * 1250}+ views',
+                                      color: Colors.white.withOpacity(0.8),
+                                      fontSize: 13.sp,
+                                      fontWeight: FontWeight.w500,
                                     ),
+
                                     // SizedBox(width: 16.w),
                                     // Pulse animation for "trending" indicator
                                   ],
@@ -270,13 +251,11 @@ class _CategoryCardState extends State<CategoryCard>
                                       },
                                     ),
                                     SizedBox(width: 1.w),
-                                    Text(
-                                      'Trending',
-                                      style: TextStyle(
-                                        color: accentColor.withOpacity(0.9),
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                    TextWidget(
+                                      text: 'Trending',
+                                      color: accentColor.withOpacity(0.9),
+                                      fontSize: 13.sp,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ],
                                 ),

@@ -16,6 +16,7 @@ import '../../shared/screens/video_player/video_player.dart';
 import '../../features/videos/presentation/screens/videos.dart';
 import '../../features/wallpapers/presentation/screens/wallpaper_detail.dart';
 import '../../features/wallpapers/presentation/screens/wallpapers.dart';
+import '../../shared/widgets/misc/text_widget.dart';
 import '../../shared/widgets/network/network_banner.dart';
 
 enum TransitionType {
@@ -545,7 +546,8 @@ class AppRoutes {
     return MaterialPageRoute(
       builder: (_) => Scaffold(
         body: Center(
-          child: Text('Route "$routeName" not found or missing parameters.'),
+          child: TextWidget(
+              text: 'Route "$routeName" not found or missing parameters.'),
         ),
       ),
     );

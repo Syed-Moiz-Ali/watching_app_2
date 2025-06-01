@@ -17,7 +17,7 @@
 
 //     if (Platform.isAndroid && !await Permission.storage.request().isGranted) {
 //       ScaffoldMessenger.of(SMA.navigationKey.currentContext!).showSnackBar(
-//         const SnackBar(content: Text('Storage permission denied')),
+//         const SnackBar(content: TextWidget(text:'Storage permission denied')),
 //       );
 //       return;
 //     }
@@ -55,11 +55,11 @@
 //       await tempFile.delete();
 
 //       ScaffoldMessenger.of(SMA.navigationKey.currentContext!).showSnackBar(
-//         SnackBar(content: Text('Backup saved successfully to: $outputPath')),
+//         SnackBar(content: TextWidget(text:'Backup saved successfully to: $outputPath')),
 //       );
 //     } catch (e) {
 //       ScaffoldMessenger.of(SMA.navigationKey.currentContext!).showSnackBar(
-//         SnackBar(content: Text('Failed to create backup: $e')),
+//         SnackBar(content: TextWidget(text:'Failed to create backup: $e')),
 //       );
 //     }
 //   }
@@ -68,7 +68,7 @@
 //     var provider = SMA.navigationKey.currentContext!.read<FavoritesProvider>();
 //     if (Platform.isAndroid && !await Permission.storage.request().isGranted) {
 //       ScaffoldMessenger.of(SMA.navigationKey.currentContext!).showSnackBar(
-//         const SnackBar(content: Text('Storage permission denied')),
+//         const SnackBar(content: TextWidget(text:'Storage permission denied')),
 //       );
 //       return; // Return early if permission is denied
 //     }
@@ -93,17 +93,17 @@
 //       bool? confirm = await showDialog<bool>(
 //         context: SMA.navigationKey.currentContext!,
 //         builder: (context) => AlertDialog(
-//           title: const Text('Restore Backup'),
-//           content: const Text(
+//           title: const TextWidget(text:'Restore Backup'),
+//           content: const TextWidget(text:
 //               'Are you sure you want to restore from this backup? This will overwrite your current data.'),
 //           actions: [
 //             TextButton(
 //               onPressed: () => Navigator.pop(context, false),
-//               child: const Text('Cancel'),
+//               child: const TextWidget(text:'Cancel'),
 //             ),
 //             TextButton(
 //               onPressed: () => Navigator.pop(context, true),
-//               child: const Text('Restore'),
+//               child: const TextWidget(text:'Restore'),
 //             ),
 //           ],
 //         ),
@@ -127,11 +127,11 @@
 //       await tempDbFile.delete(); // Clean up the temporary restore file
 
 //       ScaffoldMessenger.of(SMA.navigationKey.currentContext!).showSnackBar(
-//         const SnackBar(content: Text('Backup restored successfully')),
+//         const SnackBar(content: TextWidget(text:'Backup restored successfully')),
 //       );
 //     } catch (e) {
 //       ScaffoldMessenger.of(SMA.navigationKey.currentContext!).showSnackBar(
-//         SnackBar(content: Text('Failed to restore backup: $e')),
+//         SnackBar(content: TextWidget(text:'Failed to restore backup: $e')),
 //       );
 //     }
 //   }

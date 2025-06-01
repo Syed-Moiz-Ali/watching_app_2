@@ -285,7 +285,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet>
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        side: const BorderSide(color: AppColors.primaryColor),
+                        side: BorderSide(color: AppColors.primaryColor),
                       ),
                       child: TextWidget(
                         text: 'Reset',

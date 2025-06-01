@@ -29,7 +29,7 @@
         "selector": "html"
       },
       "detail": {
-        "discription_selector": {
+        "description_selector": {
           "selector": "meta[name='description']",
           "attribute": "content"
         },
@@ -79,6 +79,82 @@
     "enabled": true
   },
   {
+    "url": "https://manhwahentai.me/",
+    "searchUrl": "https://manhwahentai.me/page/{page}/?s={search}&post_type=wp-manga",
+    "type": "4",
+    "NSFW": "1",
+    "isEmbed": "0",
+    "name": "manhwahentai",
+    "icon": "https://manhwahentai.me/wp-content/uploads/2024/09/logook1.png",
+    "query": {
+      "latest": "home/page/{page}/"
+      
+    },
+    "config": {
+      "title_selector": {
+        "selector": ".page-item-detail > .item-thumb > a ",
+        "attribute":"title"
+        
+      },
+      "thumbnail_selector": {
+        "selector": ".page-item-detail > .item-thumb > a > img",
+        "attribute": "src"
+      },
+      "content_url_selector": {
+        "selector": ".page-item-detail > .item-thumb > a  ",
+        "attribute": "href"
+      },
+      "detail_selector": {
+        "selector": ".body-wrap"
+      },
+      "detail": {
+        "description_selector": {
+          "selector": ".description-summary > .summary__content "
+          
+        },
+        "genre_selector": {
+          "selector": ".summary-content > .genres-content  >  a"
+        },
+        "status_selector": {
+          "selector": ".post-status > .post-content_item:last-child > .summary-content"
+        },
+        "chapter_name_selector": {
+          "selector": "a"
+        },
+        "chapter_image_selector": {
+          "selector": ""
+        },
+        "chapters_selector": {
+          "selector": "#chapters-list > li"
+        },
+        "chapter_id_selector": {
+          "selector": "a",
+          "attribute": "href"
+        }
+      },
+      "chapter_by_id_selectors": {
+        "main_selector": {
+          "selector": " .reading-content .page-break ",
+          "attribute": ""
+        },
+        "image_selector": {
+        "selector":"img","attribute":"src"
+        },
+        "title_selector": {
+         "selector":"img","attribute":"src"
+        },
+        "id_selector": {
+        "selector":"img","attribute":"src"
+        }
+      },
+
+      "content_selector": {
+        "selector": "#loop-content> .page-listing-item > .row > .col-6"
+      }
+    },
+    "enabled": true
+  },
+  {
     "url": "https://kissmanga.in/",
     "searchUrl": "https://kissmanga.in/page/{page}/?s={search}&post_type=wp-manga&m_orderby=views",
     "type": "4",
@@ -114,7 +190,7 @@
         "selector": "html"
       },
       "detail": {
-        "discription_selector": {
+        "description_selector": {
           "selector": "meta[name='description']",
           "attribute": "content"
         },
@@ -199,7 +275,7 @@
         "selector": "html"
       },
       "detail": {
-        "discription_selector": {
+        "description_selector": {
           "selector": "meta[name='description']",
           "attribute": "content"
         },

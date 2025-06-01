@@ -80,12 +80,8 @@ class _BrowseContentState extends State<BrowseContent>
 
     for (int i = 0; i < count; i++) {
       // Generate a random red shade
-      final Color color = HSLColor.fromAHSL(
-        1.0,
-        0.0, // Fixed hue for red
-        0.7 + random.nextDouble() * 0.3, // Random saturation (70% - 100%)
-        0.5 + random.nextDouble() * 0.3, // Random lightness (50% - 80%)
-      ).toColor();
+      final Color color =
+          AppColors.primaryColor.withOpacity(0.4 + random.nextDouble() * 0.6);
 
       particles.add(
         ParticleModel(

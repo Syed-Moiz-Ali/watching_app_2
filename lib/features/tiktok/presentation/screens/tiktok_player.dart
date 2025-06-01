@@ -15,6 +15,7 @@ import 'package:watching_app_2/shared/widgets/misc/image.dart';
 import '../../../../data/models/content_item.dart';
 import '../../../../presentation/provider/favorites_provider.dart';
 import '../../../../shared/screens/favorites/favorite_button.dart';
+import '../../../../shared/widgets/misc/text_widget.dart';
 
 class TikTokVideoPlayer extends StatefulWidget {
   final ContentItem item;
@@ -344,8 +345,8 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
                         child: LinearProgressIndicator(
                           value: _videoProgress,
                           backgroundColor: Colors.white.withOpacity(0.2),
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                              AppColors.secondaryColor),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.primaryColor),
                         ),
                       ),
                     ),
@@ -442,23 +443,17 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      _videoAuthor,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
+                                    TextWidget(
+                                      text: _videoAuthor,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15.sp,
                                     ),
                                     const SizedBox(height: 4),
-                                    Text(
-                                      _videoDescription,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        color: Colors.white.withOpacity(0.9),
-                                        fontSize: 14,
-                                      ),
+                                    TextWidget(
+                                      text: _videoDescription,
+                                      color: Colors.white.withOpacity(0.9),
+                                      fontSize: 14.sp,
                                     ),
                                   ],
                                 ),
@@ -521,18 +516,16 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const CupertinoActivityIndicator(
-                color: AppColors.secondaryColor,
+              CupertinoActivityIndicator(
+                color: AppColors.primaryColor,
                 radius: 16,
               ),
               const SizedBox(height: 16),
-              Text(
-                'Loading video...',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.9),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
+              TextWidget(
+                text: 'Loading video...',
+                color: Colors.white.withOpacity(0.9),
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
               ),
             ],
           ),
@@ -544,13 +537,11 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
   Widget _buildProgressBar() {
     return Row(
       children: [
-        Text(
-          _formatDuration(_controller.value.position),
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
+        TextWidget(
+          text: _formatDuration(_controller.value.position),
+          color: Colors.white,
+          fontSize: 12.sp,
+          fontWeight: FontWeight.bold,
         ),
         Expanded(
           child: SliderTheme(
@@ -558,10 +549,10 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
               trackHeight: 4,
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
               overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
-              activeTrackColor: AppColors.secondaryColor,
+              activeTrackColor: AppColors.primaryColor,
               inactiveTrackColor: Colors.grey.withOpacity(0.3),
-              thumbColor: AppColors.secondaryColor,
-              overlayColor: AppColors.secondaryColor.withOpacity(0.3),
+              thumbColor: AppColors.primaryColor,
+              overlayColor: AppColors.primaryColor.withOpacity(0.3),
             ),
             child: Slider(
               value: _controller.value.position.inSeconds.toDouble(),
@@ -573,13 +564,11 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
             ),
           ),
         ),
-        Text(
-          _formatDuration(_controller.value.duration),
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
+        TextWidget(
+          text: _formatDuration(_controller.value.duration),
+          color: Colors.white,
+          fontSize: 12.sp,
+          fontWeight: FontWeight.bold,
         ),
       ],
     );
@@ -646,13 +635,11 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            count,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
+          TextWidget(
+            text: count,
+            color: Colors.white,
+            fontSize: 12.sp,
+            fontWeight: FontWeight.bold,
           ),
         ],
       ),
@@ -686,13 +673,11 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Comments',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+              TextWidget(
+                text: 'Comments',
+                color: Colors.white,
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
               ),
               const SizedBox(height: 16),
               Expanded(
@@ -730,31 +715,26 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
                               children: [
                                 Row(
                                   children: [
-                                    Text(
-                                      '@user${index + 100}',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                      ),
+                                    TextWidget(
+                                      text: '@user${index + 100}',
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14.sp,
                                     ),
                                     const SizedBox(width: 8),
-                                    Text(
-                                      '${index + 1}h ago',
-                                      style: TextStyle(
-                                        color: Colors.grey.shade400,
-                                        fontSize: 12,
-                                      ),
+                                    TextWidget(
+                                      text: '${index + 1}h ago',
+                                      color: Colors.grey.shade400,
+                                      fontSize: 12.sp,
                                     ),
                                   ],
                                 ),
                                 const SizedBox(height: 4),
-                                Text(
-                                  'This is such an amazing video! ${index == 0 ? 'I can\'t believe how cool this is!' : ''}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                  ),
+                                TextWidget(
+                                  text:
+                                      'This is such an amazing video! ${index == 0 ? 'I can\'t believe how cool this is!' : ''}',
+                                  color: Colors.white,
+                                  fontSize: 14.sp,
                                 ),
                                 const SizedBox(height: 8),
                                 Row(
@@ -765,12 +745,10 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
                                       size: 16,
                                     ),
                                     const SizedBox(width: 4),
-                                    Text(
-                                      '${42 - index * 7}',
-                                      style: TextStyle(
-                                        color: Colors.grey.shade400,
-                                        fontSize: 12,
-                                      ),
+                                    TextWidget(
+                                      text: '${42 - index * 7}',
+                                      color: Colors.grey.shade400,
+                                      fontSize: 12.sp,
                                     ),
                                     const SizedBox(width: 16),
                                     const Icon(
@@ -779,12 +757,10 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
                                       size: 16,
                                     ),
                                     const SizedBox(width: 4),
-                                    Text(
-                                      'Reply',
-                                      style: TextStyle(
-                                        color: Colors.grey.shade400,
-                                        fontSize: 12,
-                                      ),
+                                    TextWidget(
+                                      text: 'Reply',
+                                      color: Colors.grey.shade400,
+                                      fontSize: 12.sp,
                                     ),
                                   ],
                                 ),
@@ -829,7 +805,7 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
                     const SizedBox(width: 12),
                     Container(
                       decoration: BoxDecoration(
-                        color: AppColors.secondaryColor,
+                        color: AppColors.primaryColor,
                         shape: BoxShape.circle,
                       ),
                       child: IconButton(
@@ -877,13 +853,11 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
                 ),
               ),
               const SizedBox(height: 24),
-              const Text(
-                'Share to',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+              TextWidget(
+                text: 'Share to',
+                color: Colors.white,
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
               ),
               const SizedBox(height: 24),
               Row(
@@ -910,16 +884,13 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
                           color: Colors.grey.shade800,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Center(
-                          child: Text(
-                            'Save video',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
+                        child: Center(
+                            child: TextWidget(
+                          text: 'Save video',
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.sp,
+                        )),
                       ),
                     ),
                   ],
@@ -949,12 +920,10 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-          ),
+        TextWidget(
+          text: label,
+          color: Colors.white,
+          fontSize: 12.sp,
         ),
       ],
     );
@@ -1062,12 +1031,9 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer>
         icon,
         color: Colors.white,
       ),
-      title: Text(
-        label,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-        ),
+      title: TextWidget(
+        text: label,
+        color: Colors.white,
       ),
       onTap: onTap,
     );

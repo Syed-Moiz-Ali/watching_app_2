@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:watching_app_2/data/models/content_item.dart';
 
 import '../../data/database/local_database.dart'; // Adjust import path as needed
@@ -78,6 +80,7 @@ class DatabaseManager {
   Future<List<ContentItem>> getFavoritesByType(String contentType) async {
     try {
       final favorites = await _db.getFavoritesByType(contentType);
+      log("favorites from db is $favorites");
       return favorites;
     } catch (e) {
       throw Exception('Failed to get favorites by type: $e');

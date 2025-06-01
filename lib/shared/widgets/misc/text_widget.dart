@@ -102,7 +102,7 @@ class _TextWidgetState extends State<TextWidget>
                 return LinearGradient(
                   colors: [
                     AppColors.primaryColor.withOpacity(0.6),
-                    AppColors.secondaryColor,
+                    AppColors.primaryColor,
                     AppColors.primaryColor.withOpacity(0.6),
                   ],
                   stops: [0.0, _animation.value, 1],

@@ -4,6 +4,7 @@ import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/shared/widgets/misc/padding.dart';
 import '../../../core/constants/colors.dart';
 import '../../../data/models/content_item.dart';
+import '../../widgets/misc/text_widget.dart';
 import 'filters_bottom_sheet.dart'; // Assume this is your bottom sheet implementation
 
 class FloatingActionButtonWidget extends StatefulWidget {
@@ -100,9 +101,9 @@ class _FloatingActionButtonWidgetState extends State<FloatingActionButtonWidget>
                   colors: _isHovered
                       ? [
                           AppColors.primaryColor.withOpacity(0.9),
-                          AppColors.secondaryColor.withOpacity(0.9)
+                          AppColors.primaryColor.withOpacity(0.9)
                         ]
-                      : [AppColors.primaryColor, AppColors.secondaryColor],
+                      : [AppColors.primaryColor, AppColors.primaryColor],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -128,14 +129,12 @@ class _FloatingActionButtonWidgetState extends State<FloatingActionButtonWidget>
                     ),
                   ),
                   SizedBox(width: 1.w),
-                  Text(
-                    'Filter',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.backgroundColorLight,
-                      letterSpacing: 0.2,
-                    ),
+                  TextWidget(
+                    text: 'Filter',
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.backgroundColorLight,
+                    letterSpacing: 0.2,
                   ),
                 ],
               ),

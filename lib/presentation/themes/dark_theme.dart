@@ -24,7 +24,7 @@ class DarkTheme {
         toolbarTextStyle: TextStyle(color: Color(0xFFFFFFFF), fontSize: 20),
         titleTextStyle: TextStyle(color: AppColors.textColorDark, fontSize: 20),
       ),
-      buttonTheme: const ButtonThemeData(
+      buttonTheme: ButtonThemeData(
         buttonColor: AppColors.primaryColor,
         textTheme: ButtonTextTheme.primary,
       ),
@@ -33,7 +33,7 @@ class DarkTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
-            side: const BorderSide(color: AppColors.primaryColor)),
+            side: BorderSide(color: AppColors.primaryColor)),
       ),
       colorScheme: ColorScheme.fromSeed(
         primary: AppColors.primaryColor,
@@ -43,7 +43,7 @@ class DarkTheme {
         seedColor: AppColors.primaryColor,
         brightness: Brightness.dark,
         error: AppColors.errorColor,
-        secondary: AppColors.secondaryColor,
+        secondary: AppColors.primaryColor,
       ),
     );
   }

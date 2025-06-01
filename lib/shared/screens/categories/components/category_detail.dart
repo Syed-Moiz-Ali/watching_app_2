@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
+import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/core/navigation/app_navigator.dart';
 import 'package:watching_app_2/core/navigation/routes.dart';
 import 'package:watching_app_2/data/database/local_database.dart';
@@ -212,10 +213,10 @@ class _PremiumCategoryDetailScreenState
               gradient: LinearGradient(
                 colors: isPrimary
                     ? [
-                        Color.lerp(
-                            Colors.purple[800], Colors.blue[700], value)!,
-                        Color.lerp(
-                            Colors.deepPurple[900], Colors.blue[900], value)!,
+                        Color.lerp(AppColors.primaryColor,
+                            AppColors.primaryColor.withOpacity(.7), value)!,
+                        Color.lerp(AppColors.primaryColor.withOpacity(.6),
+                            AppColors.primaryColor.withOpacity(.9), value)!,
                       ]
                     : [
                         Colors.grey[850]!,
@@ -372,6 +373,7 @@ class _PremiumCategoryDetailScreenState
             text: content,
             fontSize: 16.sp,
             color: Colors.white.withOpacity(0.9),
+            maxLine: 10,
           ),
         ),
       ],

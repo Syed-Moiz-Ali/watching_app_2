@@ -26,7 +26,7 @@ class AppTheme {
         titleTextStyle:
             TextStyle(color: AppColors.textColorLight, fontSize: 20),
       ),
-      buttonTheme: const ButtonThemeData(
+      buttonTheme: ButtonThemeData(
         buttonColor: AppColors.primaryColor,
         textTheme: ButtonTextTheme.primary,
       ),
@@ -45,7 +45,7 @@ class AppTheme {
         seedColor: AppColors.primaryColor,
         brightness: Brightness.light,
         error: AppColors.errorColor,
-        secondary: AppColors.secondaryColor,
+        secondary: AppColors.primaryColor,
       ),
     );
   }

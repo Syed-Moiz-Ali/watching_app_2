@@ -2,7 +2,9 @@
 
 import 'dart:developer';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
@@ -11,9 +13,7 @@ import 'package:watching_app_2/data/database/local_database.dart';
 import 'package:watching_app_2/features/tiktok/widgets/tiktok_gridview.dart';
 import 'package:watching_app_2/features/wallpapers/presentation/widgets/wallpaper_grid_view.dart';
 import 'package:watching_app_2/shared/widgets/misc/gap.dart';
-
 import 'package:watching_app_2/shared/widgets/misc/tabbar.dart';
-
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 import '../../../core/navigation/app_navigator.dart';
 import '../../../data/models/tab_model.dart';
@@ -26,11 +26,12 @@ import '../../widgets/misc/padding.dart';
 import 'empty_favorites.dart';
 import 'filters_bottom_sheet.dart';
 
+/// Main Favorites page displaying user's favorite content across different categories
 class Favorites extends StatefulWidget {
   const Favorites({super.key});
 
   @override
-  _FavoritesState createState() => _FavoritesState();
+  State<Favorites> createState() => _FavoritesState();
 }
 
 class _FavoritesState extends State<Favorites>
@@ -38,16 +39,24 @@ class _FavoritesState extends State<Favorites>
   late TabController _tabController;
   final ValueNotifier<bool> _isGridView = ValueNotifier(true);
 
+  // Favorites data
+  List<ContentItem> _allFavorites = [];
+
   @override
   void initState() {
     super.initState();
-    // Initialize tab controller with number of content types
+    _initializeTabController();
+    _initializeFavoritesProvider();
+  }
+
+  void _initializeTabController() {
     _tabController = TabController(
       length: ContentTypes.ALL_TYPES.length,
       vsync: this,
     );
+  }
 
-    // Initialize the favorites provider
+  void _initializeFavoritesProvider() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<FavoritesProvider>().initialize();
     });
@@ -62,95 +71,194 @@ class _FavoritesState extends State<Favorites>
 
   @override
   Widget build(BuildContext context) {
-    Theme.of(context);
+    return Consumer<FavoritesProvider>(
+      builder: (context, provider, _) {
+        return FutureBuilder<List<ContentItem>>(
+          future: provider.getAllFavorites(),
+          builder: (context, snapshot) {
+            return _buildScaffold(snapshot);
+          },
+        );
+      },
+    );
+  }
 
-    List<TabContent> tabList = ContentTypes.ALL_TYPES.map((entry) {
-      return TabContent(
-          title: entry, icon: _getIconForType(entry), length: '0');
-    }).toList();
+  Widget _buildScaffold(AsyncSnapshot<List<ContentItem>> snapshot) {
+    if (snapshot.hasError) {
+      return _buildErrorState(snapshot.error.toString());
+    }
+
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return _buildLoadingState();
+    }
+
+    _allFavorites = snapshot.data ?? [];
 
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(15.h),
-        child: CustomAppBar(
-          title: 'My Favorites',
-          appBarStyle: AppBarStyle.standard,
-          actions: [
-            ValueListenableBuilder<bool>(
-              valueListenable: _isGridView,
-              builder: (context, isGrid, child) {
-                return IconButton(
-                  icon: Icon(
-                    isGrid ? Icons.view_list : Icons.grid_view,
-                  ),
-                  onPressed: () {
-                    _isGridView.value = !isGrid;
-                  },
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.search),
-              onPressed: () {
-                // Implement search functionality
-              },
+      appBar: _buildAppBar(_allFavorites.length.toString()),
+      body: _buildTabBarView(),
+    );
+  }
+
+  Widget _buildErrorState(String error) {
+    return Scaffold(
+      appBar: _buildSimpleAppBar(),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, size: 48, color: Colors.red),
+            SizedBox(height: 16),
+            TextWidget(text: 'Error: $error'),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => setState(() {}),
+              child: TextWidget(text: 'Retry'),
             ),
           ],
-          bottom: PreferredSize(
-            preferredSize: Size.fromHeight(10.h),
-            child: CustomTabBar(
-              tabController: _tabController,
-              tabContents: tabList,
-              onTabChanged: (index) {
-                _tabController.animateTo(index);
-              },
-            ),
-          ),
         ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: ContentTypes.ALL_TYPES.map((type) {
-          return ValueListenableBuilder<bool>(
-            valueListenable: _isGridView,
-            builder: (context, isGrid, child) {
-              return FavoritesTabView(
-                contentType: type,
-                isGrid: isGrid,
-              );
-            },
-          );
-        }).toList(),
       ),
     );
   }
 
+  Widget _buildLoadingState() {
+    return Scaffold(
+      appBar: _buildSimpleAppBar(),
+      body: const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
+
+  PreferredSize _buildSimpleAppBar() {
+    return PreferredSize(
+      preferredSize: Size.fromHeight(AppBar().preferredSize.height),
+      child: CustomAppBar(
+        title: 'My Favorites',
+        appBarStyle: AppBarStyle.standard,
+      ),
+    );
+  }
+
+  PreferredSize _buildAppBar(String length) {
+    return PreferredSize(
+      preferredSize: Size.fromHeight(15.h),
+      child: CustomAppBar(
+        title: 'My Favorites (${length})',
+        appBarStyle: AppBarStyle.standard,
+        actions: _buildAppBarActions(),
+        bottom: _buildTabBar(),
+      ),
+    );
+  }
+
+  List<Widget> _buildAppBarActions() {
+    return [
+      _buildViewToggleButton(),
+      _buildSearchButton(),
+    ];
+  }
+
+  Widget _buildViewToggleButton() {
+    return ValueListenableBuilder<bool>(
+      valueListenable: _isGridView,
+      builder: (context, isGrid, child) {
+        return IconButton(
+          icon: Icon(
+            isGrid ? Icons.view_list : Icons.grid_view,
+          ),
+          onPressed: () => _isGridView.value = !isGrid,
+          tooltip: isGrid ? 'List View' : 'Grid View',
+        );
+      },
+    );
+  }
+
+  Widget _buildSearchButton() {
+    return IconButton(
+      icon: const Icon(Icons.search),
+      onPressed: _handleSearch,
+      tooltip: 'Search Favorites',
+    );
+  }
+
+  void _handleSearch() {
+    // TODO: Implement search functionality
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+          content: TextWidget(text: 'Search functionality coming soon!')),
+    );
+  }
+
+  PreferredSize _buildTabBar() {
+    return PreferredSize(
+      preferredSize: Size.fromHeight(10.h),
+      child: CustomTabBarHorizontal(
+        tabController: _tabController,
+        tabContents: _buildTabContents(),
+        onTabChanged: (index) => _tabController.animateTo(index),
+      ),
+    );
+  }
+
+  List<TabContent> _buildTabContents() {
+    return ContentTypes.ALL_TYPES.map((contentType) {
+      final count = _getFavoritesCountForType(contentType);
+      return TabContent(
+        title: contentType,
+        icon: _getIconForType(contentType),
+        length: count.toString(),
+      );
+    }).toList();
+  }
+
+  int _getFavoritesCountForType(String contentType) {
+    final category = ContentTypes.TYPE_TO_CATEGORY2[contentType];
+    return _allFavorites.where((item) => item.source.type == category).length;
+  }
+
+  Widget _buildTabBarView() {
+    return TabBarView(
+      controller: _tabController,
+      children: ContentTypes.ALL_TYPES.map((type) {
+        return ValueListenableBuilder<bool>(
+          valueListenable: _isGridView,
+          builder: (context, isGrid, child) {
+            return FavoritesTabView(
+              contentType: type,
+              isGrid: isGrid,
+              favorites: _allFavorites,
+              key: ValueKey('${type}_$isGrid'),
+            );
+          },
+        );
+      }).toList(),
+    );
+  }
+
   IconData _getIconForType(String type) {
-    switch (type) {
-      case ContentTypes.VIDEO:
-        return Icons.video_library_rounded;
-      case ContentTypes.TIKTOK:
-        return Icons.music_video_rounded;
-      case ContentTypes.IMAGE:
-        return Icons.image_rounded;
-      case ContentTypes.MANGA:
-        return Icons.book_rounded;
-      case ContentTypes.ANIME:
-        return Icons.movie_rounded;
-      default:
-        return Icons.favorite_rounded;
-    }
+    const iconMap = {
+      ContentTypes.VIDEO: Icons.video_library_rounded,
+      ContentTypes.TIKTOK: Icons.music_video_rounded,
+      ContentTypes.IMAGE: Icons.image_rounded,
+      ContentTypes.MANGA: Icons.book_rounded,
+      ContentTypes.ANIME: Icons.movie_rounded,
+    };
+    return iconMap[type] ?? Icons.favorite_rounded;
   }
 }
 
+/// Individual tab view for displaying favorites of a specific content type
 class FavoritesTabView extends StatefulWidget {
   final String contentType;
   final bool isGrid;
+  final List<ContentItem> favorites;
 
   const FavoritesTabView({
     super.key,
     required this.contentType,
     required this.isGrid,
+    required this.favorites,
   });
 
   @override
@@ -159,165 +267,421 @@ class FavoritesTabView extends StatefulWidget {
 
 class _FavoritesTabViewState extends State<FavoritesTabView>
     with AutomaticKeepAliveClientMixin {
+  // Video player state
   int _currentPlayingIndex = -1;
-  List<ContentItem> favorites = []; // Original list
-  List<ContentItem> filteredFavorites = []; // Filtered list
-  // Track if filters are applied
-  bool _filtersApplied = false;
+
+  // Filtered data
+  late List<ContentItem> _categoryFavorites;
+  List<ContentItem> _filteredFavorites = [];
+  bool _hasActiveFilters = false;
 
   @override
   bool get wantKeepAlive => true;
 
   @override
+  void initState() {
+    super.initState();
+    _updateFavoritesList();
+  }
+
+  @override
+  void didUpdateWidget(covariant FavoritesTabView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_shouldUpdateFavorites(oldWidget)) {
+      _updateFavoritesList();
+    }
+  }
+
+  bool _shouldUpdateFavorites(FavoritesTabView oldWidget) {
+    return widget.favorites != oldWidget.favorites ||
+        widget.contentType != oldWidget.contentType;
+  }
+
+  void _updateFavoritesList() {
+    _categoryFavorites = _getFavoritesForCategory();
+    _updateFilteredList();
+  }
+
+  List<ContentItem> _getFavoritesForCategory() {
+    final category = ContentTypes.TYPE_TO_CATEGORY2[widget.contentType];
+    return widget.favorites
+        .where((item) => item.source.type == category)
+        .toList();
+  }
+
+  void _updateFilteredList() {
+    if (!_hasActiveFilters || _filteredFavorites.isEmpty) {
+      _filteredFavorites = List.from(_categoryFavorites);
+    } else {
+      _updateFilteredListWithNewItems(_categoryFavorites);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
 
-    return Consumer<FavoritesProvider>(
-      builder: (context, favoritesProvider, child) {
-        // log("widget.contentType is ${widget.contentType}");
-        return StreamBuilder<List<ContentItem>>(
-          stream: favoritesProvider.watchFavoritesByType(widget.contentType),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Center(
-                  child: TextWidget(text: 'Error: ${snapshot.error}'));
-            }
+    if (_filteredFavorites.isEmpty) {
+      return _buildEmptyState();
+    }
 
-            if (snapshot.hasData) {
-              favorites = snapshot.data ?? [];
-
-              // Only update filteredFavorites if no filters are applied
-              // or if this is the first data load
-              if (!_filtersApplied || filteredFavorites.isEmpty) {
-                filteredFavorites = List.from(favorites);
-              } else {
-                // If filters are applied, we need to preserve the filter logic
-                // but update the list if elements were added or removed
-                // This is just a placeholder - your actual filter logic may be different
-                _updateFilteredListWithNewItems(favorites);
-              }
-            }
-
-            if (filteredFavorites.isEmpty) {
-              return AnimatedEmptyState(
-                contentType: widget.contentType,
-                onExplore: () {
-                  final navProvider = context.read<NavigationProvider>();
-                  navProvider.setIndex(2);
-                },
-              );
-            }
-            return Scaffold(
-              body: widget.contentType == ContentTypes.IMAGE
-                  ? WallpaperGridView(
-                      wallpapers: filteredFavorites,
-                      onItemTap: (index) {
-                        NH.nameNavigateTo(AppRoutes.wallpaperDetail,
-                            arguments: {'item': filteredFavorites[index]});
-                      },
-                    )
-                  : widget.contentType == ContentTypes.TIKTOK
-                      ? WallpaperGridView(
-                          wallpapers: filteredFavorites,
-                          onItemTap: (index) {
-                            NH.navigateTo(TiktokGridView(
-                              tiktok: filteredFavorites,
-                              onItemTap: (index) {},
-                              initalPage: index,
-                            ));
-                            // NH.nameNavigateTo(AppRoutes.tiktok, arguments: {
-                            //   'source': filteredFavorites[index],
-                            //   'initalPage': index
-                            // });
-                          },
-                        )
-                      : VideoGridView(
-                          videos: filteredFavorites,
-                          isGrid: widget.isGrid,
-                          contentType: widget.contentType,
-                          currentPlayingIndex: _currentPlayingIndex,
-                          onHorizontalDragStart: (index) => setState(() {
-                            _currentPlayingIndex = index;
-                          }),
-                          onHorizontalDragEnd: (index) => setState(() {
-                            _currentPlayingIndex = index;
-                          }),
-                          onItemTap: (index) {
-                            NH.nameNavigateTo(AppRoutes.detail,
-                                arguments: {'item': filteredFavorites[index]});
-                          },
-                        ),
-              floatingActionButton: GestureDetector(
-                onTap: () {
-                  FiltersBottomSheet.show(
-                    context,
-                    contentType: widget.contentType,
-                    items: favorites, // Pass unfiltered list
-                    onFiltersApplied: (filteredItems) {
-                      setState(() {
-                        filteredFavorites = filteredItems;
-                        _filtersApplied = true; // Mark that filters are applied
-                      });
-                    },
-                  );
-                },
-                child: CustomPadding(
-                  bottomFactor: .12,
-                  child: Container(
-                    width: 25.w,
-                    height: 5.h,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: AppColors.primaryColor,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.filter_list_rounded,
-                            size: 18.sp, color: AppColors.backgroundColorLight),
-                        CustomGap(widthFactor: .02),
-                        TextWidget(
-                          text: "Filter",
-                          color: AppColors.backgroundColorLight,
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
+    return Scaffold(
+      body: _buildContentView(),
+      floatingActionButton: _buildFilterButton(),
     );
   }
 
-  // Method to update filtered list while preserving filter logic
+  Widget _buildEmptyState() {
+    return AnimatedEmptyState(
+      contentType: widget.contentType,
+      onExplore: _navigateToExplore,
+    );
+  }
+
+  void _navigateToExplore() {
+    final navProvider = context.read<NavigationProvider>();
+    navProvider.setIndex(2);
+  }
+
+  Widget _buildContentView() {
+    switch (widget.contentType) {
+      case ContentTypes.IMAGE:
+      case ContentTypes.TIKTOK:
+        return _buildWallpaperGrid(widget.contentType);
+      // case ContentTypes.TIKTOK:
+      //   return _buildTiktokGrid();
+      default:
+        return _buildVideoGrid();
+    }
+  }
+
+  Widget _buildWallpaperGrid(String contentType) {
+    return WallpaperGridView(
+      wallpapers: _filteredFavorites,
+      onItemTap: (index) => _handleWallpaperTap(index, contentType),
+    );
+  }
+
+  Widget _buildTiktokGrid() {
+    return TiktokGridView(
+      tiktok: _filteredFavorites,
+      onItemTap: _handleTiktokTap,
+      initalPage: 0,
+    );
+  }
+
+  Widget _buildVideoGrid() {
+    return VideoGridView(
+      videos: _filteredFavorites,
+      isGrid: widget.isGrid,
+      contentType: widget.contentType,
+      currentPlayingIndex: _currentPlayingIndex,
+      onHorizontalDragStart: _handleVideoPlay,
+      onHorizontalDragEnd: _handleVideoPlay,
+      onItemTap: _handleVideoTap,
+    );
+  }
+
+  void _handleWallpaperTap(int index, String contentType) {
+    if (contentType == ContentTypes.TIKTOK) {
+      NH.navigateTo(TiktokGridView(
+        tiktok: _filteredFavorites,
+        onItemTap: _handleTiktokTap,
+        initalPage: index,
+      ));
+    } else {
+      NH.nameNavigateTo(
+        AppRoutes.wallpaperDetail,
+        arguments: {'item': _filteredFavorites[index]},
+      );
+    }
+  }
+
+  void _handleTiktokTap(int index) {
+    // TODO: Implement TikTok tap handling
+    log('TikTok item tapped: $index');
+  }
+
+  void _handleVideoPlay(int index) {
+    if (mounted) {
+      setState(() => _currentPlayingIndex = index);
+    }
+  }
+
+  void _handleVideoTap(int index) {
+    NH.nameNavigateTo(
+      AppRoutes.detail,
+      arguments: {'item': _filteredFavorites[index]},
+    );
+  }
+
+  Widget _buildFilterButton() {
+    return CustomPadding(
+      bottomFactor: 0.08,
+      child: PremiumFilterButton(
+        onPressed: _showFilters,
+        hasActiveFilters: _hasActiveFilters,
+        tooltip: 'Toggle filters',
+      ),
+    );
+  }
+
+  void _showFilters() {
+    FiltersBottomSheet.show(
+      context,
+      contentType: widget.contentType,
+      items: _categoryFavorites,
+      onFiltersApplied: _applyFilters,
+    );
+  }
+
+  void _applyFilters(List<ContentItem> filteredItems) {
+    if (mounted) {
+      setState(() {
+        _filteredFavorites = filteredItems;
+        _hasActiveFilters = true;
+      });
+    }
+  }
+
   void _updateFilteredListWithNewItems(List<ContentItem> newFullList) {
-    // This is a simple example - you'll need to adjust based on your actual filtering logic
-    // For example, if you're filtering by tags, categories, etc.
+    final filteredUrls =
+        _filteredFavorites.map((item) => item.contentUrl).toSet();
 
-    // Get the URLs of items in the current filtered list
-    final Set<String> filteredUrls =
-        filteredFavorites.map((item) => item.contentUrl).toSet();
-
-    // For new items in the full list that match filter criteria, add them
+    // Add new items that match current filters
     for (final item in newFullList) {
-      // This assumes your filter bottom sheet provides the logic to check if an item
-      // should be included based on the current filters
-      // Replace this with your actual filter logic check
-      bool matchesCurrentFilters = true; // Replace with your filter check
-
-      if (matchesCurrentFilters && !filteredUrls.contains(item.contentUrl)) {
-        filteredFavorites.add(item);
+      if (_itemMatchesCurrentFilters(item) &&
+          !filteredUrls.contains(item.contentUrl)) {
+        _filteredFavorites.add(item);
       }
     }
 
-    // Remove items from filtered list that no longer exist in the full list
-    final Set<String> fullListUrls =
-        newFullList.map((item) => item.contentUrl).toSet();
+    // Remove items that are no longer in the full list
+    final fullListUrls = newFullList.map((item) => item.contentUrl).toSet();
 
-    filteredFavorites
-        .removeWhere((item) => !fullListUrls.contains(item.contentUrl));
+    _filteredFavorites.removeWhere(
+      (item) => !fullListUrls.contains(item.contentUrl),
+    );
+  }
+
+  bool _itemMatchesCurrentFilters(ContentItem item) {
+    // TODO: Implement actual filter matching logic
+    return true;
+  }
+}
+
+/// Ultra-premium animated filter button with sophisticated animations and modern design
+class PremiumFilterButton extends StatefulWidget {
+  final VoidCallback onPressed;
+  final bool hasActiveFilters;
+  final bool isEnabled;
+  final String? tooltip;
+
+  const PremiumFilterButton({
+    super.key,
+    required this.onPressed,
+    required this.hasActiveFilters,
+    this.isEnabled = true,
+    this.tooltip,
+  });
+
+  @override
+  State<PremiumFilterButton> createState() => _PremiumFilterButtonState();
+}
+
+class _PremiumFilterButtonState extends State<PremiumFilterButton>
+    with TickerProviderStateMixin {
+  // UI State
+  bool _isPressed = false;
+  bool _isHovered = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void _handleTapDown(TapDownDetails details) {
+    if (!widget.isEnabled) return;
+
+    setState(() => _isPressed = true);
+
+    // Haptic feedback
+    HapticFeedback.lightImpact();
+  }
+
+  void _handleTapUp(TapUpDetails details) {
+    if (!widget.isEnabled) return;
+
+    setState(() => _isPressed = false);
+
+    widget.onPressed();
+  }
+
+  void _handleTapCancel() {
+    if (!widget.isEnabled) return;
+
+    setState(() => _isPressed = false);
+  }
+
+  void _handleHoverEnter(PointerEnterEvent event) {
+    if (!widget.isEnabled) return;
+    setState(() => _isHovered = true);
+  }
+
+  void _handleHoverExit(PointerExitEvent event) {
+    if (!widget.isEnabled) return;
+    setState(() => _isHovered = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Start shimmer animation if not active
+
+    return MouseRegion(
+      onEnter: _handleHoverEnter,
+      onExit: _handleHoverExit,
+      child: Tooltip(
+        message: widget.tooltip ??
+            (widget.hasActiveFilters ? 'Clear Filters' : 'Apply Filters'),
+        preferBelow: false,
+        child: GestureDetector(
+          onTapDown: _handleTapDown,
+          onTapUp: _handleTapUp,
+          onTapCancel: _handleTapCancel,
+          child: Container(
+            width: 25.w,
+            height: 5.h,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                // Primary shadow
+                BoxShadow(
+                  color: (AppColors.primaryColor).withOpacity(0.3),
+                  spreadRadius: _isHovered ? 2 : 0,
+                ),
+                // Glow effect for active state
+                if (widget.hasActiveFilters)
+                  BoxShadow(
+                    color: Colors.white.withOpacity(0.2),
+                    blurRadius: 15,
+                    offset: const Offset(0, 0),
+                    spreadRadius: 1,
+                  ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Stack(
+                children: [
+                  // Main button container
+                  _buildMainContainer(),
+
+                  // Shimmer effect overlay
+
+                  // Ripple effect
+
+                  // Content
+                  _buildContent(),
+
+                  // Disabled overlay
+                  if (!widget.isEnabled) _buildDisabledOverlay(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMainContainer() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            (AppColors.primaryColor).withOpacity(0.9),
+            AppColors.primaryColor,
+            (AppColors.primaryColor).withOpacity(0.8),
+          ],
+          stops: const [0.0, 0.5, 1.0],
+        ),
+        border: Border.all(
+          color: Colors.transparent,
+          width: 1.5,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContent() {
+    return Positioned.fill(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Animated Icon
+          TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 400),
+            tween: Tween(begin: 0.0, end: widget.hasActiveFilters ? 1.0 : 0.0),
+            builder: (context, value, child) {
+              return Transform.rotate(
+                angle: value * 0.5, // Subtle rotation
+                child: Icon(
+                  widget.hasActiveFilters
+                      ? Icons.filter_list_off_rounded
+                      : Icons.filter_list_rounded,
+                  size: 18.sp,
+                  color: AppColors.backgroundColorLight.withOpacity(
+                    widget.isEnabled ? 1.0 : 0.5,
+                  ),
+                ),
+              );
+            },
+          ),
+
+          // Animated Gap
+          TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 300),
+            tween: Tween(begin: 0.02, end: _isPressed ? 0.015 : 0.02),
+            builder: (context, value, child) {
+              return SizedBox(width: value * 100.w);
+            },
+          ),
+
+          // Animated Text
+          AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 300),
+            style: TextStyle(
+              color: AppColors.backgroundColorLight.withOpacity(
+                widget.isEnabled ? 1.0 : 0.5,
+              ),
+              fontWeight:
+                  widget.hasActiveFilters ? FontWeight.w600 : FontWeight.w500,
+              fontSize: _isPressed ? 13.sp : 14.sp,
+            ),
+            child: TextWidget(
+              text: widget.hasActiveFilters ? "Filtered" : "Filter",
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDisabledOverlay() {
+    return Positioned.fill(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
   }
 }

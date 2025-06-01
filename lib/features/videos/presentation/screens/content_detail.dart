@@ -477,8 +477,7 @@ class _ContentDetailState extends State<ContentDetail>
                                                   child: Container(
                                                     padding:
                                                         EdgeInsets.all(2.w),
-                                                    decoration:
-                                                        const BoxDecoration(
+                                                    decoration: BoxDecoration(
                                                       color: AppColors
                                                           .primaryColor,
                                                       shape: BoxShape.circle,
