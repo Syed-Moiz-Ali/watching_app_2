@@ -4,12 +4,10 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:watching_app_2/data/models/content_item.dart';
-import 'package:watching_app_2/data/models/content_source.dart';
 
 /// Content type constants for the application
 class ContentTypes {
@@ -116,7 +114,7 @@ class LocalDatabase {
     final db = await database;
 
     // Store content source and get its ID
-    final sourceId = await _storeContentSource(item.source);
+    // final sourceId = await _storeContentSource(item.source);
 
     try {
       final favoriteData = {
@@ -129,25 +127,6 @@ class LocalDatabase {
     } catch (e) {
       throw Exception('Failed to serialize ContentItem: $e');
     }
-  }
-
-  /// Store content source and return its ID
-  Future<int> _storeContentSource(ContentSource source) async {
-    final db = await database;
-
-    // Check if source exists by comparing JSON data
-    final sourceJson = jsonEncode(source.toJson());
-    final existingSources = await db.query(
-      SOURCE_TABLE,
-      where: '$COLUMN_DATA = ?',
-      whereArgs: [sourceJson],
-    );
-
-    if (existingSources.isNotEmpty) {
-      return existingSources.first[COLUMN_ID] as int;
-    }
-
-    return await db.insert(SOURCE_TABLE, {COLUMN_DATA: sourceJson});
   }
 
   /// Remove content item from favorites by ID

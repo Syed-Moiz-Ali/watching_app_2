@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/core/navigation/app_navigator.dart';
-import 'package:watching_app_2/shared/widgets/loading/loading_indicator.dart';
 
 import '../shared/widgets/misc/text_widget.dart';
 import 'app_initializer.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -71,104 +70,92 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       // Premium dark gradient background
-      body: Container(
-        // decoration: const BoxDecoration(
-        //   gradient: LinearGradient(
-        //     begin: Alignment.topCenter,
-        //     end: Alignment.bottomCenter,
-        //     colors: [
-        //       Color(0xFF1E1E2A), // Deep navy/charcoal
-        //       Color(0xFF0A0A14), // Nearly black
-        //     ],
-        //   ),
-        // ),
-        child: AnimatedBuilder(
-          animation: _animationController,
-          builder: (context, child) {
-            return FadeTransition(
-              opacity: _fadeInAnimation,
-              child: ScaleTransition(
-                scale: _scaleAnimation,
-                child: child,
+      body: AnimatedBuilder(
+        animation: _animationController,
+        builder: (context, child) {
+          return FadeTransition(
+            opacity: _fadeInAnimation,
+            child: ScaleTransition(
+              scale: _scaleAnimation,
+              child: child,
+            ),
+          );
+        },
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Premium logo container with subtle glow
+              Container(
+                width: 110,
+                height: 110,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.black,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryColor.withOpacity(0.25),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/icon.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
-            );
-          },
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Premium logo container with subtle glow
-                Container(
-                  width: 110,
-                  height: 110,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.black,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primaryColor.withOpacity(0.25),
-                        blurRadius: 20,
-                        spreadRadius: 5,
-                      ),
+
+              const SizedBox(height: 32),
+
+              // App name with premium thin typography
+              TextWidget(
+                text: 'BrowseX',
+                fontSize: 22.sp,
+                fontWeight: FontWeight.w300,
+                letterSpacing: 6,
+                color: AppColors.primaryColor,
+              ),
+
+              const SizedBox(height: 8),
+
+              // Tagline text
+              TextWidget(
+                text: 'Premium Viewing Experience',
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w400,
+                color: AppColors.primaryColor.withOpacity(0.7),
+                letterSpacing: 0.5,
+              ),
+
+              const SizedBox(height: 48),
+
+              // Elegant custom divider
+              Container(
+                width: 30,
+                height: 2,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.primaryColor.withOpacity(0),
+                      AppColors.primaryColor.withOpacity(0.7),
+                      AppColors.primaryColor.withOpacity(0),
                     ],
                   ),
-                  child: ClipOval(
-                    child: Image.asset(
-                      'assets/images/icon.png',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
                 ),
+              ),
 
-                const SizedBox(height: 32),
+              const SizedBox(height: 48),
 
-                // App name with premium thin typography
-                TextWidget(
-                  text: 'BrowseX',
-                  fontSize: 22.sp,
-                  fontWeight: FontWeight.w300,
-                  letterSpacing: 6,
-                  color: AppColors.primaryColor,
-                ),
-
-                const SizedBox(height: 8),
-
-                // Tagline text
-                TextWidget(
-                  text: 'Premium Viewing Experience',
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.primaryColor.withOpacity(0.7),
-                  letterSpacing: 0.5,
-                ),
-
-                const SizedBox(height: 48),
-
-                // Elegant custom divider
-                Container(
-                  width: 30,
-                  height: 2,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.primaryColor.withOpacity(0),
-                        AppColors.primaryColor.withOpacity(0.7),
-                        AppColors.primaryColor.withOpacity(0),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 48),
-
-                // Custom styled loading indicator
-                // const SizedBox(
-                //   width: 36,
-                //   height: 36,
-                //   child: CustomLoadingIndicator(),
-                // ),
-              ],
-            ),
+              // Custom styled loading indicator
+              // const SizedBox(
+              //   width: 36,
+              //   height: 36,
+              //   child: CustomLoadingIndicator(),
+              // ),
+            ],
           ),
         ),
       ),

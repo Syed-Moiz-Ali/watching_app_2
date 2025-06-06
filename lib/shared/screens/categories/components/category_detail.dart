@@ -1,5 +1,3 @@
-import 'dart:developer';
-import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -107,81 +105,8 @@ class _PremiumCategoryDetailScreenState
   }
 
   // Premium badge with glassmorphism effect
-  Widget _buildPremiumBadge() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 6.h),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.purple.withOpacity(0.8),
-            Colors.deepPurple.withOpacity(0.9),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.purple.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.diamond_outlined,
-                size: 16.sp,
-                color: Colors.white,
-              ),
-              SizedBox(width: 6.w),
-              TextWidget(
-                text: 'PREMIUM',
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                fontSize: 12.sp,
-                letterSpacing: 1.2,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   // Stat item with improved design
-  Widget _buildStatItem(IconData icon, String text) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 16.sp,
-            color: Colors.white.withOpacity(0.9),
-          ),
-          SizedBox(width: 2.w),
-          TextWidget(
-            text: text,
-            color: Colors.white.withOpacity(0.9),
-            fontWeight: FontWeight.w500,
-            fontSize: 13.sp,
-          ),
-        ],
-      ),
-    );
-  }
 
   // Neu-morphic button with gradient and pressed state animation
   Widget _buildActionButton(String text, IconData icon, bool isPrimary) {
@@ -360,7 +285,7 @@ class _PremiumCategoryDetailScreenState
         ),
         SizedBox(height: 4.h),
         Container(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.05),
             borderRadius: BorderRadius.circular(20.sp),
@@ -397,7 +322,7 @@ class _PremiumCategoryDetailScreenState
           elevation: 0,
           leading: IconButton(
             icon: Container(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.3),
                 shape: BoxShape.circle,

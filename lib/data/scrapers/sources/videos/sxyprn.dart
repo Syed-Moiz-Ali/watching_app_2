@@ -2,15 +2,11 @@ import 'dart:convert';
 import 'package:html/dom.dart';
 
 import '../../../../core/global/globals.dart';
-import '../../../models/content_source.dart';
 import '../../../models/scraper_config.dart';
 import '../../base_scraper.dart';
 
 class Sxyprn extends BaseScraper {
-  Sxyprn(ContentSource source)
-      : super(
-          source,
-        );
+  Sxyprn(super.source);
 
   @override
   Future<String?> extractCustomValue(ElementSelector selector,
@@ -19,8 +15,6 @@ class Sxyprn extends BaseScraper {
     if (selector == source.config!.watchingLinkSelector) {
       try {
         Map watchingLink = {};
-        var scripts =
-            element!.querySelectorAll('#vid_container_id').first.outerHtml;
         // log('scripts is $scripts');
         // watchingLink.addEntries(params.entries);
         return Future.value(json.encode(watchingLink));

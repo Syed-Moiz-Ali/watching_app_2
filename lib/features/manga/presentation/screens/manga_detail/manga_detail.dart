@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -8,10 +10,7 @@ import 'package:watching_app_2/core/global/globals.dart';
 import 'package:watching_app_2/core/navigation/app_navigator.dart';
 import 'package:watching_app_2/data/models/content_item.dart';
 import 'package:watching_app_2/features/manga/presentation/screens/manga_reader/manga_reader_screen.dart';
-import 'package:watching_app_2/features/manga/presentation/screens/manga_detail/widgets/action_button.dart';
 import 'package:watching_app_2/features/manga/presentation/screens/manga_detail/widgets/chapter_tile.dart';
-import 'package:watching_app_2/features/manga/presentation/screens/manga_detail/widgets/genre_chip.dart';
-import 'package:watching_app_2/features/manga/presentation/screens/manga_detail/widgets/stat_card.dart';
 import 'package:watching_app_2/features/manga/presentation/screens/manga_detail/widgets/status_chip.dart';
 import 'package:watching_app_2/presentation/provider/manga_detail_provider.dart';
 import '../../../../../shared/widgets/misc/text_widget.dart';
@@ -37,7 +36,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
   static const double _buttonSpacing = 12.0;
   static const double _statSpacing = 12.0;
   static const double _textSpacing = 8.0;
-  static const double _listSpacing = 8.0;
   static const EdgeInsets _buttonMargin = EdgeInsets.all(8.0);
   static const Duration _fadeAnimationDuration = Duration(milliseconds: 800);
   static const Duration _crossFadeDuration = Duration(milliseconds: 300);
@@ -58,7 +56,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
   bool _showDescription = false;
   bool _isFavorite = false;
   bool _showAllChapters = false;
-  int _currentImageIndex = 0;
   String _sortOrder = 'Latest';
 
   @override
@@ -311,7 +308,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(Icons.star, color: Colors.amber, size: 16),
+                        const Icon(Icons.star, color: Colors.amber, size: 16),
                         const SizedBox(width: 4),
                         TextWidget(
                           text: '4.8 • 2.1M reads',
@@ -614,8 +611,9 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
   }
 
   Widget _buildDescription(ContentItem details) {
-    if (details.detailContent!.discription == null)
+    if (details.detailContent!.discription == null) {
       return const SizedBox.shrink();
+    }
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -724,7 +722,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
                 LinearProgressIndicator(
                   value: 0.67,
                   backgroundColor: Colors.grey.shade200,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                  valueColor:
+                      const AlwaysStoppedAnimation<Color>(Colors.orange),
                 ),
               ],
             ),

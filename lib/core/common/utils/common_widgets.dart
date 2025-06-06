@@ -227,7 +227,7 @@ class CommonWidgets {
           children: [
             Row(
               children: [
-                TextWidget(
+                const TextWidget(
                   text: 'Subscrbe to get ',
                   styleType: TextStyleType.body,
                   color: AppColors.backgroundColorLight,

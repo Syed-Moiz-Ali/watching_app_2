@@ -18,13 +18,12 @@ import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 import '../../../../core/navigation/app_navigator.dart';
 import '../../../../data/scrapers/scraper_service.dart';
 import '../../../../presentation/provider/similar_content_provider.dart';
-import '../../../../shared/screens/video_player/components/similar_content.dart';
 import 'dart:ui';
 import 'dart:developer';
 
 class ContentDetail extends StatefulWidget {
-  ContentItem item;
-  ContentDetail({super.key, required this.item});
+  final ContentItem item;
+  const ContentDetail({super.key, required this.item});
 
   @override
   State<ContentDetail> createState() => _ContentDetailState();
@@ -143,7 +142,7 @@ class _ContentDetailState extends State<ContentDetail>
 
   @override
   Widget build(BuildContext context) {
-    var similarProvider = Provider.of<SimilarContentProvider>(context);
+    Provider.of<SimilarContentProvider>(context);
 
     return Scaffold(
       // backgroundColor: AppColors.primaryColor,
@@ -303,7 +302,7 @@ class _ContentDetailState extends State<ContentDetail>
                           _buildWatchButton(),
                           const CustomGap(heightFactor: .04),
                           if (detailItem!.detailContent != null)
-                            Container(
+                            SizedBox(
                               height: 45.h,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,

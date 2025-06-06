@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -35,15 +34,9 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
   late AnimationController _uiAnimationController;
   late AnimationController _pageTransitionController;
   late AnimationController _fabAnimationController;
-  late Animation<double> _uiSlideAnimation;
-  late Animation<double> _uiOpacityAnimation;
-  late Animation<double> _fabScaleAnimation;
-  late Animation<Offset> _fabSlideAnimation;
   final ScrollController _scrollController = ScrollController();
 
   // Enhanced UI state
-  bool _isMenuExpanded = false;
-  bool _showPageIndicator = false;
   double _brightness = 1.0;
   PageController? _pageController;
   bool _isPageView = false;
@@ -71,22 +64,6 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
       duration: const Duration(milliseconds: 300),
     );
 
-    _uiSlideAnimation = Tween<double>(
-      begin: 10.0,
-      end: 0.0,
-    ).animate(CurvedAnimation(
-      parent: _uiAnimationController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _uiOpacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _uiAnimationController,
-      curve: Curves.easeOut,
-    ));
-
     // Page Transition Controller
     _pageTransitionController = AnimationController(
       vsync: this,
@@ -98,22 +75,6 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
       vsync: this,
       duration: const Duration(milliseconds: 200),
     );
-
-    _fabScaleAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fabAnimationController,
-      curve: Curves.elasticOut,
-    ));
-
-    _fabSlideAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _fabAnimationController,
-      curve: Curves.easeOutBack,
-    ));
   }
 
   void _initializeSystemUI() {
@@ -147,15 +108,12 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
         if (newPage != _currentPage) {
           setState(() {
             _currentPage = newPage;
-            _showPageIndicator = true;
           });
 
           // Auto-hide page indicator
           Future.delayed(const Duration(seconds: 2), () {
             if (mounted) {
-              setState(() {
-                _showPageIndicator = false;
-              });
+              setState(() {});
             }
           });
         }
@@ -431,23 +389,6 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildUIOverlay(MangaDetailProvider provider) {
-    return AnimatedBuilder(
-      animation: _uiAnimationController,
-      builder: (context, child) {
-        return Opacity(
-          opacity: _uiOpacityAnimation.value,
-          child: Stack(
-            children: [
-              _buildTopBar(),
-              _buildBottomBar(provider),
-            ],
-          ),
-        );
-      },
     );
   }
 
@@ -817,7 +758,7 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
   }
 
   Widget _buildReaderContent(MangaDetailProvider provider) {
-    return Container(
+    return SizedBox(
       height: 100.h,
       child: GestureDetector(
         onTapDown: _handleTapNavigation,

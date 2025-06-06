@@ -46,15 +46,12 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
   bool _interfaceVisible = true;
   bool _isDownloading = false;
   bool _isWallpaperSetting = false;
-  bool _isFavorite = false;
 
   // Theming constants
   final Color _accentColor = AppColors.primaryColor;
-  final Color _secondaryAccentColor = const Color(0xFF4ECDC4);
 
   // Animation timing configuration
   final Duration _entranceAnimationDuration = const Duration(milliseconds: 600);
-  final Duration _buttonAnimationDuration = const Duration(milliseconds: 200);
   final Duration _interfaceToggleDuration = const Duration(milliseconds: 250);
 
   @override
@@ -195,19 +192,6 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
         Colors.redAccent,
       );
     });
-  }
-
-  void _toggleFavorite() {
-    HapticFeedback.lightImpact();
-    setState(() {
-      _isFavorite = !_isFavorite;
-    });
-
-    _showFeedback(
-      _isFavorite ? 'Added to favorites' : 'Removed from favorites',
-      _isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-      _isFavorite ? Colors.redAccent : Colors.white,
-    );
   }
 
   void _showWallpaperOptions() {

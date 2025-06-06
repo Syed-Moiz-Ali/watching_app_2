@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/navigation/app_navigator.dart';
 import 'package:watching_app_2/data/models/content_item.dart';
 import 'package:watching_app_2/features/manga/presentation/screens/manga_reader/manga_reader_screen.dart';

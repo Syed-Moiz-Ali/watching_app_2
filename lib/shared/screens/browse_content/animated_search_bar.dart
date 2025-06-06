@@ -52,7 +52,6 @@ class _UltraPremiumSearchBarState extends State<UltraPremiumSearchBar>
   OverlayEntry? _overlayEntry;
   late StreamSubscription<bool> keyboardSubscription;
   late AnimationController _animationController;
-  late Animation<double> _searchBarAnimation;
   late Animation<double> _borderRadiusAnimation;
   late Animation<Color?> _borderColorAnimation;
   late Animation<double> _shadowOpacityAnimation;
@@ -71,10 +70,6 @@ class _UltraPremiumSearchBarState extends State<UltraPremiumSearchBar>
     _animationController = AnimationController(
       duration: widget.animationDuration,
       vsync: this,
-    );
-
-    _searchBarAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
     );
 
     _borderRadiusAnimation = Tween<double>(begin: 24.0, end: 16.0).animate(
@@ -296,20 +291,6 @@ class _UltraPremiumSearchBarState extends State<UltraPremiumSearchBar>
         ),
       ),
     );
-  }
-
-  void _addToRecentSearches(String query) {
-    if (query.isEmpty) return;
-
-    List<String> updatedSearches = List.from(widget.recentSearches);
-    updatedSearches.remove(query);
-    updatedSearches.insert(0, query);
-
-    if (updatedSearches.length > 5) {
-      updatedSearches = updatedSearches.sublist(0, 5);
-    }
-
-    widget.onRecentSearchesUpdated(updatedSearches);
   }
 
   Widget _buildSearchBar() {

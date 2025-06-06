@@ -78,7 +78,7 @@ class SearchProvider with ChangeNotifier {
         // log("activeSources count: ${activeSources.length}, sources: ${activeSources.map((s) => s.url).toList()}");
         // log("activeSources is ${activeSources.length}");
         for (var source in activeSources) {
-          if (source.url == null || source.url.isEmpty) {
+          if (source.url.isEmpty) {
             log("Skipping source with null or empty URL: $source");
             continue; // Skip invalid sources
           }

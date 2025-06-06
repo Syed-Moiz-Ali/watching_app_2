@@ -34,7 +34,6 @@ abstract class BaseScraper {
 
   Future<List<Chapter>> scrapeChapterContent(String data) async {
     log("data is $data and source.config!.chapterImagesByIdSelectionSelector is ${source.config!.chapterImagesByIdSelectionSelector}");
-    if (source.config!.chapterImagesByIdSelectionSelector == null) return [];
     final document = parse(data);
     final elements = document.querySelectorAll(
         source.config!.chapterImagesByIdSelectionSelector.selector ?? '');
@@ -43,7 +42,6 @@ abstract class BaseScraper {
 
   Future<List<VideoSource>> scrapeVideos(String data) async {
     // log("this is videoSelector and ${source.config!.videoSelector!.selector}");
-    if (source.config!.videoSelector == null) return [];
     final document = parse(data);
     final elements =
         document.querySelectorAll(source.config!.videoSelector.selector ?? '');

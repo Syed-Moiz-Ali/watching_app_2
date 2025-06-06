@@ -6,7 +6,8 @@ class AppColors {
   // Primary Colors
 
   static Color primaryColor = Color(SMA.pref!.getInt('customThemeColor') ??
-      Color(0xFFb91c1c).value); // Dark grey (nearly black) for primary actions
+      const Color(0xFFb91c1c)
+          .value); // Dark grey (nearly black) for primary actions
   // static const Color primaryColor =
   //     Color(0xFF0A0A0A); // Dark grey (nearly black) for primary actions
   static const Color primaryDark =

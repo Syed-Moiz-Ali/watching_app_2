@@ -1,17 +1,12 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:html/dom.dart';
 
 import '../../../../core/global/globals.dart';
-import '../../../models/content_source.dart';
 import '../../../models/scraper_config.dart';
 import '../../base_scraper.dart';
 
 class Crazyporn extends BaseScraper {
-  Crazyporn(ContentSource source)
-      : super(
-          source,
-        );
+  Crazyporn(super.source);
 
   @override
   Future<String?> extractCustomValue(ElementSelector selector,
@@ -27,11 +22,9 @@ class Crazyporn extends BaseScraper {
           (scriptTag) => scriptTag.text.contains('<![CDATA['),
           // orElse: () => null,
         );
-        print('cdataScriptTag is $cdataScriptTag');
         Map<String, String> dataMap = extractDataFromScript(cdataScriptTag);
 
         // Print the extracted data map
-        print(dataMap);
         Map params = {'auto': '${source.url}embed.php?id=${dataMap['vid']}'};
         watchingLink.addEntries(params.entries);
         return Future.value(json.encode(watchingLink));
@@ -56,11 +49,8 @@ class Crazyporn extends BaseScraper {
     Match? match = regex.firstMatch(jsContent);
     if (match != null) {
       String vid = match.group(1)!;
-      print('vid: $vid');
       dataMap.addEntries({'vid': vid}.entries);
-    } else {
-      print('vid not found');
-    }
+    } else {}
     // Return the extracted data map
     return dataMap;
   }

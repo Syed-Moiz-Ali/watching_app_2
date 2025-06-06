@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'content_source.dart';
 
 class ContentItem {

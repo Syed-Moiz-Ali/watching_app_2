@@ -250,7 +250,7 @@ class FavoriteButtonState extends State<FavoriteButton>
   }
 
   void _showErrorSnackbar(String errorMessage) {
-    log("errorMessage is ${errorMessage}");
+    log("errorMessage is $errorMessage");
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: TextWidget(

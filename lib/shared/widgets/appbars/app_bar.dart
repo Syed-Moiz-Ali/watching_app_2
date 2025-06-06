@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'dart:ui';
 import 'package:flutter/services.dart';
-import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/core/global/globals.dart';
 import 'dart:math' as math;
 
@@ -138,7 +137,6 @@ class _CustomAppBarState extends State<CustomAppBar>
   late ScrollController _scrollController;
   double _scrollPosition = 0.0;
   bool _isScrolled = false;
-  Color _dynamicColor = Colors.transparent;
   late AnimationController _colorAnimationController;
   late AnimationController _breathingController;
   late Animation<Color?> _colorAnimation;

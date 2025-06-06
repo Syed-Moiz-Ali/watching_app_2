@@ -1,4 +1,4 @@
-// ignore_for_file: library Hawkins
+// ignore_for_file: library Hawkins, library_private_types_in_public_api, use_build_context_synchronously, unused_element
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -337,7 +337,7 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
             curve: const Interval(0.3, 0.7, curve: Curves.easeOutQuint),
           )),
           child: IconButton(
-            icon: Icon(Icons.search),
+            icon: const Icon(Icons.search),
             onPressed: () {},
           ),
         ),
@@ -737,7 +737,7 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                           checkColor: Colors.white,
                           activeColor: AppColors.primaryColor,
                         );
-                      }).toList(),
+                      }),
                       const SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,

@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/enums/enums.dart';
 import 'package:watching_app_2/data/models/content_item.dart';
-import 'package:watching_app_2/presentation/provider/similar_content_provider.dart';
 import 'package:watching_app_2/presentation/provider/webview_provider.dart';
 import 'package:watching_app_2/shared/widgets/appbars/app_bar.dart';
 import 'package:watching_app_2/shared/widgets/loading/loading_indicator.dart';

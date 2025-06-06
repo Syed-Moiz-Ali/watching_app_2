@@ -2,15 +2,11 @@ import 'dart:convert';
 import 'package:html/dom.dart';
 
 import '../../../../core/global/globals.dart';
-import '../../../models/content_source.dart';
 import '../../../models/scraper_config.dart';
 import '../../base_scraper.dart';
 
 class Kompoz2 extends BaseScraper {
-  Kompoz2(ContentSource source)
-      : super(
-          source,
-        );
+  Kompoz2(super.source);
 
   @override
   Future<String?> extractCustomValue(ElementSelector selector,

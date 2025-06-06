@@ -1,7 +1,7 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
-import 'package:watching_app_2/shared/widgets/misc/padding.dart';
 import '../../../core/constants/colors.dart';
 import '../../../data/models/content_item.dart';
 import '../../widgets/misc/text_widget.dart';
@@ -12,10 +12,10 @@ class FloatingActionButtonWidget extends StatefulWidget {
   final List<ContentItem> favorites; // Replace with your actual data type
 
   const FloatingActionButtonWidget({
-    Key? key,
+    super.key,
     required this.contentType,
     required this.favorites,
-  }) : super(key: key);
+  });
 
   @override
   _FloatingActionButtonWidgetState createState() =>

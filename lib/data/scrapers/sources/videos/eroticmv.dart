@@ -145,15 +145,11 @@ import 'dart:convert';
 import 'package:html/dom.dart';
 
 import '../../../../core/global/globals.dart';
-import '../../../models/content_source.dart';
 import '../../../models/scraper_config.dart';
 import '../../base_scraper.dart';
 
 class Eroticmv extends BaseScraper {
-  Eroticmv(ContentSource source)
-      : super(
-          source,
-        );
+  Eroticmv(super.source);
 
   @override
   Future<String?> extractCustomValue(ElementSelector selector,

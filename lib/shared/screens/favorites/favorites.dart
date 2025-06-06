@@ -12,7 +12,6 @@ import 'package:watching_app_2/data/models/content_item.dart';
 import 'package:watching_app_2/data/database/local_database.dart';
 import 'package:watching_app_2/features/tiktok/widgets/tiktok_gridview.dart';
 import 'package:watching_app_2/features/wallpapers/presentation/widgets/wallpaper_grid_view.dart';
-import 'package:watching_app_2/shared/widgets/misc/gap.dart';
 import 'package:watching_app_2/shared/widgets/misc/tabbar.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 import '../../../core/navigation/app_navigator.dart';
@@ -107,13 +106,13 @@ class _FavoritesState extends State<Favorites>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 48, color: Colors.red),
-            SizedBox(height: 16),
+            const Icon(Icons.error_outline, size: 48, color: Colors.red),
+            const SizedBox(height: 16),
             TextWidget(text: 'Error: $error'),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => setState(() {}),
-              child: TextWidget(text: 'Retry'),
+              child: const TextWidget(text: 'Retry'),
             ),
           ],
         ),
@@ -133,7 +132,7 @@ class _FavoritesState extends State<Favorites>
   PreferredSize _buildSimpleAppBar() {
     return PreferredSize(
       preferredSize: Size.fromHeight(AppBar().preferredSize.height),
-      child: CustomAppBar(
+      child: const CustomAppBar(
         title: 'My Favorites',
         appBarStyle: AppBarStyle.standard,
       ),
@@ -144,7 +143,7 @@ class _FavoritesState extends State<Favorites>
     return PreferredSize(
       preferredSize: Size.fromHeight(15.h),
       child: CustomAppBar(
-        title: 'My Favorites (${length})',
+        title: 'My Favorites ($length)',
         appBarStyle: AppBarStyle.standard,
         actions: _buildAppBarActions(),
         bottom: _buildTabBar(),
@@ -183,7 +182,6 @@ class _FavoritesState extends State<Favorites>
   }
 
   void _handleSearch() {
-    // TODO: Implement search functionality
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
           content: TextWidget(text: 'Search functionality coming soon!')),
@@ -362,14 +360,6 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
     );
   }
 
-  Widget _buildTiktokGrid() {
-    return TiktokGridView(
-      tiktok: _filteredFavorites,
-      onItemTap: _handleTiktokTap,
-      initalPage: 0,
-    );
-  }
-
   Widget _buildVideoGrid() {
     return VideoGridView(
       videos: _filteredFavorites,
@@ -398,7 +388,6 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
   }
 
   void _handleTiktokTap(int index) {
-    // TODO: Implement TikTok tap handling
     log('TikTok item tapped: $index');
   }
 
@@ -465,7 +454,6 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
   }
 
   bool _itemMatchesCurrentFilters(ContentItem item) {
-    // TODO: Implement actual filter matching logic
     return true;
   }
 }
@@ -498,11 +486,6 @@ class _PremiumFilterButtonState extends State<PremiumFilterButton>
   @override
   void initState() {
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   void _handleTapDown(TapDownDetails details) {

@@ -1,16 +1,12 @@
 import 'dart:convert';
 
 import '../../../../core/global/globals.dart';
-import '../../../models/content_source.dart';
 import '../../../models/scraper_config.dart';
 import '../../base_scraper.dart';
 import 'package:html/dom.dart';
 
 class NoodleMagazine extends BaseScraper {
-  NoodleMagazine(ContentSource source)
-      : super(
-          source,
-        );
+  NoodleMagazine(super.source);
 
   @override
   Future<String?> extractCustomValue(ElementSelector selector,

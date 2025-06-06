@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 
 import '../loading/loading_indicator.dart';
@@ -67,9 +66,7 @@ class ImageWidget extends StatefulWidget {
 class _ImageWidgetState extends State<ImageWidget>
     with SingleTickerProviderStateMixin {
   String? randomErrorImage;
-  bool _isLoaded = false;
   bool _isHovering = false;
-  bool _isError = false;
   Offset _parallaxOffset = Offset.zero;
 
   // Animation controller for various effects
@@ -356,7 +353,6 @@ class _ImageWidgetState extends State<ImageWidget>
   Widget _buildImage(String imageUrl, bool isSvg) {
     // Early validation: if the URL is empty or invalid, show error widget
     if (imageUrl.isEmpty) {
-      _isError = true;
       return _buildFallbackErrorWidget();
     }
 
@@ -368,7 +364,6 @@ class _ImageWidgetState extends State<ImageWidget>
     // Validate URL for network images
     final uri = Uri.tryParse(imageUrl);
     if (uri == null || !uri.hasScheme || !uri.hasAuthority) {
-      _isError = true;
       return _buildFallbackErrorWidget(); // Invalid URL (no host or scheme)
     }
 
@@ -396,9 +391,7 @@ class _ImageWidgetState extends State<ImageWidget>
             if (frame != null) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (mounted) {
-                  setState(() {
-                    _isLoaded = true;
-                  });
+                  setState(() {});
                 }
               });
               return child;
@@ -406,13 +399,11 @@ class _ImageWidgetState extends State<ImageWidget>
             return _buildPlaceholder();
           },
           errorBuilder: (context, error, stackTrace) {
-            _isError = true;
             return _buildFallbackErrorWidget();
           },
         );
       }
     } catch (e) {
-      _isError = true;
       return _buildFallbackErrorWidget();
     }
   }
@@ -430,7 +421,6 @@ class _ImageWidgetState extends State<ImageWidget>
       );
     } catch (e) {
       // Catch any loading errors and return the error widget silently
-      _isError = true;
       return _buildFallbackErrorWidget();
     }
   }
@@ -444,7 +434,6 @@ class _ImageWidgetState extends State<ImageWidget>
         width: widget.width,
         placeholder: (context, url) => _buildPlaceholder(),
         errorWidget: (context, url, error) {
-          _isError = true;
           return _buildFallbackErrorWidget();
         },
         fadeInDuration: _getTransitionDuration(),
@@ -453,9 +442,7 @@ class _ImageWidgetState extends State<ImageWidget>
           // Mark as loaded once image is ready
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
-              setState(() {
-                _isLoaded = true;
-              });
+              setState(() {});
             }
           });
 
@@ -519,7 +506,6 @@ class _ImageWidgetState extends State<ImageWidget>
       );
     } catch (e) {
       // Catch any loading errors and return the error widget silently
-      _isError = true;
       return _buildFallbackErrorWidget();
     }
   }
@@ -556,25 +542,6 @@ class _ImageWidgetState extends State<ImageWidget>
         ),
       ),
     );
-  }
-
-  Widget _buildErrorWidget() {
-    // Try to use random error image if available
-    if (randomErrorImage != null && randomErrorImage!.isNotEmpty) {
-      final uri = Uri.tryParse(randomErrorImage!);
-      if (uri != null && uri.hasScheme && uri.hasAuthority) {
-        return CachedNetworkImage(
-          imageUrl: randomErrorImage!,
-          fit: widget.fit,
-          height: widget.height,
-          width: widget.width,
-          placeholder: (context, url) => _buildFallbackErrorWidget(),
-          errorWidget: (context, url, error) => _buildFallbackErrorWidget(),
-        );
-      }
-    }
-
-    return _buildFallbackErrorWidget();
   }
 
   Widget _buildFallbackErrorWidget() {

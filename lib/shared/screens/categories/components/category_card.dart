@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
@@ -160,7 +159,7 @@ class _CategoryCardState extends State<CategoryCard>
                                 primaryColor.withOpacity(0.3),
                                 Colors.black.withOpacity(0.7),
                               ],
-                              stops: [0.0, 0.4, 1.0],
+                              stops: const [0.0, 0.4, 1.0],
                               transform: GradientRotation(
                                 (0.5 * 3.14) +
                                     (0.05 * _shimmerController.value),

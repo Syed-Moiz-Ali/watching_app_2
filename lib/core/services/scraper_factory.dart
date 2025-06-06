@@ -1,7 +1,4 @@
-import 'dart:developer';
-
 import 'package:watching_app_2/data/models/content_source.dart';
-import 'package:watching_app_2/data/models/scraper_config.dart';
 import 'package:watching_app_2/data/scrapers/base_scraper.dart';
 // Photo Scrapers
 import '../../data/scrapers/sources/photos/definebabe.dart';
@@ -32,7 +29,6 @@ import '../../data/scrapers/sources/videos/porntop.dart';
 import '../../data/scrapers/sources/videos/spankbang.dart';
 import '../../data/scrapers/sources/videos/sxyprn.dart';
 import '../../data/scrapers/sources/videos/taboohome.dart';
-import '../../data/scrapers/sources/videos/tabooporn2.dart';
 import '../../data/scrapers/sources/videos/tranny.dart';
 import '../../data/scrapers/sources/videos/whoreshub.dart';
 import '../../data/scrapers/sources/videos/xtapes.dart';
@@ -40,7 +36,7 @@ import '../../data/scrapers/sources/videos/youjizz.dart';
 
 /// Dummy Scraper class for handling null cases
 class DummyScraper extends BaseScraper {
-  DummyScraper(ContentSource source) : super(source);
+  DummyScraper(super.source);
 }
 
 /// Factory class for creating scraper instances based on content source

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../data/models/content_item.dart';
-import '../../wallpapers/presentation/widgets/wallpaper_card.dart';
 import '../presentation/screens/tiktok_player.dart';
 
 class TiktokGridView extends StatefulWidget {

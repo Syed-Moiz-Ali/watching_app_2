@@ -31,7 +31,6 @@ class _LocalAuthScreenState extends State<LocalAuthScreen>
   // Continuous effect animations
   late Animation<double> _pulseAnimation;
   late Animation<double> _shimmerAnimation;
-  late Animation<double> _particleAnimation;
 
   // Interactive animations
   late AnimationController _buttonPressController;
@@ -137,12 +136,6 @@ class _LocalAuthScreenState extends State<LocalAuthScreen>
     );
 
     // Particle flow animation
-    _particleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _particleController,
-        curve: Curves.linear,
-      ),
-    );
 
     // Button press animation
     _buttonScaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
@@ -682,7 +675,7 @@ class _LocalAuthScreenState extends State<LocalAuthScreen>
             begin: Alignment(-1.5 + _shimmerAnimation.value, 0),
             end: Alignment(1.5 + _shimmerAnimation.value, 0),
           ).createShader(bounds),
-          child: TextWidget(
+          child: const TextWidget(
             text: "Seamless • Secure • Simple",
             fontWeight: FontWeight.w600,
             color: Colors.white,
@@ -1070,7 +1063,7 @@ class _LocalAuthScreenState extends State<LocalAuthScreen>
   }
 
   Widget _buildAuthenticatingState(ColorScheme colorScheme) {
-    return Row(
+    return const Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         // Enhanced loading indicator
@@ -1111,7 +1104,7 @@ class _LocalAuthScreenState extends State<LocalAuthScreen>
         //   ),
         // ),
         // const SizedBox(width: 14),
-        const TextWidget(
+        TextWidget(
           text: "Verifying Identity...",
           color: Colors.white,
           fontWeight: FontWeight.w600,

@@ -125,7 +125,7 @@ class _VideoCardState extends State<VideoCard>
                 filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                 child: Container(
                   padding: EdgeInsets.all(widget.isGrid ? 5.sp : 5.sp),
-                  decoration: BoxDecoration(),
+                  decoration: const BoxDecoration(),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

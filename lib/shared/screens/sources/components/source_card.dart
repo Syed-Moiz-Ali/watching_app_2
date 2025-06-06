@@ -1,9 +1,6 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import 'dart:ui';
 import 'package:watching_app_2/core/navigation/app_navigator.dart';
 import 'package:watching_app_2/core/navigation/routes.dart';
 import 'package:watching_app_2/features/manga/presentation/screens/manga.dart';

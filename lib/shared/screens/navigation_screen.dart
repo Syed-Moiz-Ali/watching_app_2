@@ -80,12 +80,9 @@ class _MinimalistNavBarState extends State<MinimalistNavBar>
 
   late Animation<Offset> _slideAnimation;
   late Animation<double> _scaleAnimation;
-  late Animation<double> _indicatorAnimation;
 
   List<AnimationController> _itemControllers = [];
   List<Animation<double>> _itemAnimations = [];
-
-  int _previousIndex = 0;
 
   @override
   void initState() {
@@ -127,11 +124,6 @@ class _MinimalistNavBarState extends State<MinimalistNavBar>
     _indicatorController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
-    );
-
-    _indicatorAnimation = CurvedAnimation(
-      parent: _indicatorController,
-      curve: Curves.easeOutCubic,
     );
 
     // Individual item animations
@@ -180,7 +172,6 @@ class _MinimalistNavBarState extends State<MinimalistNavBar>
   void _animateIndicator(int index) {
     _indicatorController.reset();
     _indicatorController.forward();
-    setState(() => _previousIndex = index);
   }
 
   @override
@@ -299,7 +290,7 @@ class _MinimalistNavBarState extends State<MinimalistNavBar>
         ),
       ),
       child: SafeArea(
-        child: Container(
+        child: SizedBox(
           height: 9.h,
           child: _buildNavItems(navProvider, accentColor, isDark),
         ),

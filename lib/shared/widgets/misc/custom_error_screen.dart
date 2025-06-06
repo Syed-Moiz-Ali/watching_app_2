@@ -105,7 +105,6 @@ class _CustomErrorScreenState extends State<CustomErrorScreen>
   late AnimationController _slideController;
   late Animation<double> _pulseAnimation;
   late Animation<Offset> _slideAnimation;
-  bool _showTechnicalDetails = false;
 
   // Context detection
   bool _isDebugMode = false;
@@ -182,7 +181,6 @@ class _CustomErrorScreenState extends State<CustomErrorScreen>
 
   ThemeData _buildErrorTheme(BuildContext context) {
     final brightness = MediaQuery.of(context).platformBrightness;
-    final isDark = brightness == Brightness.dark;
 
     return ThemeData(
       brightness: brightness,
@@ -235,8 +233,8 @@ class _CustomErrorScreenState extends State<CustomErrorScreen>
         end: Alignment.bottomCenter,
         colors: [
           primaryColor.withOpacity(0.1),
-          Theme.of(context).colorScheme.background,
-          Theme.of(context).colorScheme.background,
+          Theme.of(context).colorScheme.surface,
+          Theme.of(context).colorScheme.surface,
         ],
         stops: const [0.0, 0.3, 1.0],
       ),
@@ -329,7 +327,7 @@ class _CustomErrorScreenState extends State<CustomErrorScreen>
       text: 'Oops! Something went wrong',
       fontSize: compact ? 16.sp : 22.sp,
       fontWeight: FontWeight.bold,
-      color: Theme.of(context).colorScheme.onBackground,
+      color: Theme.of(context).colorScheme.onSurface,
       textAlign: TextAlign.center,
     );
   }
@@ -340,7 +338,7 @@ class _CustomErrorScreenState extends State<CustomErrorScreen>
           ? message
           : 'We apologize for the inconvenience. The app encountered an unexpected issue.',
       fontSize: compact ? 12.sp : 14.sp,
-      color: Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
       textAlign: TextAlign.center,
     );
   }
@@ -352,7 +350,7 @@ class _CustomErrorScreenState extends State<CustomErrorScreen>
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 6.sp),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(20.sp),
       ),
       child: Row(
@@ -391,7 +389,10 @@ class _CustomErrorScreenState extends State<CustomErrorScreen>
 
     return Card(
       elevation: 0,
-      color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+      color: Theme.of(context)
+          .colorScheme
+          .surfaceContainerHighest
+          .withOpacity(0.3),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.sp),
       ),
@@ -417,34 +418,30 @@ class _CustomErrorScreenState extends State<CustomErrorScreen>
               ],
             ),
             SizedBox(height: 12.sp),
-            ...suggestions
-                .map((suggestion) => Padding(
-                      padding: EdgeInsets.only(bottom: 6.sp),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 4.sp,
-                            height: 4.sp,
-                            margin: EdgeInsets.only(top: 6.sp, right: 8.sp),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
-                          Expanded(
-                            child: TextWidget(
-                              text: suggestion,
-                              fontSize: 12.sp,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
-                          ),
-                        ],
+            ...suggestions.map((suggestion) => Padding(
+                  padding: EdgeInsets.only(bottom: 6.sp),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 4.sp,
+                        height: 4.sp,
+                        margin: EdgeInsets.only(top: 6.sp, right: 8.sp),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                       ),
-                    ))
-                .toList(),
+                      Expanded(
+                        child: TextWidget(
+                          text: suggestion,
+                          fontSize: 12.sp,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
           ],
         ),
       ),
@@ -459,7 +456,7 @@ class _CustomErrorScreenState extends State<CustomErrorScreen>
           child: ElevatedButton.icon(
             onPressed: _restartApp,
             icon: Icon(Icons.refresh_rounded, size: 16.sp),
-            label: TextWidget(text: 'Restart App'),
+            label: const TextWidget(text: 'Restart App'),
             style: ElevatedButton.styleFrom(
               padding: EdgeInsets.symmetric(vertical: 12.sp),
               shape: RoundedRectangleBorder(
@@ -486,7 +483,7 @@ class _CustomErrorScreenState extends State<CustomErrorScreen>
               child: ElevatedButton.icon(
                 onPressed: _restartApp,
                 icon: Icon(Icons.refresh_rounded, size: 18.sp),
-                label: TextWidget(text: 'Restart App'),
+                label: const TextWidget(text: 'Restart App'),
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 14.sp),
                   shape: RoundedRectangleBorder(
@@ -500,7 +497,7 @@ class _CustomErrorScreenState extends State<CustomErrorScreen>
               child: OutlinedButton.icon(
                 onPressed: _goToHome,
                 icon: Icon(Icons.home_rounded, size: 18.sp),
-                label: TextWidget(text: 'Go Home'),
+                label: const TextWidget(text: 'Go Home'),
                 style: OutlinedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 14.sp),
                   shape: RoundedRectangleBorder(
@@ -515,10 +512,10 @@ class _CustomErrorScreenState extends State<CustomErrorScreen>
         TextButton.icon(
           onPressed: _copyErrorInfo,
           icon: Icon(Icons.copy_rounded, size: 14.sp),
-          label: TextWidget(text: 'Copy Error Info'),
+          label: const TextWidget(text: 'Copy Error Info'),
           style: TextButton.styleFrom(
             foregroundColor:
-                Theme.of(context).colorScheme.onBackground.withOpacity(0.6),
+                Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
           ),
         ),
       ],
