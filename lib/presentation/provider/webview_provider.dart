@@ -162,7 +162,7 @@ class WebviewProvider with ChangeNotifier {
           }
         }
 
-        return NavigationDecision.prevent;
+        return NavigationDecision.navigate;
       },
       onWebResourceError: (error) {
         _log('WebView resource error: ${error.description}', error: error);
