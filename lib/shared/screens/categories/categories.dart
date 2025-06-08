@@ -2,11 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/services/source_manager.dart';
 import 'package:watching_app_2/shared/screens/categories/components/category_card.dart';
 import 'package:watching_app_2/shared/widgets/appbars/app_bar.dart';
 import 'package:watching_app_2/shared/widgets/misc/padding.dart';
 import '../../../data/models/category_model.dart';
+import '../../../data/models/tab_model.dart';
+import '../../widgets/misc/tabbar.dart';
 import 'components/category_detail.dart';
 
 class Categories extends StatefulWidget {
@@ -19,10 +22,14 @@ class Categories extends StatefulWidget {
 class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
   late AnimationController _backgroundController;
   late AnimationController _cardsController;
+  late TabController _tabController;
   List<CategoryModel> _categories = [];
   List<CategoryModel> _filteredCategories = []; // Filtered list
+  List<CategoryModel> _stars = [];
+  List<CategoryModel> _filteredStars = []; // Filtered stars list
 
   final List<AnimationController> _hoverControllers = [];
+  final List<AnimationController> _starsHoverControllers = [];
   bool _isLoading = true;
   late AnimationController _shimmerController;
 
@@ -31,7 +38,11 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
     _backgroundController.dispose();
     _cardsController.dispose();
     _shimmerController.dispose();
+    _tabController.dispose();
     for (var controller in _hoverControllers) {
+      controller.dispose();
+    }
+    for (var controller in _starsHoverControllers) {
       controller.dispose();
     }
     super.dispose();
@@ -40,6 +51,9 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+
+    // Initialize TabController
+    _tabController = TabController(length: 2, vsync: this);
 
     // Enhanced background animation
     _backgroundController = AnimationController(
@@ -63,6 +77,7 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
 
     // Fetch data with enhanced loading state
     fetchCategories();
+    fetchStars();
 
     // Delayed animation start with smoother timing
     Future.delayed(const Duration(milliseconds: 300), () {
@@ -98,18 +113,44 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
     }
   }
 
-  void _filterCategories(String query) {
-    // String query = .text.toLowerCase();
+  fetchStars() async {
+    final loadedStars = await SourceManager().loadStars();
 
+    if (mounted) {
+      setState(() {
+        _stars = loadedStars;
+        _filteredStars = List.from(loadedStars); // Initially show all stars
+      });
+
+      // Initialize hover controllers for each star
+      for (int i = 0; i < _stars.length; i++) {
+        _starsHoverControllers.add(AnimationController(
+          vsync: this,
+          duration: const Duration(milliseconds: 180),
+        ));
+      }
+    }
+  }
+
+  void _filterCategories(String query) {
     setState(() {
       if (query.isEmpty) {
         _filteredCategories = List.from(_categories);
+        _filteredStars = List.from(_stars);
       } else {
-        _filteredCategories = _categories
-            .where((category) => category.title
-                .toLowerCase()
-                .contains(query)) // Case-insensitive search
-            .toList();
+        if (_tabController.index == 0) {
+          _filteredCategories = _categories
+              .where((category) => category.title
+                  .toLowerCase()
+                  .contains(query.toLowerCase())) // Case-insensitive search
+              .toList();
+        } else {
+          _filteredStars = _stars
+              .where((star) => star.title
+                  .toLowerCase()
+                  .contains(query.toLowerCase())) // Case-insensitive search
+              .toList();
+        }
       }
     });
   }
@@ -191,7 +232,8 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
   }
 
   // Enhanced animated category card
-  Widget _buildAnimatedCategoryCard(int index) {
+  Widget _buildAnimatedCategoryCard(
+      List<CategoryModel> filteredData, int index) {
     // Staggered animation for each grid item
     return AnimatedBuilder(
       animation: _cardsController,
@@ -225,7 +267,7 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
         child: AnimatedBuilder(
           animation: _hoverControllers[index],
           builder: (context, child) {
-            var category = _filteredCategories[index];
+            var category = filteredData[index];
             // Enhanced hover effect with subtle lift and glow
             return Transform.scale(
               scale: 1.0 + (0.05 * _hoverControllers[index].value),
@@ -236,7 +278,7 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
                 child: CategoryCard(
                   category: category,
                   index: index,
-                  onTap: (index) => _onCategoryTap(index),
+                  onTap: (index) => _onCategoryTap(category),
                 ),
               ),
             );
@@ -255,7 +297,7 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
     _hoverControllers[index].reverse();
   }
 
-  void _onCategoryTap(int index) {
+  void _onCategoryTap(CategoryModel data) {
     // Enhanced haptic feedback
     HapticFeedback.mediumImpact();
 
@@ -265,7 +307,7 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
         transitionDuration: const Duration(milliseconds: 800),
         pageBuilder: (context, animation, secondaryAnimation) {
           return PremiumCategoryDetailScreen(
-            category: _filteredCategories[index],
+            category: data,
           );
         },
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -309,53 +351,99 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
     );
   }
 
+  Widget _buildCategoriesTab(List<CategoryModel> filteredData) {
+    return _isLoading
+        ? _buildShimmerLoading()
+        : CustomPadding(
+            horizontalFactor: .04,
+            topFactor: .02,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: GridView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      childAspectRatio: 0.85,
+                    ),
+                    itemCount: filteredData.length,
+                    itemBuilder: (context, index) {
+                      return _buildAnimatedCategoryCard(filteredData, index);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
       appBar: CustomAppBar(
+        appBarHeight: 15.h,
         elevation: 0,
-        // backgroundColor: Colors.transparent,
         title: 'Explore',
         isShowSearchbar: true,
+        bottom: _buildTabBar(),
+        appBarStyle: AppBarStyle.standard,
         onChanged: (value) {
           _filterCategories(value);
         },
+        onSearchClosed: () {
+          setState(() {
+            _filteredCategories = _categories;
+            _filteredStars = _stars;
+          });
+        },
       ),
-      body: Stack(
-        children: [
-          SafeArea(
-            child: _isLoading
-                ? _buildShimmerLoading()
-                : CustomPadding(
-                    horizontalFactor: .04,
-                    topFactor: .02,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: GridView.builder(
-                            physics: const BouncingScrollPhysics(),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
-                              childAspectRatio: 0.85,
-                            ),
-                            itemCount: _filteredCategories.length,
-                            itemBuilder: (context, index) {
-                              return _buildAnimatedCategoryCard(index);
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-          ),
-        ],
+      body: _buildBody(),
+    );
+  }
+
+  Widget _buildBody() {
+    return TabBarView(
+      controller: _tabController,
+      physics: const BouncingScrollPhysics(),
+      children: _tabViews,
+    );
+  }
+
+  List<Widget> get _tabViews {
+    return [
+      _buildCategoriesTab(_filteredCategories),
+      _buildCategoriesTab(_filteredStars)
+    ];
+  }
+
+  PreferredSize _buildTabBar() {
+    return PreferredSize(
+      preferredSize: Size.fromHeight(10.h),
+      child: CustomTabBarHorizontal(
+        tabController: _tabController,
+        tabContents: _tabContents,
+        onTabChanged: (index) => _tabController.animateTo(index),
       ),
     );
+  }
+
+  List<TabContent> get _tabContents {
+    return [
+      TabContent(
+        title: 'Categories',
+        icon: Icons.category_rounded,
+        length: _filteredCategories.length.toString(),
+      ),
+      TabContent(
+        title: 'Stars',
+        icon: Icons.star_rounded,
+        length: _filteredStars.length.toString(),
+      ),
+    ];
   }
 }

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../core/constants/colors.dart';
 import '../core/global/globals.dart';
 import '../core/navigation/routes.dart';
 import '../presentation/provider/theme_provider.dart';
@@ -65,6 +66,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    // AppColors.primaryColor;
     return FutureBuilder(
       future: _appInitialization,
       builder: (context, snapshot) {
@@ -100,7 +102,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 class AppInitializer {
   static Future<void> initializeApp() async {
     // Add initialization logic (e.g., SharedPreferences, Firebase)
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 0));
   }
 }
 

@@ -327,33 +327,6 @@ class _MinimalistNavBarState extends State<MinimalistNavBar>
       NavigationProvider navProvider, Color accentColor, bool isDark) {
     return Stack(
       children: [
-        // Animated indicator
-        // AnimatedBuilder(
-        //   animation: _indicatorAnimation,
-        //   builder: (context, _) {
-        //     final itemWidth = 100.w / widget.items.length;
-        //     return Positioned(
-        //       top: 1.h,
-        //       left: navProvider.currentIndex *
-        //               itemWidth /
-        //               widget.items.length *
-        //               100.w /
-        //               100 +
-        //           itemWidth * 0.2,
-        //       child: AnimatedContainer(
-        //         duration: const Duration(milliseconds: 300),
-        //         width: itemWidth * 0.6,
-        //         height: 0.5.h,
-        //         decoration: BoxDecoration(
-        //           color: accentColor,
-        //           borderRadius: BorderRadius.circular(10),
-        //         ),
-        //       ),
-        //     );
-        //   },
-        // ),
-
-        // Navigation items
         Row(
           children: List.generate(widget.items.length, (index) {
             return Expanded(

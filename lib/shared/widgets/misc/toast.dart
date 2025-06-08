@@ -1,7 +1,8 @@
 // import 'package:flutter/material.dart';
-// import 'package:watching_app_2/global/app_global.dart';
 
-// import 'custom_icon.dart';
+// import '../../../core/constants/colors.dart';
+// import '../../../core/global/globals.dart';
+// import 'icon.dart';
 // import 'text_widget.dart';
 
 // class CustomToast {
@@ -27,15 +28,15 @@
 //             color: backgroundColor,
 //             borderRadius: BorderRadius.circular(12),
 //           ),
-//           height: Aio.size.height * 0.07,
-//           width: Aio.size.width,
+//           height: SMA.size.height * 0.07,
+//           width: SMA.size.width,
 //           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
 //           margin: const EdgeInsets.all(8),
 //           child: Row(
 //             children: [
 //               CustomIconWidget(
 //                 iconData: iconData,
-//                 size: Aio.size.width * 0.06,
+//                 size: SMA.size.width * 0.06,
 //                 color: AppColors.backgroundColorLight,
 //               ),
 //               const SizedBox(width: 10),
@@ -73,7 +74,7 @@
 //   static Color _getToastColor(ToastType type) {
 //     switch (type) {
 //       case ToastType.success:
-//         return Aio.theme.colorScheme.primaryColor;
+//         return SMA.theme.colorScheme.primaryColor;
 //       case ToastType.error:
 //         return AppColors.errorColor;
 //       case ToastType.warning:
@@ -81,7 +82,7 @@
 //       case ToastType.info:
 //         return AppColors.primaryColor.withOpacity(.9);
 //       default:
-//         return Aio.theme.colorScheme.primaryColor;
+//         return SMA.theme.colorScheme.primaryColor;
 //     }
 //   }
 // }

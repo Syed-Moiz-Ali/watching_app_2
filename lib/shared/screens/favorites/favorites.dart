@@ -650,6 +650,7 @@ class _PremiumFilterButtonState extends State<PremiumFilterButton>
             ),
             child: TextWidget(
               text: widget.hasActiveFilters ? "Filtered" : "Filter",
+              color: AppColors.backgroundColorLight,
             ),
           ),
         ],

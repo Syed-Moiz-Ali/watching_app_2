@@ -34,4 +34,18 @@ class SourceManager {
       return [];
     }
   }
+
+  Future<List<CategoryModel>> loadStars() async {
+    try {
+      final String jsonString =
+          await rootBundle.loadString('assets/stars.json');
+      final List<dynamic> jsonList = json.decode(jsonString);
+      return jsonList.map((json) => CategoryModel.fromJson(json)).toList();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error loading sources: $e');
+      }
+      return [];
+    }
+  }
 }

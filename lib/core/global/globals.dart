@@ -3,12 +3,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/models/content_item.dart';
+import '../../shared/widgets/misc/restart_widget.dart';
 import '../constants/colors.dart';
 import '../services/logger.dart';
 import '../services/service_locator.dart';
 
 class SMA {
   static GlobalKey<NavigatorState> navigationKey = GlobalKey();
+  static final GlobalKey<RestartWidgetState> restartKey =
+      GlobalKey<RestartWidgetState>();
   static GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
   static var theme = Theme.of(navigationKey.currentContext!);

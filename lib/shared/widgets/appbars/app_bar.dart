@@ -43,6 +43,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.automaticallyImplyLeading,
     this.isShowSearchbar = false,
     this.onSearch,
+    this.onSearchClosed,
     this.onChanged,
     this.blurIntensity = 8.0, // Reduced for subtlety
     this.expandedHeight,
@@ -83,6 +84,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final PreferredSizeWidget? bottom;
   final bool isShowSearchbar;
   final Function(String)? onSearch;
+  final Function()? onSearchClosed;
   final Function(String)? onChanged;
   final double blurIntensity;
   final double? expandedHeight;
@@ -321,6 +323,7 @@ class _CustomAppBarState extends State<CustomAppBar>
         _focusNode.unfocus();
         _searchController.clear();
         HapticFeedback.selectionClick();
+        widget.onSearchClosed!();
       }
     });
   }
@@ -819,6 +822,11 @@ class _CustomAppBarState extends State<CustomAppBar>
                           _toggleSearch();
                         }
                       },
+                      // onClose:() {
+                      //   if(widget.onSearchClosed != null) {
+                      //     widget.onSearchClosed();
+                      //   }
+                      // },
                       onChanged: (query) {
                         if (widget.onChanged != null) {
                           widget.onChanged!(query);

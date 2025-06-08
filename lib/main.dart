@@ -15,6 +15,7 @@ import 'package:watching_app_2/shared/provider/local_auth_provider.dart';
 import 'core/services/network_status_service.dart';
 import 'core/services/service_locator.dart';
 import 'shared/widgets/misc/custom_error_screen.dart';
+import 'shared/widgets/misc/restart_widget.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,24 +35,26 @@ void main() {
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   setupLocator();
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => SourceProvider()),
-        ChangeNotifierProvider(
-            create: (_) => ThemeProvider()..initializeTheme()),
-        ChangeNotifierProvider(create: (_) => WebviewProvider()),
-        ChangeNotifierProvider(
-            create: (_) => NetworkServiceProvider()..initConnectivity()),
-        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
-        ChangeNotifierProvider(create: (_) => SimilarContentProvider()),
-        ChangeNotifierProvider(create: (_) => NavigationProvider()),
-        ChangeNotifierProvider(create: (_) => SearchProvider()),
-        ChangeNotifierProvider(
-            create: (_) => LocalAuthProvider()..loadPreferences()),
-        ChangeNotifierProvider(create: (_) => MangaDetailProvider()),
-      ],
-      child: const SafeArea(
-        child: MyApp(),
+    RestartWidget(
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => SourceProvider()),
+          ChangeNotifierProvider(
+              create: (_) => ThemeProvider()..initializeTheme()),
+          ChangeNotifierProvider(create: (_) => WebviewProvider()),
+          ChangeNotifierProvider(
+              create: (_) => NetworkServiceProvider()..initConnectivity()),
+          ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+          ChangeNotifierProvider(create: (_) => SimilarContentProvider()),
+          ChangeNotifierProvider(create: (_) => NavigationProvider()),
+          ChangeNotifierProvider(create: (_) => SearchProvider()),
+          ChangeNotifierProvider(
+              create: (_) => LocalAuthProvider()..loadPreferences()),
+          ChangeNotifierProvider(create: (_) => MangaDetailProvider()),
+        ],
+        child: const SafeArea(
+          child: MyApp(),
+        ),
       ),
     ),
   );

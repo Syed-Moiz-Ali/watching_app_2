@@ -11,6 +11,7 @@ import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/core/navigation/app_navigator.dart';
 import 'package:watching_app_2/shared/provider/local_auth_provider.dart';
 import 'package:watching_app_2/shared/widgets/appbars/app_bar.dart';
+import 'package:watching_app_2/shared/widgets/misc/restart_widget.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 
 import '../../core/common/utils/common_utils.dart';
@@ -46,20 +47,10 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
   final double _textSize = 1.0;
   int? _hoveredSectionIndex;
   int? _hoveredItemIndex;
-  bool _contentFilteringEnabled = false;
   bool _explicitContentWarningEnabled = false;
   bool _incognitoModeEnabled = false;
   bool _ageVerificationEnabled = false;
-  int _contentFilterAge = 13; // Default age for content filtering
-  List<String> _selectedCategories = ['General', 'Kids']; // Default categories
-  // Color _customThemeColor =
-  //     AppColors.primaryColor; // Default custom theme color
 
-  // Gradients
-  // late List<Color> _backgroundGradient;
-  // late List<Color> _accentGradient;
-
-  // Particle positions for background animation
   final List<_Particle> _particles = [];
 
   @override
@@ -145,16 +136,12 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
     setState(() {
       _isDarkMode = prefs.getBool('isDarkMode') ?? false;
       _notificationsEnabled = prefs.getBool('notificationsEnabled') ?? true;
-      _contentFilteringEnabled =
-          prefs.getBool('contentFilteringEnabled') ?? false;
+
       _explicitContentWarningEnabled =
           prefs.getBool('explicitContentWarningEnabled') ?? false;
       _incognitoModeEnabled = prefs.getBool('incognitoModeEnabled') ?? false;
       _ageVerificationEnabled =
           prefs.getBool('ageVerificationEnabled') ?? false;
-      _contentFilterAge = prefs.getInt('contentFilterAge') ?? 13;
-      _selectedCategories =
-          prefs.getStringList('selectedCategories') ?? ['General', 'Kids'];
     });
 
     // Apply dark mode to ThemeProvider
@@ -170,13 +157,10 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isDarkMode', _isDarkMode);
     await prefs.setBool('notificationsEnabled', _notificationsEnabled);
-    await prefs.setBool('contentFilteringEnabled', _contentFilteringEnabled);
     await prefs.setBool(
         'explicitContentWarningEnabled', _explicitContentWarningEnabled);
     await prefs.setBool('incognitoModeEnabled', _incognitoModeEnabled);
     await prefs.setBool('ageVerificationEnabled', _ageVerificationEnabled);
-    await prefs.setInt('contentFilterAge', _contentFilterAge);
-    await prefs.setStringList('selectedCategories', _selectedCategories);
   }
 
   void _createParticles() {
@@ -221,7 +205,8 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
         btnText: 'Restart',
         onTap: () async {
           NH.navigateBack();
-          NH.nameNavigateAndRemoveUntil(AppRoutes.splash);
+          context.restartApp();
+          // NH.nameNavigateAndRemoveUntil(AppRoutes.splash);
 
           // await Turf.navigateTo(const SplashScreen());
         });
@@ -324,24 +309,25 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
   // }
 
   PreferredSizeWidget _buildAppBar() {
-    return CustomAppBar(
+    return const CustomAppBar(
       elevation: 0,
       title: "Settings",
-      actions: [
-        SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(1, 0),
-            end: Offset.zero,
-          ).animate(CurvedAnimation(
-            parent: _pageEnterController,
-            curve: const Interval(0.3, 0.7, curve: Curves.easeOutQuint),
-          )),
-          child: IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
-          ),
-        ),
-      ],
+      appBarStyle: AppBarStyle.standard,
+      // actions: [
+      //   SlideTransition(
+      //     position: Tween<Offset>(
+      //       begin: const Offset(1, 0),
+      //       end: Offset.zero,
+      //     ).animate(CurvedAnimation(
+      //       parent: _pageEnterController,
+      //       curve: const Interval(0.3, 0.7, curve: Curves.easeOutQuint),
+      //     )),
+      //     child: IconButton(
+      //       icon: const Icon(Icons.search),
+      //       onPressed: () {},
+      //     ),
+      //   ),
+      // ],
     );
   }
 
@@ -411,24 +397,6 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
               ],
             ),
 
-            // Content Preferences Section
-            _buildSectionWithItems(
-              sectionIndex: 2,
-              title: 'Content Preferences',
-              icon: Icons.category,
-              items: [
-                _SettingItem(
-                  title: 'Content Categories',
-                  subtitle: 'Filter content by preferred categories',
-                  icon: Icons.filter_list,
-                  onTap: () {
-                    _openCategoryFilterDialog();
-                  },
-                  type: _SettingType.button,
-                ),
-              ],
-            ),
-
             // Security Section
             _buildSectionWithItems(
               sectionIndex: 3,
@@ -474,15 +442,6 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
               icon: Icons.category,
               items: [
                 _SettingItem(
-                  title: 'Content Filtering',
-                  subtitle: 'Set content preferences based on age or category',
-                  icon: Icons.filter_list,
-                  onTap: () {
-                    _openContentFilterDialog();
-                  },
-                  type: _SettingType.button,
-                ),
-                _SettingItem(
                   title: 'Explicit Content Warning',
                   subtitle: 'Show a warning before displaying explicit content',
                   icon: Icons.warning,
@@ -526,252 +485,6 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
           ],
         ),
       ),
-    );
-  }
-
-  void _openContentFilterDialog() {
-    _dialogController.reset();
-    _dialogController.forward();
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        int tempAge = _contentFilterAge;
-
-        return AnimatedBuilder(
-          animation: _dialogController,
-          builder: (context, _) {
-            return ScaleTransition(
-              scale: Tween(begin: 0.8, end: 1.0).animate(CurvedAnimation(
-                parent: _dialogController,
-                curve: Curves.easeOutBack,
-              )),
-              child: AlertDialog(
-                backgroundColor: Colors.transparent,
-                contentPadding: EdgeInsets.zero,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                content: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppColors.primaryColor,
-                        AppColors.primaryColor.withOpacity(.7)
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primaryColor.withOpacity(0.3),
-                        blurRadius: 16,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextWidget(
-                        text: 'Content Age Filter',
-                        color: Colors.white,
-                        fontSize: 18.sp * _textSize,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      const SizedBox(height: 16),
-                      TextWidget(
-                        text: 'Select minimum age for content filtering',
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 14.sp * _textSize,
-                      ),
-                      const SizedBox(height: 16),
-                      DropdownButton<int>(
-                        value: tempAge,
-                        dropdownColor: AppColors.primaryColor.withOpacity(0.9),
-                        items: [13, 16, 18, 21].map((age) {
-                          return DropdownMenuItem(
-                            value: age,
-                            child: TextWidget(
-                              text: '$age+',
-                              color: Colors.white,
-                              fontSize: 14.sp * _textSize,
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() {
-                              tempAge = value;
-                            });
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: TextWidget(
-                              text: 'Cancel',
-                              color: Colors.white,
-                              fontSize: 15.sp * _textSize,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          _buildActionButton(
-                            onTap: () {
-                              setState(() {
-                                _contentFilteringEnabled = true;
-                                _contentFilterAge = tempAge;
-                                _savePreferences();
-                              });
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _openCategoryFilterDialog() {
-    _dialogController.reset();
-    _dialogController.forward();
-
-    List<String> tempCategories = List.from(_selectedCategories);
-    const availableCategories = [
-      'General',
-      'Kids',
-      'Teens',
-      'Adults',
-      'Educational',
-      'Entertainment',
-      'News',
-    ];
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AnimatedBuilder(
-          animation: _dialogController,
-          builder: (context, _) {
-            return ScaleTransition(
-              scale: Tween(begin: 0.8, end: 1.0).animate(CurvedAnimation(
-                parent: _dialogController,
-                curve: Curves.easeOutBack,
-              )),
-              child: AlertDialog(
-                backgroundColor: Colors.transparent,
-                contentPadding: EdgeInsets.zero,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                content: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppColors.primaryColor,
-                        AppColors.primaryColor.withOpacity(.7)
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primaryColor.withOpacity(0.3),
-                        blurRadius: 16,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextWidget(
-                        text: 'Content Categories',
-                        color: Colors.white,
-                        fontSize: 18.sp * _textSize,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      const SizedBox(height: 16),
-                      TextWidget(
-                        text: 'Select preferred content categories',
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 14.sp * _textSize,
-                      ),
-                      const SizedBox(height: 16),
-                      ...availableCategories.map((category) {
-                        return CheckboxListTile(
-                          title: TextWidget(
-                            text: category,
-                            color: Colors.white,
-                            fontSize: 14.sp * _textSize,
-                          ),
-                          value: tempCategories.contains(category),
-                          onChanged: (value) {
-                            setState(() {
-                              if (value == true) {
-                                tempCategories.add(category);
-                              } else {
-                                tempCategories.remove(category);
-                              }
-                            });
-                          },
-                          checkColor: Colors.white,
-                          activeColor: AppColors.primaryColor,
-                        );
-                      }),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: TextWidget(
-                              text: 'Cancel',
-                              color: Colors.white,
-                              fontSize: 15.sp * _textSize,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          _buildActionButton(
-                            onTap: () {
-                              setState(() {
-                                _selectedCategories = tempCategories;
-                                _savePreferences();
-                              });
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
     );
   }
 
