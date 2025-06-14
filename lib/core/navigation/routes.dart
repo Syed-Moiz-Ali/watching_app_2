@@ -18,6 +18,7 @@ import '../../features/wallpapers/presentation/screens/wallpaper_detail.dart';
 import '../../features/wallpapers/presentation/screens/wallpapers.dart';
 import '../../shared/widgets/misc/text_widget.dart';
 import '../../shared/widgets/network/network_banner.dart';
+import '../global/globals.dart';
 
 enum TransitionType {
   fadeIn,
@@ -182,16 +183,54 @@ class AppRoutes {
   /// Enhanced route creation with many transition options
   static PageRouteBuilder<dynamic> _createRoute(
       Widget page, RouteSettings settings, TransitionType type) {
+    void onNetworkConnected() {
+      ScaffoldMessenger.of(SMA.navigationKey.currentContext!).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.wifi, color: Colors.white),
+              SizedBox(width: 8),
+              Text('Network connection restored!'),
+            ],
+          ),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+
+    void onNetworkDisconnected() {
+      ScaffoldMessenger.of(SMA.navigationKey.currentContext!).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.wifi_off, color: Colors.white),
+              SizedBox(width: 8),
+              Text('Network connection lost!'),
+            ],
+          ),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
+
     return PageRouteBuilder<dynamic>(
       settings: settings,
       pageBuilder: (context, animation, secondaryAnimation) => Stack(
         children: [
           page,
-          const Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: NetworkBanner()), // Network banner on every screen
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: NetworkBanner(
+              showQualityInfo: true,
+              autoHide: false,
+              onConnected: onNetworkConnected,
+              onDisconnected: onNetworkDisconnected,
+            ),
+          ), // Network banner on every screen
         ],
       ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {

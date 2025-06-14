@@ -9,7 +9,7 @@ class FileUtils {
 
   /// App name for file organization
   final String appName =
-      'PornQueen'; // Should be configurable from a central place
+      'BrowseX'; // Should be configurable from a central place
 
   /// Get download directory path based on platform
   Future<String> getDownloadDirectoryPath() async {
