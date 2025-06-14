@@ -32,9 +32,7 @@ class _NetworkBannerState extends State<NetworkBanner>
   bool _wasConnected = true;
 
   late AnimationController _pulseController;
-  late AnimationController _slideController;
   late Animation<double> _pulseAnimation;
-  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
@@ -48,25 +46,12 @@ class _NetworkBannerState extends State<NetworkBanner>
       vsync: this,
     );
 
-    _slideController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-
     _pulseAnimation = Tween<double>(
       begin: 0.8,
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _pulseController,
       curve: Curves.easeInOut,
-    ));
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, -1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutBack,
     ));
 
     _pulseController.repeat(reverse: true);
@@ -153,7 +138,6 @@ class _NetworkBannerState extends State<NetworkBanner>
   @override
   void dispose() {
     _pulseController.dispose();
-    _slideController.dispose();
     super.dispose();
   }
 }
