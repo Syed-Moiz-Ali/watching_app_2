@@ -508,3 +508,161 @@ class EnhancedLoadingPainter extends CustomPainter {
         oldDelegate.secondaryProgress != secondaryProgress;
   }
 }
+
+// import 'package:flutter/material.dart';
+// import 'dart:math' as math;
+
+// class CustomLoadingIndicator extends StatefulWidget {
+//   final double size;
+//   final Color? color;
+//   final double strokeWidth;
+//   final Duration duration;
+
+//   const CustomLoadingIndicator({
+//     super.key,
+//     this.size = 36.0,
+//     this.color,
+//     this.strokeWidth = 3.0,
+//     this.duration = const Duration(milliseconds: 1200),
+//   });
+
+//   @override
+//   State<CustomLoadingIndicator> createState() => _CustomLoadingIndicatorState();
+// }
+
+// class _CustomLoadingIndicatorState extends State<CustomLoadingIndicator>
+//     with SingleTickerProviderStateMixin {
+//   late AnimationController _controller;
+//   late Animation<double> _animation;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _controller = AnimationController(
+//       vsync: this,
+//       duration: widget.duration,
+//     )..repeat();
+
+//     _animation = Tween<double>(
+//       begin: 0.0,
+//       end: 1.0,
+//     ).animate(CurvedAnimation(
+//       parent: _controller,
+//       curve: Curves.easeInOut,
+//     ));
+//   }
+
+//   @override
+//   void dispose() {
+//     _controller.dispose();
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final color = widget.color ?? Theme.of(context).primaryColor;
+
+//     return SizedBox(
+//       width: widget.size,
+//       height: widget.size,
+//       child: AnimatedBuilder(
+//         animation: _animation,
+//         builder: (context, child) {
+//           return CustomPaint(
+//             painter: LoadingPainter(
+//               progress: _animation.value,
+//               color: color,
+//               strokeWidth: widget.strokeWidth,
+//             ),
+//           );
+//         },
+//       ),
+//     );
+//   }
+// }
+
+// class LoadingPainter extends CustomPainter {
+//   final double progress;
+//   final Color color;
+//   final double strokeWidth;
+
+//   LoadingPainter({
+//     required this.progress,
+//     required this.color,
+//     required this.strokeWidth,
+//   });
+
+//   @override
+//   void paint(Canvas canvas, Size size) {
+//     final center = Offset(size.width / 2, size.height / 2);
+//     final radius = (size.width - strokeWidth) / 2;
+
+//     // Background circle
+//     final backgroundPaint = Paint()
+//       ..color = color.withOpacity(0.1)
+//       ..strokeWidth = strokeWidth
+//       ..style = PaintingStyle.stroke;
+
+//     canvas.drawCircle(center, radius, backgroundPaint);
+
+//     // Animated arc
+//     final paint = Paint()
+//       ..color = color
+//       ..strokeWidth = strokeWidth
+//       ..style = PaintingStyle.stroke
+//       ..strokeCap = StrokeCap.round;
+
+//     // Create gradient effect
+//     final gradient = SweepGradient(
+//       colors: [
+//         color.withOpacity(0.1),
+//         color.withOpacity(0.5),
+//         color,
+//         color,
+//       ],
+//       stops: const [0.0, 0.3, 0.7, 1.0],
+//       transform: GradientRotation(progress * 2 * math.pi),
+//     );
+
+//     paint.shader = gradient.createShader(
+//       Rect.fromCircle(center: center, radius: radius),
+//     );
+
+//     // Draw rotating arc
+//     const startAngle = -math.pi / 2;
+//     final sweepAngle = 2 * math.pi * 0.75;
+
+//     canvas.drawArc(
+//       Rect.fromCircle(center: center, radius: radius),
+//       startAngle + (progress * 2 * math.pi),
+//       sweepAngle,
+//       false,
+//       paint,
+//     );
+
+//     // Add pulsing dots
+//     for (int i = 0; i < 3; i++) {
+//       final angle = (progress * 2 * math.pi) + (i * 2 * math.pi / 3);
+//       final dotX = center.dx + radius * math.cos(angle);
+//       final dotY = center.dy + radius * math.sin(angle);
+
+//       final dotPaint = Paint()
+//         ..color = color.withOpacity(0.8)
+//         ..style = PaintingStyle.fill;
+
+//       final pulseValue = math.sin(progress * 4 * math.pi + i);
+//       final dotRadius = 2 + pulseValue.abs() * 2;
+
+//       canvas.drawCircle(
+//         Offset(dotX, dotY),
+//         dotRadius,
+//         dotPaint,
+//       );
+//     }
+//   }
+
+//   @override
+//   bool shouldRepaint(LoadingPainter oldDelegate) {
+//     return progress != oldDelegate.progress;
+//   }
+// }

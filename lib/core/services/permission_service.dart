@@ -98,7 +98,7 @@ class PermissionService {
 
   /// Handle iOS permissions
   Future<PermissionResult> _handleIOSPermissions() async {
-    final Permission photosPermission = Permission.photos;
+    const Permission photosPermission = Permission.photos;
     final PermissionStatus currentStatus = await photosPermission.status;
 
     if (currentStatus == PermissionStatus.granted ||
@@ -259,7 +259,7 @@ class PermissionService {
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.info_outline,
+                          const Icon(Icons.info_outline,
                               color: Colors.orange, size: 20),
                           const SizedBox(width: 8),
                           Expanded(
@@ -341,12 +341,12 @@ class PermissionService {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
+                        const Row(
                           children: [
                             Icon(Icons.info_outline,
                                 color: Colors.blue, size: 20),
-                            const SizedBox(width: 8),
-                            const TextWidget(
+                            SizedBox(width: 8),
+                            TextWidget(
                               text: 'How to enable permissions:',
                               fontWeight: FontWeight.w600,
                               fontSize: 12,
@@ -451,7 +451,7 @@ class PermissionService {
       }
     }
 
-    final String baseMessage =
+    const String baseMessage =
         'To provide the best wallpaper experience, we need permission to ';
     final String reasonsText = reasons.join(', ');
 

@@ -13,10 +13,8 @@ import 'package:watching_app_2/shared/provider/local_auth_provider.dart';
 import 'package:watching_app_2/shared/widgets/appbars/app_bar.dart';
 import 'package:watching_app_2/shared/widgets/misc/restart_widget.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
-
 import '../../core/common/utils/common_utils.dart';
 import '../../core/global/globals.dart';
-import '../../core/navigation/routes.dart';
 import '../../presentation/provider/theme_provider.dart';
 
 class Settings extends StatefulWidget {

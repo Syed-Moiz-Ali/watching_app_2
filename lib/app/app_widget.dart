@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-
-import '../core/constants/colors.dart';
 import '../core/global/globals.dart';
 import '../core/navigation/routes.dart';
 import '../presentation/provider/theme_provider.dart';
@@ -19,12 +17,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  late Future<void> _appInitialization;
-
   @override
   void initState() {
     super.initState();
-    _appInitialization = AppInitializer.initializeApp();
     WidgetsBinding.instance.addObserver(this);
     _enableWakelock();
   }
@@ -67,42 +62,23 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     // AppColors.primaryColor;
-    return FutureBuilder(
-      future: _appInitialization,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const MaterialApp(
-            home: Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            ),
-          );
-        }
-        return ResponsiveSizer(builder: (context, orientation, screenType) {
-          return MaterialApp(
-            title: 'BrowseX',
-            navigatorKey: SMA.navigationKey,
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
-            darkTheme: DarkTheme.darkTheme,
-            themeMode: context.watch<ThemeProvider>().themeMode,
-            initialRoute: AppRoutes.splash,
-            onGenerateRoute: AppRoutes.generateRoute,
-            builder: (context, child) {
-              return SafeArea(
-                  child: ErrorBoundary(child: child ?? const SizedBox()));
-            },
-            navigatorObservers: [AnalyticsNavigatorObserver()],
-          );
-        });
-      },
-    );
-  }
-}
-
-class AppInitializer {
-  static Future<void> initializeApp() async {
-    // Add initialization logic (e.g., SharedPreferences, Firebase)
-    await Future.delayed(const Duration(seconds: 0));
+    return ResponsiveSizer(builder: (context, orientation, screenType) {
+      return MaterialApp(
+        title: 'BrowseX',
+        navigatorKey: SMA.navigationKey,
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        darkTheme: DarkTheme.darkTheme,
+        themeMode: context.watch<ThemeProvider>().themeMode,
+        initialRoute: AppRoutes.splash,
+        onGenerateRoute: AppRoutes.generateRoute,
+        builder: (context, child) {
+          return SafeArea(
+              child: ErrorBoundary(child: child ?? const SizedBox()));
+        },
+        navigatorObservers: [AnalyticsNavigatorObserver()],
+      );
+    });
   }
 }
 

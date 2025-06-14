@@ -12,6 +12,7 @@ import 'package:watching_app_2/presentation/provider/theme_provider.dart';
 import 'package:watching_app_2/presentation/provider/similar_content_provider.dart';
 import 'package:watching_app_2/presentation/provider/webview_provider.dart';
 import 'package:watching_app_2/shared/provider/local_auth_provider.dart';
+import 'app/app_config_provider.dart';
 import 'core/services/network_status_service.dart';
 import 'core/services/service_locator.dart';
 import 'shared/widgets/misc/custom_error_screen.dart';
@@ -51,6 +52,7 @@ void main() {
           ChangeNotifierProvider(
               create: (_) => LocalAuthProvider()..loadPreferences()),
           ChangeNotifierProvider(create: (_) => MangaDetailProvider()),
+          ChangeNotifierProvider(create: (_) => AppConfigProvider()),
         ],
         child: const SafeArea(
           child: MyApp(),
