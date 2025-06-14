@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppConfigProvider extends ChangeNotifier {
-  String _updateConfigUrl =
+  final String _updateConfigUrl =
       'https://luststream-app.github.io/luststream_config/appConfig.json';
   bool _isProtectionEnabled = false;
   String? _errorMessage;
@@ -20,7 +20,9 @@ class AppConfigProvider extends ChangeNotifier {
       await prefs.setStringList('selectedCategories', ['videos']);
       notifyListeners();
     } catch (e) {
-      print('Config initialization error: $e');
+      if (kDebugMode) {
+        print('Config initialization error: $e');
+      }
       _errorMessage = 'Failed to initialize configuration.';
       _errorDetails = e.toString();
       notifyListeners();

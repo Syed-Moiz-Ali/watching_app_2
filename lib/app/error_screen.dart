@@ -1,3 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -105,7 +108,7 @@ class _ErrorScreenState extends State<ErrorScreen>
                     child: child,
                   );
                 },
-                child: Icon(
+                child: const Icon(
                   Icons.error_outline,
                   size: 60,
                   color: Colors.redAccent,
@@ -163,7 +166,8 @@ class _ErrorScreenState extends State<ErrorScreen>
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryColor,
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -186,8 +190,10 @@ class _ErrorScreenState extends State<ErrorScreen>
                   name: 'contact_support_clicked',
                   parameters: {'timestamp': DateTime.now().toIso8601String()},
                 );
-                print(
-                    'Contact Support clicked - implement email or support page');
+                if (kDebugMode) {
+                  print(
+                      'Contact Support clicked - implement email or support page');
+                }
               },
               child: TextWidget(
                 text: 'Contact Support',
