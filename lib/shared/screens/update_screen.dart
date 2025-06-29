@@ -798,53 +798,6 @@ class _UpdateScreenState extends State<UpdateScreen>
             ),
           ],
         ),
-
-        // Download stats
-        // Padding(
-        //   padding: const EdgeInsets.only(top: 20),
-        //   child: Row(
-        //     mainAxisAlignment: MainAxisAlignment.center,
-        //     children: [
-        //       Icon(
-        //         Icons.speed_rounded,
-        //         color: _accentColor,
-        //         size: 16,
-        //       ),
-        //       const SizedBox(width: 6),
-        //       TextWidget(text:
-        //         "3.2 MB/s",
-        //         style: TextStyle(
-        //           fontSize: 14,
-        //           color: _textGreyColor,
-        //         ),
-        //       ),
-        //       Padding(
-        //         padding: const EdgeInsets.symmetric(horizontal: 12),
-        //         child: Container(
-        //           width: 4,
-        //           height: 4,
-        //           decoration: BoxDecoration(
-        //             shape: BoxShape.circle,
-        //             color: _textGreyColor.withOpacity(0.6),
-        //           ),
-        //         ),
-        //       ),
-        //       Icon(
-        //         Icons.timer_outlined,
-        //         color: _accentColor,
-        //         size: 16,
-        //       ),
-        //       const SizedBox(width: 6),
-        //       TextWidget(text:
-        //         "2 min left",
-        //         style: TextStyle(
-        //           fontSize: 14,
-        //           color: _textGreyColor,
-        //         ),
-        //       ),
-        //     ],
-        //   ),
-        // ),
       ],
     );
   }

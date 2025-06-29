@@ -68,7 +68,7 @@ class _FloatingActionButtonWidgetState extends State<FloatingActionButtonWidget>
           _isHovered = false;
         });
         _animationController.reverse();
-        FiltersBottomSheet.show(
+        MinimalistFiltersBottomSheet.show(
           context,
           contentType: widget.contentType,
           items: widget.favorites,

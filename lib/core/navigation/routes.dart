@@ -6,6 +6,7 @@ import 'package:watching_app_2/features/tiktok/presentation/screens/tiktok_scree
 import 'package:watching_app_2/shared/screens/local_auth_screen.dart';
 import 'package:watching_app_2/shared/screens/update_screen.dart';
 
+import '../../app/age_verification.dart';
 import '../../features/videos/presentation/screens/content_detail.dart';
 import '../../shared/screens/favorites/favorites.dart';
 import '../../shared/screens/navigation_screen.dart';
@@ -63,6 +64,7 @@ class AppRoutes {
   static const String splash = '/';
   static const String home = '/home';
   static const String auth = '/auth';
+  static const String age = '/age';
   static const String update = '/update';
   static const String bottomNavigation = '/bottom-navigation';
   static const String categories = '/categories';
@@ -105,6 +107,9 @@ class AppRoutes {
         return _createRoute(const NavigationScreen(), settings, transitionType);
       case auth:
         return _createRoute(const LocalAuthScreen(), settings, transitionType);
+      case age:
+        return _createRoute(
+            const AgeVerificationScreen(), settings, transitionType);
       case update:
         final String updateUrl = args['updateUrl'] ?? '';
         return _createRoute(

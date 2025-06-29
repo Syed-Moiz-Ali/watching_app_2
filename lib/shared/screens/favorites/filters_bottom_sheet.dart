@@ -7,15 +7,14 @@ import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/data/models/content_item.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 import 'package:watching_app_2/shared/widgets/buttons/primary_button.dart';
-
 import '../../../data/database/local_database.dart';
 
-class FiltersBottomSheet extends StatefulWidget {
+class MinimalistFiltersBottomSheet extends StatefulWidget {
   final String contentType;
   final List<ContentItem> items;
   final Function(List<ContentItem>) onFiltersApplied;
 
-  const FiltersBottomSheet({
+  const MinimalistFiltersBottomSheet({
     super.key,
     required this.contentType,
     required this.items,
@@ -32,7 +31,7 @@ class FiltersBottomSheet extends StatefulWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => FiltersBottomSheet(
+      builder: (context) => MinimalistFiltersBottomSheet(
         contentType: contentType,
         items: items,
         onFiltersApplied: onFiltersApplied,
@@ -41,13 +40,13 @@ class FiltersBottomSheet extends StatefulWidget {
   }
 
   @override
-  State<FiltersBottomSheet> createState() => _FiltersBottomSheetState();
+  State<MinimalistFiltersBottomSheet> createState() =>
+      _MinimalistFiltersBottomSheetState();
 }
 
-class _FiltersBottomSheetState extends State<FiltersBottomSheet>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  final List<String> _tabTitles = ['Sort', 'Source', 'Date', 'More'];
+class _MinimalistFiltersBottomSheetState
+    extends State<MinimalistFiltersBottomSheet> {
+  int _currentSection = 0;
 
   // Filter states
   String _sortOption = 'Latest';
@@ -70,18 +69,6 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet>
     return sources.toList();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: _tabTitles.length, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
   List<ContentItem> _applyFilters() {
     List<ContentItem> filteredItems = List.from(widget.items);
 
@@ -99,9 +86,6 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet>
       case 'Z-A':
         filteredItems.sort((a, b) => (b.title).compareTo(a.title));
         break;
-      // case 'Popular':
-      //   filteredItems.sort((a, b) => (b.views ?? 0).compareTo(a.viewCount ?? 0));
-      //   break;
     }
 
     // Apply source filter
@@ -121,15 +105,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet>
           .toList();
     }
 
-    // // Apply additional filters
-    // if (_additionalFilters['Watched'] == true) {
-    //   filteredItems = filteredItems.where((item) => item.watched == true).toList();
-    // }
-
-    // if (_additionalFilters['Unwatched'] == true) {
-    //   filteredItems = filteredItems.where((item) => item.watched != true).toList();
-    // }
-
+    // Apply additional filters
     if (_additionalFilters['HD Only'] == true) {
       filteredItems = filteredItems
           .where((item) =>
@@ -142,183 +118,54 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet>
     return filteredItems;
   }
 
+  void _resetFilters() {
+    setState(() {
+      _sortOption = 'Latest';
+      _selectedSources.clear();
+      _dateRange = null;
+      _additionalFilters.forEach((key, value) {
+        _additionalFilters[key] = false;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      initialChildSize: 0.75,
-      minChildSize: 0.5,
+      initialChildSize: 0.8,
+      minChildSize: 0.6,
       maxChildSize: 0.95,
       builder: (context, scrollController) {
         return Container(
           decoration: BoxDecoration(
             color: Theme.of(context).scaffoldBackgroundColor,
             borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
+              topLeft: Radius.circular(32),
+              topRight: Radius.circular(32),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 10,
-                offset: const Offset(0, -5),
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 24,
+                offset: const Offset(0, -8),
               ),
             ],
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Handle and header
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 2.h),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 15.w,
-                      height: 0.5.h,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    SizedBox(height: 2.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: 6.w),
-                          child: TextWidget(
-                            text: 'Filter and Sort',
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(right: 4.w),
-                          child: IconButton(
-                            icon: const Icon(Icons.close_rounded),
-                            onPressed: () => Navigator.pop(context),
-                          ).animate().scale(
-                                duration: const Duration(milliseconds: 200),
-                              ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              // Elegant header
+              _buildHeader(),
 
-              // Tabs
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4.w),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: TabBar(
-                    controller: _tabController,
-                    tabs: _tabTitles
-                        .map((title) => Tab(
-                              child: TextWidget(
-                                text: title,
-                                fontSize: 14.sp,
-                              ),
-                            ))
-                        .toList(),
-                    indicatorWeight: 1,
-                    // indicator: BoxDecoration(
-                    //   color: AppColors.primaryColor,
-                    //   borderRadius: BorderRadius.circular(12),
-                    // ),
-                    labelColor: Colors.white,
-                    unselectedLabelColor:
-                        Theme.of(context).textTheme.bodyLarge?.color,
-                    onTap: (index) {
-                      // Optional haptic feedback
-                      // HapticFeedback.lightImpact();
-                    },
-                    splashBorderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
+              // Minimalist navigation
+              _buildNavigation(),
 
-              // Tab content
+              // Content area
               Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    // Sort tab
-                    _buildSortTab(scrollController),
-
-                    // Source tab
-                    _buildSourceTab(scrollController),
-
-                    // Date tab
-                    _buildDateTab(scrollController),
-
-                    // More filters tab
-                    _buildMoreFiltersTab(scrollController),
-                  ],
-                ),
+                child: _buildContent(scrollController),
               ),
 
-              // Action buttons
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    OutlinedButton(
-                      onPressed: () {
-                        setState(() {
-                          _sortOption = 'Latest';
-                          _selectedSources.clear();
-                          _dateRange = null;
-                          _additionalFilters.forEach((key, value) {
-                            _additionalFilters[key] = false;
-                          });
-                        });
-                      },
-                      style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 4.w, vertical: 1.5.h),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        side: BorderSide(color: AppColors.primaryColor),
-                      ),
-                      child: TextWidget(
-                        text: 'Reset',
-                        fontSize: 14.sp,
-                      ),
-                    )
-                        .animate()
-                        .fadeIn(delay: const Duration(milliseconds: 400)),
-                    PrimaryButton(
-                      width: 0.4,
-                      borderRadius: 12,
-                      onTap: () {
-                        // Apply all filters and close
-                        widget.onFiltersApplied(_applyFilters());
-                        Navigator.pop(context);
-                      },
-                      child: TextWidget(
-                        text: 'Apply',
-                        fontSize: 14.sp,
-                        color: Colors.white,
-                      ),
-                    )
-                        .animate()
-                        .fadeIn(delay: const Duration(milliseconds: 400))
-                        .scaleXY(
-                          begin: 0.95,
-                          end: 1,
-                          delay: const Duration(milliseconds: 400),
-                          duration: const Duration(milliseconds: 200),
-                        ),
-                  ],
-                ),
-              ),
+              // Clean action bar
+              _buildActionBar(),
             ],
           ),
         )
@@ -326,77 +173,272 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet>
             .slideY(
               begin: 1,
               end: 0,
-              duration: const Duration(milliseconds: 400),
-              curve: Curves.easeOutQuart,
+              duration: 600.ms,
+              curve: Curves.easeOutCubic,
             )
-            .fadeIn(duration: const Duration(milliseconds: 300));
+            .fadeIn(duration: 400.ms);
       },
     );
   }
 
-  Widget _buildSortTab(ScrollController scrollController) {
-    final sortOptions = ['Latest', 'Oldest', 'A-Z', 'Z-A', 'Popular'];
+  Widget _buildHeader() {
+    return Container(
+      padding: EdgeInsets.only(top: 2.h, bottom: 3.h),
+      child: Column(
+        children: [
+          // Subtle handle
+          Container(
+            width: 12.w,
+            height: 0.4.h,
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ).animate().fadeIn(delay: 200.ms).scaleX(begin: 0.5, end: 1.0),
+
+          SizedBox(height: 3.h),
+
+          // Clean title with close button
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 6.w),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextWidget(
+                  text: 'Filters',
+                  fontSize: 24.sp,
+                  fontWeight: FontWeight.w300,
+                ).animate().fadeIn(delay: 300.ms).slideX(begin: -0.3, end: 0),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.close_rounded,
+                      size: 6.w,
+                      color: Colors.grey[600],
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ).animate().fadeIn(delay: 400.ms).then().shimmer(
+                    duration: 1500.ms, color: Colors.white.withOpacity(0.1)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavigation() {
+    final sections = [
+      {'title': 'Sort', 'icon': Icons.sort_rounded},
+      {'title': 'Source', 'icon': Icons.source_outlined},
+      {'title': 'Date', 'icon': Icons.calendar_today_outlined},
+      // {'title': 'More', 'icon': Icons.tune_rounded},
+    ];
+
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 6.w),
+      padding: EdgeInsets.all(0.5.h),
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: sections.asMap().entries.map((entry) {
+          final index = entry.key;
+          final section = entry.value;
+          final isActive = _currentSection == index;
+
+          return Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _currentSection = index;
+                });
+              },
+              child: AnimatedContainer(
+                duration: 300.ms,
+                curve: Curves.easeOutCubic,
+                padding: EdgeInsets.symmetric(vertical: 1.5.h),
+                decoration: BoxDecoration(
+                  color: isActive ? Colors.white : Colors.transparent,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: isActive
+                      ? [
+                          BoxShadow(
+                            color: AppColors.primaryColor.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      section['icon'] as IconData,
+                      size: 5.w,
+                      color: isActive ? AppColors.primaryColor : Colors.grey,
+                    ),
+                    if (isActive) ...[
+                      SizedBox(width: 2.w),
+                      TextWidget(
+                        text: section['title'] as String,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.primaryColor,
+                      )
+                          .animate()
+                          .fadeIn(delay: 100.ms)
+                          .slideX(begin: 0.3, end: 0),
+                    ]
+                  ],
+                ),
+              ),
+            ),
+          ).animate(target: isActive ? 1 : 0);
+        }).toList(),
+      ),
+    ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.2, end: 0);
+  }
+
+  Widget _buildContent(ScrollController scrollController) {
+    switch (_currentSection) {
+      case 0:
+        return _buildSortSection(scrollController);
+      case 1:
+        return _buildSourceSection(scrollController);
+      case 2:
+        return _buildDateSection(scrollController);
+      // case 3:
+      //   return _buildMoreSection(scrollController);
+      default:
+        return Container();
+    }
+  }
+
+  Widget _buildSortSection(ScrollController scrollController) {
+    final sortOptions = ['Latest', 'Oldest', 'A-Z', 'Z-A'];
+
     return ListView(
       controller: scrollController,
       padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
       children: [
         TextWidget(
-          text: 'Sort By',
+          text: 'Sort your content',
           fontSize: 16.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        SizedBox(height: 2.h),
-        ...sortOptions.map((option) {
-          bool isSelected = _sortOption == option;
-          return ListTile(
-            contentPadding:
-                EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.5.h),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+          fontWeight: FontWeight.w400,
+          color: Colors.grey[600],
+        ).animate().fadeIn(delay: 200.ms),
+        SizedBox(height: 3.h),
+        ...sortOptions.asMap().entries.map((entry) {
+          final index = entry.key;
+          final option = entry.value;
+          final isSelected = _sortOption == option;
+
+          return Container(
+            margin: EdgeInsets.only(bottom: 2.h),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  setState(() {
+                    _sortOption = option;
+                  });
+                },
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.primaryColor.withOpacity(0.1)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isSelected
+                          ? AppColors.primaryColor.withOpacity(0.3)
+                          : Colors.grey.withOpacity(0.1),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 6.w,
+                        height: 6.w,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isSelected
+                              ? AppColors.primaryColor
+                              : Colors.transparent,
+                          border: Border.all(
+                            color: isSelected
+                                ? AppColors.primaryColor
+                                : Colors.grey.withOpacity(0.4),
+                            width: 2,
+                          ),
+                        ),
+                        child: isSelected
+                            ? Icon(
+                                Icons.check_rounded,
+                                color: Colors.white,
+                                size: 4.w,
+                              )
+                            : null,
+                      ),
+                      SizedBox(width: 4.w),
+                      TextWidget(
+                        text: option,
+                        fontSize: 15.sp,
+                        fontWeight:
+                            isSelected ? FontWeight.w500 : FontWeight.w400,
+                        color: isSelected ? AppColors.primaryColor : null,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-            title: TextWidget(
-              text: option,
-              fontSize: 14.sp,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-            ),
-            leading: Radio<String>(
-              value: option,
-              groupValue: _sortOption,
-              activeColor: AppColors.primaryColor,
-              onChanged: (value) {
-                setState(() {
-                  _sortOption = value!;
-                });
-              },
-            ),
-            selected: isSelected,
-            selectedTileColor: AppColors.primaryColor.withOpacity(0.1),
-            onTap: () {
-              setState(() {
-                _sortOption = option;
-              });
-            },
-          ).animate().fadeIn(
-              delay: Duration(milliseconds: 100 * sortOptions.indexOf(option)));
+          )
+              .animate()
+              .fadeIn(delay: (300 + index * 100).ms)
+              .slideX(begin: 0.3, end: 0, delay: (300 + index * 100).ms);
         }),
       ],
     );
   }
 
-  Widget _buildSourceTab(ScrollController scrollController) {
+  Widget _buildSourceSection(ScrollController scrollController) {
     final sources = _availableSources;
+
     if (sources.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.source_outlined, size: 48, color: Colors.grey),
-            SizedBox(height: 2.h),
-            TextWidget(
-              text: 'No source information available',
-              fontSize: 16.sp,
-              color: Colors.grey,
+            Container(
+              padding: EdgeInsets.all(6.w),
+              decoration: BoxDecoration(
+                color: Colors.grey.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.source_outlined,
+                size: 12.w,
+                color: Colors.grey[400],
+              ),
             ),
+            SizedBox(height: 3.h),
+            TextWidget(
+              text: 'No sources available',
+              fontSize: 16.sp,
+              color: Colors.grey[600],
+            ).animate().fadeIn(delay: 300.ms),
           ],
         ),
       );
@@ -410,9 +452,10 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             TextWidget(
-              text: 'Filter by Source',
+              text: 'Choose sources',
               fontSize: 16.sp,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w400,
+              color: Colors.grey[600],
             ),
             TextButton(
               onPressed: () {
@@ -425,418 +468,426 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet>
                   }
                 });
               },
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
+              ),
               child: TextWidget(
                 text: _selectedSources.length == sources.length
-                    ? 'Unselect All'
-                    : 'Select All',
+                    ? 'Clear all'
+                    : 'Select all',
                 fontSize: 14.sp,
                 color: AppColors.primaryColor,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
-        ),
-        SizedBox(height: 2.h),
+        ).animate().fadeIn(delay: 200.ms),
+        SizedBox(height: 3.h),
         Wrap(
-          spacing: 2.w,
-          runSpacing: 1.h,
-          children: sources.map((source) {
-            bool isSelected = _selectedSources.contains(source);
-            return FilterChip(
-              label: TextWidget(
-                text: source,
-                fontSize: 13.sp,
-                color: isSelected ? Colors.white : null,
-              ),
-              selected: isSelected,
-              selectedColor: AppColors.primaryColor,
-              backgroundColor: Colors.grey.withOpacity(0.1),
-              checkmarkColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(
-                  color:
-                      isSelected ? AppColors.primaryColor : Colors.transparent,
-                ),
-              ),
-              onSelected: (selected) {
+          spacing: 3.w,
+          runSpacing: 2.h,
+          children: sources.asMap().entries.map((entry) {
+            final index = entry.key;
+            final source = entry.value;
+            final isSelected = _selectedSources.contains(source);
+
+            return GestureDetector(
+              onTap: () {
                 setState(() {
-                  if (selected) {
-                    _selectedSources.add(source);
-                  } else {
+                  if (isSelected) {
                     _selectedSources.remove(source);
+                  } else {
+                    _selectedSources.add(source);
                   }
                 });
               },
-              elevation: isSelected ? 2 : 0,
-              padding: EdgeInsets.symmetric(horizontal: 1.w, vertical: 1.h),
-            ).animate().fadeIn(
-                delay: Duration(milliseconds: 50 * sources.indexOf(source)));
+              child: AnimatedContainer(
+                duration: 200.ms,
+                curve: Curves.easeOutCubic,
+                padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? AppColors.primaryColor
+                      : Colors.grey.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: AppColors.primaryColor.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: TextWidget(
+                  text: source,
+                  fontSize: 14.sp,
+                  color: isSelected ? Colors.white : Colors.grey[700],
+                  fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+                ),
+              ),
+            ).animate().fadeIn(delay: (300 + index * 80).ms).then().shimmer(
+                  duration: 1500.ms,
+                  color: Colors.white.withOpacity(0.3),
+                  delay: (1000 + index * 200).ms,
+                );
           }).toList(),
         ),
       ],
     );
   }
 
-  Widget _buildDateTab(ScrollController scrollController) {
+  Widget _buildDateSection(ScrollController scrollController) {
     return ListView(
       controller: scrollController,
       padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
       children: [
         TextWidget(
-          text: 'Filter by Date Added',
+          text: 'Filter by date',
           fontSize: 16.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        SizedBox(height: 3.h),
+          fontWeight: FontWeight.w400,
+          color: Colors.grey[600],
+        ).animate().fadeIn(delay: 200.ms),
 
-        // Date range selector
-        Container(
-          padding: EdgeInsets.all(3.w),
-          decoration: BoxDecoration(
-            color: Colors.grey.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: _dateRange != null
-                  ? AppColors.primaryColor
-                  : Colors.transparent,
-              width: 2,
+        SizedBox(height: 4.h),
+
+        // Date range display
+        GestureDetector(
+          onTap: _selectDateRange,
+          child: Container(
+            padding: EdgeInsets.all(4.w),
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: _dateRange != null
+                    ? AppColors.primaryColor.withOpacity(0.3)
+                    : Colors.grey.withOpacity(0.1),
+                width: 1,
+              ),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(3.w),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.date_range_rounded,
+                        color: AppColors.primaryColor,
+                        size: 6.w,
+                      ),
+                    ),
+                    SizedBox(width: 4.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextWidget(
+                            text: 'Date Range',
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          SizedBox(height: 0.5.h),
+                          TextWidget(
+                            text: _dateRange != null
+                                ? '${_formatDate(_dateRange!.start)} - ${_formatDate(_dateRange!.end)}'
+                                : 'Tap to select dates',
+                            fontSize: 13.sp,
+                            color: _dateRange != null
+                                ? AppColors.primaryColor
+                                : Colors.grey[600],
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (_dateRange != null)
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _dateRange = null;
+                          });
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(2.w),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.close_rounded,
+                            size: 4.w,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ).animate().fadeIn(
+                            delay: 200.ms,
+                            duration: 300.ms,
+                          ),
+                  ],
+                ),
+              ],
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextWidget(
-                text: 'Selected Date Range',
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-              ),
-              SizedBox(height: 1.h),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                          vertical: 1.5.h, horizontal: 3.w),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.calendar_today, size: 5.w),
-                          SizedBox(width: 2.w),
-                          TextWidget(
-                            text: _dateRange?.start != null
-                                ? '${_dateRange!.start.day}/${_dateRange!.start.month}/${_dateRange!.start.year}'
-                                : 'Start Date',
-                            fontSize: 13.sp,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 2.w),
-                    child: TextWidget(
-                      text: 'to',
-                      fontSize: 14.sp,
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                          vertical: 1.5.h, horizontal: 3.w),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.calendar_today, size: 5.w),
-                          SizedBox(width: 2.w),
-                          TextWidget(
-                            text: _dateRange?.end != null
-                                ? '${_dateRange!.end.day}/${_dateRange!.end.month}/${_dateRange!.end.year}'
-                                : 'End Date',
-                            fontSize: 13.sp,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 3.h),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  if (_dateRange != null)
-                    OutlinedButton.icon(
-                      icon: Icon(Icons.clear, size: 5.w),
-                      label: TextWidget(
-                        text: 'Clear',
-                        fontSize: 14.sp,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _dateRange = null;
-                        });
-                      },
-                      style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                            vertical: 1.5.h, horizontal: 4.w),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ElevatedButton.icon(
-                    icon:
-                        Icon(Icons.date_range, color: Colors.white, size: 5.w),
-                    label: TextWidget(
-                      text: 'Select Dates',
-                      fontSize: 14.sp,
-                      color: Colors.white,
-                    ),
-                    onPressed: () async {
-                      final now = DateTime.now();
-                      final initialDateRange = _dateRange ??
-                          DateTimeRange(
-                            start: now.subtract(const Duration(days: 30)),
-                            end: now,
-                          );
+        ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.3, end: 0),
 
-                      final newDateRange = await showDateRangePicker(
-                        context: context,
-                        initialDateRange: initialDateRange,
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime.now(),
-                        builder: (context, child) {
-                          return Theme(
-                            data: Theme.of(context).copyWith(
-                              colorScheme: ColorScheme.light(
-                                primary: AppColors.primaryColor,
-                                onPrimary: Colors.white,
-                                surface: Theme.of(context).cardColor,
-                                onSurface: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge!
-                                    .color!,
-                              ),
-                            ),
-                            child: child!,
-                          );
-                        },
-                      );
+        SizedBox(height: 4.h),
 
-                      if (newDateRange != null) {
-                        setState(() {
-                          _dateRange = newDateRange;
-                        });
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryColor,
-                      padding: EdgeInsets.symmetric(
-                          vertical: 1.5.h, horizontal: 4.w),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ).animate().fadeIn(delay: const Duration(milliseconds: 100)).slideY(
-            begin: 0.2, end: 0, delay: const Duration(milliseconds: 100)),
-
-        SizedBox(height: 3.h),
-
-        // Quick date filters
+        // Quick filters
         TextWidget(
-          text: 'Quick Filters',
-          fontSize: 16.sp,
-          fontWeight: FontWeight.w600,
-        ),
+          text: 'Quick select',
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w500,
+          color: Colors.grey[600],
+        ).animate().fadeIn(delay: 400.ms),
+
         SizedBox(height: 2.h),
+
         Wrap(
-          spacing: 2.w,
-          runSpacing: 1.h,
+          spacing: 3.w,
+          runSpacing: 2.h,
           children: [
-            _buildQuickDateFilter('Today', 0),
-            _buildQuickDateFilter('Yesterday', 1),
-            _buildQuickDateFilter('Last 7 days', 7),
-            _buildQuickDateFilter('Last 30 days', 30),
-            _buildQuickDateFilter('This month', -1),
-            _buildQuickDateFilter('Last month', -2),
+            _buildQuickDateChip('Today', 0),
+            _buildQuickDateChip('Yesterday', 1),
+            _buildQuickDateChip('Last 7 days', 7),
+            _buildQuickDateChip('Last 30 days', 30),
+            _buildQuickDateChip('This month', -1),
           ],
-        ).animate().fadeIn(delay: const Duration(milliseconds: 200)),
+        ).animate().fadeIn(delay: 500.ms),
       ],
     );
   }
 
-  Widget _buildQuickDateFilter(String label, int days) {
-    return InkWell(
-      onTap: () {
-        final now = DateTime.now();
-        DateTimeRange range;
-
-        if (days > 0) {
-          // Simple day range
-          range = DateTimeRange(
-            start: now.subtract(Duration(days: days)),
-            end: now,
-          );
-        } else if (days == 0) {
-          // Today
-          range = DateTimeRange(
-            start: DateTime(now.year, now.month, now.day),
-            end: now,
-          );
-        } else if (days == -1) {
-          // This month
-          range = DateTimeRange(
-            start: DateTime(now.year, now.month, 1),
-            end: now,
-          );
-        } else {
-          // Last month
-          final lastMonth = now.month == 1
-              ? DateTime(now.year - 1, 12, 1)
-              : DateTime(now.year, now.month - 1, 1);
-
-          final lastDay = DateTime(
-            lastMonth.year,
-            lastMonth.month + 1,
-            0,
-          ).day;
-
-          range = DateTimeRange(
-            start: lastMonth,
-            end: DateTime(lastMonth.year, lastMonth.month, lastDay),
-          );
-        }
-
-        setState(() {
-          _dateRange = range;
-        });
-      },
-      borderRadius: BorderRadius.circular(12),
+  Widget _buildQuickDateChip(String label, int days) {
+    return GestureDetector(
+      onTap: () => _applyQuickDateFilter(days),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
+        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
         decoration: BoxDecoration(
-          color: Colors.grey.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
+          color: Colors.grey.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: Colors.grey.withOpacity(0.2),
+            width: 1,
+          ),
         ),
         child: TextWidget(
           text: label,
           fontSize: 13.sp,
+          color: Colors.grey[700],
         ),
       ),
-    );
+    ).animate().fadeIn(
+        delay: (500 +
+                [
+                      'Today',
+                      'Yesterday',
+                      'Last 7 days',
+                      'Last 30 days',
+                      'This month'
+                    ].indexOf(label) *
+                    100)
+            .ms);
   }
 
-  Widget _buildMoreFiltersTab(ScrollController scrollController) {
-    return ListView(
-      controller: scrollController,
-      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
-      children: [
-        TextWidget(
-          text: 'Additional Filters',
-          fontSize: 16.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        SizedBox(height: 3.h),
+  // Widget _buildMoreSection(ScrollController scrollController) {
+  //   return ListView(
+  //     controller: scrollController,
+  //     padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
+  //     children: [
+  //       TextWidget(
+  //         text: 'Additional options',
+  //         fontSize: 16.sp,
+  //         fontWeight: FontWeight.w400,
+  //         color: Colors.grey[600],
+  //       ).animate().fadeIn(delay: 200.ms),
 
-        ..._additionalFilters.entries.map((entry) {
-          return SwitchListTile(
-            title: TextWidget(
-              text: entry.key,
-              fontSize: 14.sp,
-            ),
-            value: entry.value,
-            activeColor: AppColors.primaryColor,
-            contentPadding:
-                EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.h),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            onChanged: (value) {
-              setState(() {
-                _additionalFilters[entry.key] = value;
+  //       SizedBox(height: 3.h),
 
-                // Handle mutually exclusive filters
-                if (entry.key == 'Watched' && value) {
-                  _additionalFilters['Unwatched'] = false;
-                } else if (entry.key == 'Unwatched' && value) {
-                  _additionalFilters['Watched'] = false;
-                }
-              });
-            },
+  //       ..._additionalFilters.entries.map((mapEntry) {
+  //         final index = mapEntry.key;
+  //         final entry = mapEntry.value;
+
+  //         return Container(
+  //           margin: EdgeInsets.only(bottom: 2.h),
+  //           decoration: BoxDecoration(
+  //             color: Colors.grey.withOpacity(0.03),
+  //             borderRadius: BorderRadius.circular(16),
+  //           ),
+  //           child: SwitchListTile(
+  //             title: TextWidget(
+  //               text: entry,
+  //               fontSize: 15.sp,
+  //               fontWeight: FontWeight.w400,
+  //             ),
+  //             value: entry.value,
+  //             activeColor: AppColors.primaryColor,
+  //             contentPadding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
+  //             shape: RoundedRectangleBorder(
+  //               borderRadius: BorderRadius.circular(16),
+  //             ),
+  //             onChanged: (value) {
+  //               setState(() {
+  //                 _additionalFilters[entry.key] = value;
+
+  //                 // Handle mutually exclusive filters
+  //                 if (entry.key == 'Watched' && value) {
+  //                   _additionalFilters['Unwatched'] = false;
+  //                 } else if (entry.key == 'Unwatched' && value) {
+  //                   _additionalFilters['Watched'] = false;
+  //                 }
+  //               });
+  //             },
+  //           ),
+  //         ).animate()
+  //           .fadeIn(delay: (300 + index * 150).ms)
+  //           .slideX(begin: 0.3, end: 0, delay: (300 + index * 150).ms);
+  //       }),
+  //     ],
+  //   );
+  // }
+
+  Widget _buildActionBar() {
+    final hasActiveFilters = _sortOption != 'Latest' ||
+        _selectedSources.isNotEmpty ||
+        _dateRange != null ||
+        _additionalFilters.values.any((value) => value);
+
+    return Container(
+      padding: EdgeInsets.all(6.w),
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          if (hasActiveFilters)
+            Expanded(
+              flex: 1,
+              child: Container(
+                margin: EdgeInsets.only(right: 3.w),
+                child: OutlinedButton(
+                  onPressed: _resetFilters,
+                  style: OutlinedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 2.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    side: BorderSide(
+                      color: Colors.grey.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: TextWidget(
+                    text: 'Reset',
+                    fontSize: 14.sp,
+                    color: Colors.grey[700],
+                  ),
+                ),
+              ),
+            ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.3, end: 0),
+          Expanded(
+            flex: 2,
+            child: PrimaryButton(
+              width: 1.0,
+              borderRadius: 16,
+              onTap: () {
+                widget.onFiltersApplied(_applyFilters());
+                Navigator.pop(context);
+              },
+              child: TextWidget(
+                text: 'Apply Filters',
+                fontSize: 15.sp,
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           )
               .animate()
-              .fadeIn(
-                  delay: Duration(
-                      milliseconds: 100 *
-                          _additionalFilters.keys.toList().indexOf(entry.key)))
-              .slideX(
-                  begin: 0.2,
-                  end: 0,
-                  delay: Duration(
-                      milliseconds: 100 *
-                          _additionalFilters.keys.toList().indexOf(entry.key)));
-        }),
-
-        SizedBox(height: 3.h),
-
-        // Content type specific filters based on widget.contentType
-        if (widget.contentType == ContentTypes.VIDEO ||
-            widget.contentType == ContentTypes.ANIME)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextWidget(
-                text: 'Duration',
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-              ),
-              SizedBox(height: 2.h),
-              Wrap(
-                spacing: 2.w,
-                runSpacing: 1.h,
-                children: [
-                  _buildDurationFilter('Short (<5 min)'),
-                  _buildDurationFilter('Medium (5-20 min)'),
-                  _buildDurationFilter('Long (>20 min)'),
-                ],
-              ),
-            ],
-          ).animate().fadeIn(delay: const Duration(milliseconds: 300)),
-      ],
+              .fadeIn(delay: 300.ms)
+              .slideX(begin: 0.3, end: 0)
+              .then()
+              .shimmer(duration: 2000.ms, color: Colors.white.withOpacity(0.3)),
+        ],
+      ),
     );
   }
 
-  Widget _buildDurationFilter(String label) {
-    bool isSelected = false; // Connect to your state management
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
 
-    return FilterChip(
-      label: TextWidget(
-        text: label,
-        fontSize: 13.sp,
-        color: isSelected ? Colors.white : null,
-      ),
-      selected: isSelected,
-      selectedColor: AppColors.primaryColor,
-      backgroundColor: Colors.grey.withOpacity(0.1),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      onSelected: (selected) {
-        // Connect to your state management
+  void _applyQuickDateFilter(int days) {
+    final now = DateTime.now();
+    DateTimeRange range;
+
+    if (days > 0) {
+      range = DateTimeRange(
+        start: now.subtract(Duration(days: days)),
+        end: now,
+      );
+    } else if (days == 0) {
+      range = DateTimeRange(
+        start: DateTime(now.year, now.month, now.day),
+        end: now,
+      );
+    } else if (days == -1) {
+      range = DateTimeRange(
+        start: DateTime(now.year, now.month, 1),
+        end: now,
+      );
+    } else {
+      return;
+    }
+
+    setState(() {
+      _dateRange = range;
+    });
+  }
+
+  Future<void> _selectDateRange() async {
+    final now = DateTime.now();
+    final initialDateRange = _dateRange ??
+        DateTimeRange(
+          start: now.subtract(const Duration(days: 30)),
+          end: now,
+        );
+
+    final newDateRange = await showDateRangePicker(
+      context: context,
+      initialDateRange: initialDateRange,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppColors.primaryColor,
+              onPrimary: Colors.white,
+              surface: Theme.of(context).cardColor,
+              onSurface: Theme.of(context).textTheme.bodyLarge!.color!,
+            ),
+          ),
+          child: child!,
+        );
       },
     );
+
+    if (newDateRange != null) {
+      setState(() {
+        _dateRange = newDateRange;
+      });
+    }
   }
 }

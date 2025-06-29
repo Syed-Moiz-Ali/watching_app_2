@@ -138,8 +138,7 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
       _explicitContentWarningEnabled =
           prefs.getBool('explicitContentWarningEnabled') ?? false;
       _incognitoModeEnabled = prefs.getBool('incognitoModeEnabled') ?? false;
-      _ageVerificationEnabled =
-          prefs.getBool('ageVerificationEnabled') ?? false;
+      _ageVerificationEnabled = prefs.getBool('age_verified') ?? false;
     });
 
     // Apply dark mode to ThemeProvider
@@ -158,7 +157,7 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
     await prefs.setBool(
         'explicitContentWarningEnabled', _explicitContentWarningEnabled);
     await prefs.setBool('incognitoModeEnabled', _incognitoModeEnabled);
-    await prefs.setBool('ageVerificationEnabled', _ageVerificationEnabled);
+    await prefs.setBool('age_verified', _ageVerificationEnabled);
   }
 
   void _createParticles() {

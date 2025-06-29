@@ -20,7 +20,7 @@
     "isPreview": "1",
     "config": {
       "title_selector": {
-        "selector": ".thumb",
+        "selector": ".responsive-page > div > .line-clamp-2 > a",
         "attribute": "title"
       },
       "thumbnail_selector": {

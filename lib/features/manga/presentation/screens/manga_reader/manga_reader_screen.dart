@@ -145,7 +145,7 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
   void _handleAutoScroll() {
     if (!_isAutoScroll || !_scrollController.hasClients) return;
 
-    final newOffset = _scrollController.offset + (_autoScrollSpeed * 1.5);
+    final newOffset = _scrollController.offset + (_autoScrollSpeed * 2);
     if (newOffset >= _scrollController.position.maxScrollExtent) {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,

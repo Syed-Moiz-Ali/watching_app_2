@@ -92,7 +92,7 @@ class _SourcesState extends State<Sources> with TickerProviderStateMixin {
   }
 
   Future<void> _loadAllSources() async {
-    bool isNSFWEnabled = SMA.pref!.getBool("ageVerificationEnabled") ?? false;
+    bool isNSFWEnabled = SMA.pref!.getBool("age_verified") ?? false;
     if (!mounted) return;
 
     setState(() => _isLoading = true);

@@ -684,11 +684,12 @@
     "searchUrl": "https://backend.wallpics.app/api/wallpaper-search?nsfwContent=true&query={search}&sortBy=recommended&paginated=1&page={page}&per_page=24",
 
     "query": {
-      "new": "api/wallpaper-list/hot?nsfwContent=true&sortBy=date&paginated=1&page={page}&per_page=24",
-      "recommended": "api/wallpaper-list/hot?nsfwContent=true&sortBy=recommended&paginated=1&page={page}&per_page=24",
-      "popular": "api/wallpaper-list/hot?nsfwContent=true&sortBy=popular&paginated=1&page={page}&per_page=24"
+      "new": "api/wallpaper-list?categorySlug=hot-593&nsfwContent=true&sortBy=date&paginated=1&page={page}&per_page=24",
+      "recommended": "api/wallpaper-list?categorySlug=hot-593&nsfwContent=true&sortBy=recommended&paginated=1&page={page}&per_page=24",
+      "popular": "api/wallpaper-list?categorySlug=hot-593&nsfwContent=true&sortBy=popular&paginated=1&page={page}&per_page=24"
     },
     "header": {
+      "x-app-platform":"Web",
       "x-auth": "1724923087",
       "x-token": "5e2c254ddef88ff0f7f2e4ab6290c707"
     },

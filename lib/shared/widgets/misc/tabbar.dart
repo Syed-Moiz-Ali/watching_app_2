@@ -38,123 +38,125 @@ class CustomTabBar extends StatelessWidget {
             ),
           ),
           // Main tab bar container
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOutCubic,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.primaryColor.withOpacity(.8),
-                  AppColors.primaryColor.withOpacity(0.6),
-                  AppColors.primaryColor.withOpacity(0.6),
-                  AppColors.primaryColor.withOpacity(0.8),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(35),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: TabBar(
-              tabAlignment: TabAlignment.start,
-              isScrollable: true,
-              controller: tabController,
-              indicatorSize: TabBarIndicatorSize.tab,
-              dividerHeight: 0,
-              indicator: BoxDecoration(
-                borderRadius: BorderRadius.circular(35),
+          Center(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutCubic,
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppColors.backgroundColorDark.withOpacity(0.9),
-                    AppColors.backgroundColorDark.withOpacity(0.7),
+                    AppColors.primaryColor.withOpacity(.8),
+                    AppColors.primaryColor.withOpacity(0.6),
+                    AppColors.primaryColor.withOpacity(0.6),
+                    AppColors.primaryColor.withOpacity(0.8),
                   ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                boxShadow: const [
+                borderRadius: BorderRadius.circular(35),
+                boxShadow: [
                   BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
-              labelStyle: TextStyle(
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
-              ),
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.white.withOpacity(0.7),
-              tabs: tabContents.map((tabContent) {
-                return Tab(
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Icon
-                        if (tabContent.icon is String) ...[
-                          ImageWidget(
-                            imagePath: tabContent.icon,
-                            width: 20,
-                            height: 20,
-                          ),
-                        ] else ...[
-                          Icon(tabContent.icon, size: 20),
-                        ],
-                        const SizedBox(width: 8),
-
-                        // Title and Length in a Column
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Tab Title
-                            TextWidget(
-                              text: tabContent.title,
-                              color: Colors.white,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
+              child: TabBar(
+                tabAlignment: TabAlignment.start,
+                isScrollable: true,
+                controller: tabController,
+                indicatorSize: TabBarIndicatorSize.tab,
+                dividerHeight: 0,
+                indicator: BoxDecoration(
+                  borderRadius: BorderRadius.circular(35),
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.backgroundColorDark.withOpacity(0.9),
+                      AppColors.backgroundColorDark.withOpacity(0.7),
+                    ],
+                  ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                labelStyle: TextStyle(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white.withOpacity(0.7),
+                tabs: tabContents.map((tabContent) {
+                  return Tab(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Icon
+                          if (tabContent.icon is String) ...[
+                            ImageWidget(
+                              imagePath: tabContent.icon,
+                              width: 20,
+                              height: 20,
                             ),
+                          ] else ...[
+                            Icon(tabContent.icon, size: 20),
+                          ],
+                          const SizedBox(width: 8),
 
-                            // Tab Length with badge style
-                            if (tabContent.length.isNotEmpty) ...[
-                              const SizedBox(height: 2),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 6, vertical: 1),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: Colors.white.withOpacity(0.3),
-                                    width: 0.5,
+                          // Title and Length in a Column
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Tab Title
+                              TextWidget(
+                                text: tabContent.title,
+                                color: Colors.white,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+
+                              // Tab Length with badge style
+                              if (tabContent.length.isNotEmpty) ...[
+                                const SizedBox(height: 2),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.3),
+                                      width: 0.5,
+                                    ),
+                                  ),
+                                  child: TextWidget(
+                                    text: tabContent.length,
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white.withOpacity(0.9),
+                                    letterSpacing: 0.3,
                                   ),
                                 ),
-                                child: TextWidget(
-                                  text: tabContent.length,
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white.withOpacity(0.9),
-                                  letterSpacing: 0.3,
-                                ),
-                              ),
+                              ],
                             ],
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              }).toList(),
-              onTap: onTabChanged,
+                  );
+                }).toList(),
+                onTap: onTabChanged,
+              ),
             ),
           ),
         ],

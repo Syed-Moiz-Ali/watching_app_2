@@ -375,20 +375,22 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
       child: Scaffold(
         backgroundColor: Colors.black,
         extendBodyBehindAppBar: true,
-        body: GestureDetector(
-          onTap: _toggleInterface,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // Wallpaper image with subtle animation
-              _buildWallpaperImage(),
+        body: InteractiveViewer(
+          child: GestureDetector(
+            onTap: _toggleInterface,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // Wallpaper image with subtle animation
+                _buildWallpaperImage(),
 
-              // Gradient overlay for better text readability
-              _buildGradientOverlay(),
+                // Gradient overlay for better text readability
+                _buildGradientOverlay(),
 
-              // UI Interface elements
-              _buildInterface(),
-            ],
+                // UI Interface elements
+                _buildInterface(),
+              ],
+            ),
           ),
         ),
       ),
@@ -408,7 +410,7 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
                 image: widget.item.thumbnailUrl,
                 baseUrl: widget.item.source.url,
               ),
-              fit: BoxFit.cover,
+              fit: BoxFit.contain,
             ),
           );
         },

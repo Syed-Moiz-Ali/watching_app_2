@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../../../data/database/local_database.dart';
 import '../../../../data/models/content_item.dart';
 import 'wallpaper_card.dart';
 
 class WallpaperGridView extends StatelessWidget {
   final List<ContentItem> wallpapers;
+  final String? contentType; // Default content type
 
   final Function(int) onItemTap;
 
@@ -15,6 +17,7 @@ class WallpaperGridView extends StatelessWidget {
     required this.wallpapers,
     required this.onItemTap,
     this.controller, // Make it optional
+    this.contentType = ContentTypes.IMAGE, // Default content type
   });
 
   @override
@@ -33,6 +36,7 @@ class WallpaperGridView extends StatelessWidget {
         var item = wallpapers[index];
         return WallpaperCard(
           item: item,
+          contentType: contentType,
           onTap: () => onItemTap(index),
         );
       },

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:watching_app_2/data/models/content_source.dart';
 import 'package:watching_app_2/data/scrapers/base_scraper.dart';
 // Photo Scrapers
@@ -7,13 +8,13 @@ import '../../data/scrapers/sources/photos/peakpx.dart';
 import '../../data/scrapers/sources/photos/pmatehunter.dart';
 import '../../data/scrapers/sources/photos/wallpaper.mob.dart';
 import '../../data/scrapers/sources/photos/wallpaperporn.dart';
-import '../../data/scrapers/sources/videos/crazyporn.dart';
-import '../../data/scrapers/sources/videos/pandamovies.dart';
+// Video Scrapers
 import '../../data/scrapers/sources/videos/baddies.dart';
 import '../../data/scrapers/sources/videos/bdsm.dart';
 import '../../data/scrapers/sources/videos/bigfuck.dart';
 import '../../data/scrapers/sources/videos/brazz.dart';
 import '../../data/scrapers/sources/videos/collectionofbestporn.dart';
+import '../../data/scrapers/sources/videos/crazyporn.dart';
 import '../../data/scrapers/sources/videos/crazyshit.dart';
 import '../../data/scrapers/sources/videos/eporner.dart';
 import '../../data/scrapers/sources/videos/eroticmv.dart';
@@ -23,6 +24,7 @@ import '../../data/scrapers/sources/videos/interntchicks.dart';
 import '../../data/scrapers/sources/videos/kompoz2.dart';
 import '../../data/scrapers/sources/videos/netfapx.dart';
 import '../../data/scrapers/sources/videos/noodlemagazine.dart';
+import '../../data/scrapers/sources/videos/pandamovies.dart';
 import '../../data/scrapers/sources/videos/pimpbunny.dart';
 import '../../data/scrapers/sources/videos/pornhits.dart';
 import '../../data/scrapers/sources/videos/porntop.dart';
@@ -34,24 +36,30 @@ import '../../data/scrapers/sources/videos/whoreshub.dart';
 import '../../data/scrapers/sources/videos/xtapes.dart';
 import '../../data/scrapers/sources/videos/youjizz.dart';
 
-/// Dummy Scraper class for handling null cases
+/// Enum representing supported content types for scrapers.
+enum ContentType {
+  videos,
+  photos,
+  tiktok,
+}
+
+/// Dummy scraper implementation for handling unsupported sources.
 class DummyScraper extends BaseScraper {
   DummyScraper(super.source);
 }
 
-/// Factory class for creating scraper instances based on content source
+/// Factory class for creating scraper instances based on content source.
 class ScraperFactory {
-  /// Registry of scraper builders organized by content type
-  static final Map<String, Map<String, BaseScraper Function(ContentSource)>>
-      _scrapers = {
-    'videos': {
+  /// Registry of scraper builders organized by content type.
+  static final Map<ContentType,
+      Map<String, BaseScraper Function(ContentSource)>> _scrapers = {
+    ContentType.videos: {
       'spankbang': (source) => Spankbang(source),
       'noodlemagazine': (source) => NoodleMagazine(source),
       'ukdevilz': (source) => NoodleMagazine(source),
       'pornhits': (source) => PornHits(source),
       'tabooporn': (source) => GoodPorn(source),
       'hqporner': (source) => HQPorner(source),
-      // 'tabooporn2': (source) => Tabooporn2(source),
       'crazyshit': (source) => CrazyShit(source),
       'onlyporn': (source) => PornHits(source),
       'youjizz': (source) => YouJizz(source),
@@ -79,7 +87,7 @@ class ScraperFactory {
       'taboohome': (source) => Taboohome(source),
       'eporner': (source) => Eporner(source),
     },
-    'photos': {
+    ContentType.photos: {
       'pmatehunter': (source) => PMateHunter(source),
       'elitebabes': (source) => PMateHunter(source),
       'erowall': (source) => EroWall(source),
@@ -90,38 +98,41 @@ class ScraperFactory {
       'wallpaperporn': (source) => WallpaperPorn(source),
       'definebabe': (source) => Definebabe(source),
     },
-    // 'manga': {
-    //   'kissmanga': (source) => KissManga(source),
-    //   'manhwa18': (source) => Manwha18(source),
-    // },
-    'tiktok': {
-      // 'tikporn': (source) => TikPorn(source),
-      // 'xxxfollow': (source) => Xxxfollow(source),
-    }
+    ContentType.tiktok: {},
   };
 
-  /// Creates an appropriate scraper instance for the given content source
+  /// Creates an appropriate scraper instance for the given content source.
+  ///
+  /// [source] The content source to create a scraper for.
+  /// Returns a [BaseScraper] instance, or [DummyScraper] if no matching scraper is found.
   static BaseScraper createScraper(ContentSource source) {
-    final String sourceName = source.name.toLowerCase();
+    final sourceName = source.name.toLowerCase();
 
-    // Search through all content type categories
-    for (final category in _scrapers.values) {
-      final builder = category[sourceName];
+    for (final category in _scrapers.entries) {
+      final builder = category.value[sourceName];
       if (builder != null) {
         return builder(source);
       }
     }
-    // log("wertyuioiuytrewertyui" + source.config!.toJson().toString());
-    // Return dummy scraper if no match found
+
+    if (kDebugMode) {
+      print('No scraper found for source: $sourceName');
+    }
     return DummyScraper(source);
   }
 
-  /// Returns list of supported source names for a given content type
-  static List<String> getSupportedSources(String contentType) {
+  /// Returns a list of supported source names for a given content type.
+  ///
+  /// [contentType] The content type to query supported sources for.
+  /// Returns a list of source names or an empty list if the content type is not supported.
+  static List<String> getSupportedSources(ContentType contentType) {
     return _scrapers[contentType]?.keys.toList() ?? [];
   }
 
-  /// Checks if a source name is supported
+  /// Checks if a source name is supported by any scraper.
+  ///
+  /// [sourceName] The name of the source to check.
+  /// Returns true if the source is supported, false otherwise.
   static bool isSourceSupported(String sourceName) {
     final lowerName = sourceName.toLowerCase();
     return _scrapers.values.any((category) => category.containsKey(lowerName));

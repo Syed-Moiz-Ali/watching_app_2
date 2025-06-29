@@ -3,6 +3,7 @@ import 'package:watching_app_2/shared/widgets/loading/loading_indicator.dart';
 
 import '../../../../core/enums/enums.dart';
 import '../../../../core/navigation/app_navigator.dart';
+import '../../../../data/database/local_database.dart';
 import '../../../../data/models/content_item.dart';
 import '../../../../data/models/content_source.dart';
 import '../../../../data/scrapers/scraper_service.dart';
@@ -197,6 +198,7 @@ class _MangaState extends State<Manga> {
                               child: WallpaperGridView(
                                 wallpapers: mangas,
                                 controller: _scrollController,
+                                contentType: ContentTypes.MANGA,
                                 onItemTap: (index) {
                                   NH.navigateTo(MangaDetailScreen(
                                     item: mangas[

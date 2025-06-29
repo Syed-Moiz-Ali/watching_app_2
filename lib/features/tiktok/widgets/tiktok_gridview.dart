@@ -35,7 +35,7 @@ class _TiktokGridViewState extends State<TiktokGridView> {
       itemCount: widget.tiktok.length,
       itemBuilder: (context, index) {
         var item = widget.tiktok[index];
-        return TikTokVideoPlayer(
+        return AdvancedTikTokVideoPlayer(
           item: item,
           // onTap: () => onItemTap(index),
         );

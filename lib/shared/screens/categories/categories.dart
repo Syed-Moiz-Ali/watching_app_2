@@ -424,7 +424,7 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
   PreferredSize _buildTabBar() {
     return PreferredSize(
       preferredSize: Size.fromHeight(10.h),
-      child: CustomTabBarHorizontal(
+      child: CustomTabBar(
         tabController: _tabController,
         tabContents: _tabContents,
         onTabChanged: (index) => _tabController.animateTo(index),

@@ -345,6 +345,7 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
     switch (widget.contentType) {
       case ContentTypes.IMAGE:
       case ContentTypes.TIKTOK:
+      case ContentTypes.MANGA:
         return _buildWallpaperGrid(widget.contentType);
       // case ContentTypes.TIKTOK:
       //   return _buildTiktokGrid();
@@ -356,6 +357,7 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
   Widget _buildWallpaperGrid(String contentType) {
     return WallpaperGridView(
       wallpapers: _filteredFavorites,
+      contentType: contentType,
       onItemTap: (index) => _handleWallpaperTap(index, contentType),
     );
   }
@@ -416,7 +418,7 @@ class _FavoritesTabViewState extends State<FavoritesTabView>
   }
 
   void _showFilters() {
-    FiltersBottomSheet.show(
+    MinimalistFiltersBottomSheet.show(
       context,
       contentType: widget.contentType,
       items: _categoryFavorites,
