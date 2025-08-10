@@ -115,7 +115,7 @@ class FavoritesProvider with ChangeNotifier {
 
   // Add to favorites
   Future<void> addToFavorites(ContentItem item, String contentType) async {
-    log("contentTypecontentType is $contentType");
+    // log("contentTypecontentType is $contentType");
     if (!ContentTypes.isValidType(contentType)) {
       throw ArgumentError('Invalid content type: $contentType');
     }

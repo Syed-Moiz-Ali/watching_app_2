@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'dart:developer';
+import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -481,192 +482,192 @@ class PremiumFilterButton extends StatefulWidget {
 
 class _PremiumFilterButtonState extends State<PremiumFilterButton>
     with TickerProviderStateMixin {
-  // UI State
+  late AnimationController _pressController;
+  late AnimationController _glowController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _glowAnimation;
+
   bool _isPressed = false;
   bool _isHovered = false;
 
   @override
   void initState() {
     super.initState();
+    _initializeAnimations();
+  }
+
+  void _initializeAnimations() {
+    _pressController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+
+    _glowController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
+
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _pressController, curve: Curves.easeInOut),
+    );
+
+    _glowAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
+    );
+
+    if (widget.hasActiveFilters) {
+      _glowController.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void didUpdateWidget(PremiumFilterButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.hasActiveFilters != oldWidget.hasActiveFilters) {
+      if (widget.hasActiveFilters) {
+        _glowController.repeat(reverse: true);
+      } else {
+        _glowController.stop();
+        _glowController.reset();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _pressController.dispose();
+    _glowController.dispose();
+    super.dispose();
   }
 
   void _handleTapDown(TapDownDetails details) {
     if (!widget.isEnabled) return;
-
     setState(() => _isPressed = true);
-
-    // Haptic feedback
+    _pressController.forward();
     HapticFeedback.lightImpact();
   }
 
   void _handleTapUp(TapUpDetails details) {
     if (!widget.isEnabled) return;
-
     setState(() => _isPressed = false);
-
+    _pressController.reverse();
     widget.onPressed();
   }
 
   void _handleTapCancel() {
     if (!widget.isEnabled) return;
-
     setState(() => _isPressed = false);
-  }
-
-  void _handleHoverEnter(PointerEnterEvent event) {
-    if (!widget.isEnabled) return;
-    setState(() => _isHovered = true);
-  }
-
-  void _handleHoverExit(PointerExitEvent event) {
-    if (!widget.isEnabled) return;
-    setState(() => _isHovered = false);
+    _pressController.reverse();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Start shimmer animation if not active
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
-    return MouseRegion(
-      onEnter: _handleHoverEnter,
-      onExit: _handleHoverExit,
-      child: Tooltip(
-        message: widget.tooltip ??
-            (widget.hasActiveFilters ? 'Clear Filters' : 'Apply Filters'),
-        preferBelow: false,
-        child: GestureDetector(
-          onTapDown: _handleTapDown,
-          onTapUp: _handleTapUp,
-          onTapCancel: _handleTapCancel,
-          child: Container(
-            width: 25.w,
-            height: 5.h,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                // Primary shadow
-                BoxShadow(
-                  color: (AppColors.primaryColor).withOpacity(0.3),
-                  spreadRadius: _isHovered ? 2 : 0,
-                ),
-                // Glow effect for active state
-                if (widget.hasActiveFilters)
-                  BoxShadow(
-                    color: Colors.white.withOpacity(0.2),
-                    blurRadius: 15,
-                    offset: const Offset(0, 0),
-                    spreadRadius: 1,
+    return AnimatedBuilder(
+      animation: Listenable.merge([_scaleAnimation, _glowAnimation]),
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: Tooltip(
+            message: widget.tooltip ??
+                (widget.hasActiveFilters ? 'Clear Filters' : 'Apply Filters'),
+            preferBelow: false,
+            child: GestureDetector(
+              onTapDown: _handleTapDown,
+              onTapUp: _handleTapUp,
+              onTapCancel: _handleTapCancel,
+              child: Container(
+                width: 68, // More compact
+                height: 68,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColors.primaryColor
+                          .withOpacity(0.9 + (0.1 * _glowAnimation.value)),
+                      AppColors.primaryColor
+                          .withOpacity(0.7 + (0.1 * _glowAnimation.value)),
+                    ],
                   ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Stack(
-                children: [
-                  // Main button container
-                  _buildMainContainer(),
-
-                  // Shimmer effect overlay
-
-                  // Ripple effect
-
-                  // Content
-                  _buildContent(),
-
-                  // Disabled overlay
-                  if (!widget.isEnabled) _buildDisabledOverlay(),
-                ],
+                  borderRadius:
+                      BorderRadius.circular(20), // More refined radius
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.2),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryColor
+                          .withOpacity(0.3 + (0.2 * _glowAnimation.value)),
+                      blurRadius: 12 + (8 * _glowAnimation.value),
+                      offset: const Offset(0, 4),
+                      spreadRadius: widget.hasActiveFilters
+                          ? 2 * _glowAnimation.value
+                          : 0,
+                    ),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(isDark ? 0.4 : 0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: _buildContent(),
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMainContainer() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            (AppColors.primaryColor).withOpacity(0.9),
-            AppColors.primaryColor,
-            (AppColors.primaryColor).withOpacity(0.8),
-          ],
-          stops: const [0.0, 0.5, 1.0],
-        ),
-        border: Border.all(
-          color: Colors.transparent,
-          width: 1.5,
-        ),
-      ),
+        );
+      },
     );
   }
 
   Widget _buildContent() {
-    return Positioned.fill(
-      child: Row(
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.white.withOpacity(0.1),
+            Colors.white.withOpacity(0.05),
+          ],
+        ),
+      ),
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Animated Icon
+          // Enhanced animated icon
           TweenAnimationBuilder<double>(
-            duration: const Duration(milliseconds: 400),
+            duration: const Duration(milliseconds: 300),
             tween: Tween(begin: 0.0, end: widget.hasActiveFilters ? 1.0 : 0.0),
             builder: (context, value, child) {
               return Transform.rotate(
-                angle: value * 0.5, // Subtle rotation
+                angle: value * 0.25,
                 child: Icon(
                   widget.hasActiveFilters
                       ? Icons.filter_list_off_rounded
-                      : Icons.filter_list_rounded,
-                  size: 18.sp,
-                  color: AppColors.backgroundColorLight.withOpacity(
-                    widget.isEnabled ? 1.0 : 0.5,
-                  ),
+                      : Icons.tune_rounded,
+                  size: 24,
+                  color: Colors.white.withOpacity(widget.isEnabled ? 1.0 : 0.5),
                 ),
               );
             },
           ),
 
-          // Animated Gap
-          TweenAnimationBuilder<double>(
-            duration: const Duration(milliseconds: 300),
-            tween: Tween(begin: 0.02, end: _isPressed ? 0.015 : 0.02),
-            builder: (context, value, child) {
-              return SizedBox(width: value * 100.w);
-            },
-          ),
+          const SizedBox(height: 4),
 
-          // Animated Text
-          AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 300),
+          // Enhanced text
+          Text(
+            widget.hasActiveFilters ? "Filtered" : "Filter",
             style: TextStyle(
-              color: AppColors.backgroundColorLight.withOpacity(
-                widget.isEnabled ? 1.0 : 0.5,
-              ),
-              fontWeight:
-                  widget.hasActiveFilters ? FontWeight.w600 : FontWeight.w500,
-              fontSize: _isPressed ? 13.sp : 14.sp,
-            ),
-            child: TextWidget(
-              text: widget.hasActiveFilters ? "Filtered" : "Filter",
-              color: AppColors.backgroundColorLight,
+              color: Colors.white.withOpacity(widget.isEnabled ? 1.0 : 0.5),
+              fontSize: 11.sp,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.5,
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildDisabledOverlay() {
-    return Positioned.fill(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(12),
-        ),
       ),
     );
   }

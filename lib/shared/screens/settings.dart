@@ -15,6 +15,7 @@ import 'package:watching_app_2/shared/widgets/misc/restart_widget.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 import '../../core/common/utils/common_utils.dart';
 import '../../core/global/globals.dart';
+import '../../core/services/database_backup_manager.dart';
 import '../../presentation/provider/theme_provider.dart';
 
 class Settings extends StatefulWidget {
@@ -48,7 +49,7 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
   bool _explicitContentWarningEnabled = false;
   bool _incognitoModeEnabled = false;
   bool _ageVerificationEnabled = false;
-
+  DatabaseBackupManager backupManager = DatabaseBackupManager.instance;
   final List<_Particle> _particles = [];
 
   @override
@@ -415,7 +416,29 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                   title: 'Backup',
                   subtitle: 'Backup your data',
                   icon: Icons.backup,
-                  onTap: () {
+                  onTap: () async {
+                    final backupResult =
+                        await backupManager.createEnhancedBackup(
+                      customName: 'MyFavorites',
+                      location: BackupLocation.downloads,
+                    );
+                    if (backupResult.isSuccess) {
+                      print('Backup created: ${backupResult.filePath}');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: TextWidget(
+                            text: "Backup created: ${backupResult.filePath}",
+                            maxLine: 2,
+                            fontSize: 13.sp,
+                          ),
+                          backgroundColor: Colors.green.shade400,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          margin: EdgeInsets.all(4.w),
+                        ),
+                      );
+                    }
                     // BackupService().createBackup();
                   },
                   type: _SettingType.button,
@@ -424,7 +447,38 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
                   title: 'Restore',
                   subtitle: 'Restore your data',
                   icon: Icons.backup,
-                  onTap: () {
+                  onTap: () async {
+                    final restoreResult =
+                        await backupManager.restoreFromSelectedBackupWithLogic(
+                      context: context,
+                      showConfirmation: true,
+                    );
+
+                    if (restoreResult.isSuccess) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: TextWidget(
+                            text:
+                                'Restored ${restoreResult.restoredItemCount} items',
+                            maxLine: 2,
+                            fontSize: 13.sp,
+                          ),
+                          backgroundColor: Colors.green.shade400,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          margin: EdgeInsets.all(4.w),
+                        ),
+                      );
+                      setState(() {
+                        // Refresh your app state
+                      });
+                      print(
+                          'Restored ${restoreResult.restoredItemCount} items');
+                    } else if (!restoreResult.isCancelled) {
+                      // Handle error case
+                      print('Restore failed: ${restoreResult.error}');
+                    }
                     // BackupService().restoreBackup();
                   },
                   type: _SettingType.button,

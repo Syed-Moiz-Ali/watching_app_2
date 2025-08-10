@@ -306,7 +306,7 @@ abstract class BaseScraper {
   }
 
   Future<ContentItem> _parseContentItem(Element element) async {
-    log("config is ${element.outerHtml}");
+    // log("config is ${element.outerHtml}");
     return ContentItem(
       title: await getAttributeValue(source.config!.titleSelector,
               element: element) ??

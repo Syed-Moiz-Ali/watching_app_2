@@ -351,42 +351,42 @@ class _UpdateScreenState extends State<UpdateScreen>
     final Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      // backgroundColor: Colors.transparent,
       body: Stack(
         children: [
           // Animated Background
-          AnimatedBuilder(
-            animation: _backgroundAnimation,
-            builder: (context, child) {
-              return Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      _bgDarkColor,
-                      _bgLightColor,
-                    ],
-                    stops: const [0.3, 0.9],
-                  ),
-                ),
-              );
-            },
-          ),
+          // AnimatedBuilder(
+          //   animation: _backgroundAnimation,
+          //   builder: (context, child) {
+          //     return Container(
+          //       decoration: BoxDecoration(
+          //         gradient: LinearGradient(
+          //           begin: Alignment.topLeft,
+          //           end: Alignment.bottomRight,
+          //           colors: [
+          //             _bgDarkColor,
+          //             _bgLightColor,
+          //           ],
+          //           stops: const [0.3, 0.9],
+          //         ),
+          //       ),
+          //     );
+          //   },
+          // ),
 
           // Particles Effect
-          AnimatedBuilder(
-            animation: _particleController,
-            builder: (context, child) {
-              return CustomPaint(
-                painter: ParticlesPainter(
-                  particles: _particles,
-                  progress: _particleController.value,
-                ),
-                size: Size(screenSize.width, screenSize.height),
-              );
-            },
-          ),
+          // AnimatedBuilder(
+          //   animation: _particleController,
+          //   builder: (context, child) {
+          //     return CustomPaint(
+          //       painter: ParticlesPainter(
+          //         particles: _particles,
+          //         progress: _particleController.value,
+          //       ),
+          //       size: Size(screenSize.width, screenSize.height),
+          //     );
+          //   },
+          // ),
 
           // Main Content
           SafeArea(
@@ -438,14 +438,14 @@ class _UpdateScreenState extends State<UpdateScreen>
                                   color: _accentColor.withOpacity(0.2),
                                   width: 1,
                                 ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
-                                    blurRadius: 30,
-                                    spreadRadius: 0,
-                                    offset: const Offset(0, 15),
-                                  ),
-                                ],
+                                // boxShadow: [
+                                //   BoxShadow(
+                                //     color: Colors.black.withOpacity(0.2),
+                                //     blurRadius: 30,
+                                //     spreadRadius: 0,
+                                //     offset: const Offset(0, 15),
+                                //   ),
+                                // ],
                               ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(20),
@@ -737,7 +737,7 @@ class _UpdateScreenState extends State<UpdateScreen>
                       ),
                       const SizedBox(width: 12),
                       TextWidget(
-                        text: _progress >= 100 ? "Open" : 'Update Now',
+                        text: _progress >= 100 ? "Install" : 'Update Now',
                         fontWeight: FontWeight.w600,
                         color: _textWhiteColor,
                       ),

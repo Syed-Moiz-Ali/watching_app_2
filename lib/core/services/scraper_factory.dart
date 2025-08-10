@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:watching_app_2/data/models/content_source.dart';
 import 'package:watching_app_2/data/scrapers/base_scraper.dart';
+import 'package:watching_app_2/data/scrapers/sources/videos/crazyShit.dart';
 // Photo Scrapers
 import '../../data/scrapers/sources/photos/definebabe.dart';
 import '../../data/scrapers/sources/photos/erowall.dart';
@@ -15,10 +16,11 @@ import '../../data/scrapers/sources/videos/bigfuck.dart';
 import '../../data/scrapers/sources/videos/brazz.dart';
 import '../../data/scrapers/sources/videos/collectionofbestporn.dart';
 import '../../data/scrapers/sources/videos/crazyporn.dart';
-import '../../data/scrapers/sources/videos/crazyshit.dart';
+// import '../../data/scrapers/sources/videos/crazyshit.dart';
 import '../../data/scrapers/sources/videos/eporner.dart';
 import '../../data/scrapers/sources/videos/eroticmv.dart';
-import '../../data/scrapers/sources/videos/goodporn.dart';
+// import '../../data/scrapers/sources/videos/goodporn.dart';
+import '../../data/scrapers/sources/videos/goodPorn.dart';
 import '../../data/scrapers/sources/videos/hqporner.dart';
 import '../../data/scrapers/sources/videos/interntchicks.dart';
 import '../../data/scrapers/sources/videos/kompoz2.dart';

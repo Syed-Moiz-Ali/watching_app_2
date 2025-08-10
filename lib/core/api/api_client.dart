@@ -52,8 +52,8 @@ class ApiClient {
       );
 
       final resBody = await res.stream.bytesToString();
-      SMA.logger.logInfo(
-          'Response Status: ${res.statusCode}, Response Body: $resBody');
+      // SMA.logger.logInfo(
+      //     'Response Status: ${res.statusCode}, Response Body: $resBody');
       // Check if the response is successful
       if (res.statusCode >= 200 && res.statusCode < 300) {
         if (resBody.isEmpty) {

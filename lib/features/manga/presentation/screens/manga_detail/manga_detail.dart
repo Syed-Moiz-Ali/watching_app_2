@@ -26,7 +26,7 @@ class MangaDetailScreen extends StatefulWidget {
 
 class _MangaDetailScreenState extends State<MangaDetailScreen>
     with TickerProviderStateMixin {
-  // Constants
+// Constants
   static const double _appBarHeight = 350.0;
   static const double _scrollThreshold = 200.0;
   static const EdgeInsets _contentPadding = EdgeInsets.all(20.0);
@@ -41,7 +41,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
   static const Duration _crossFadeDuration = Duration(milliseconds: 300);
   static const Duration _pulseAnimationDuration = Duration(milliseconds: 1200);
 
-  // Animation Controllers
+// Animation Controllers
   late AnimationController _fadeAnimationController;
   late AnimationController _pulseAnimationController;
   late AnimationController _slideAnimationController;
@@ -49,7 +49,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen>
   late Animation<double> _pulseAnimation;
   late Animation<Offset> _slideAnimation;
 
-  // Controllers and State
+// Controllers and State
   late ScrollController _scrollController;
   late PageController _pageController;
   bool _isScrolled = false;

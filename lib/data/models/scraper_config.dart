@@ -99,7 +99,7 @@ class ScraperConfig {
     final detail = json['detail'] as Map<String, dynamic>? ?? {};
     final chapterByIdSelectors =
         json['chapter_by_id_selectors'] as Map<String, dynamic>? ?? {};
-    log("chapterByIdSelectors is $chapterByIdSelectors");
+    // log("chapterByIdSelectors is $chapterByIdSelectors");
     return ScraperConfig(
       titleSelector: ElementSelector.fromJson(json['title_selector'] ?? {}),
       thumbnailSelector:

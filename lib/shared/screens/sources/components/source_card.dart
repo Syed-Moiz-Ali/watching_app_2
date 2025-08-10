@@ -26,41 +26,64 @@ class SourceCard extends StatefulWidget {
   State<SourceCard> createState() => _SourceCardState();
 }
 
-class _SourceCardState extends State<SourceCard> {
+class _SourceCardState extends State<SourceCard>
+    with SingleTickerProviderStateMixin {
   bool _isHovered = false;
   bool _isPressed = false;
-  bool _isFocused = false;
   late FocusNode _focusNode;
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _elevationAnimation;
 
   @override
   void initState() {
     super.initState();
     _focusNode = FocusNode();
-    _focusNode.addListener(_onFocusChange);
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 250),
+      vsync: this,
+    );
+
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.015,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _elevationAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutCubic,
+    ));
   }
 
   @override
   void dispose() {
-    _focusNode.removeListener(_onFocusChange);
     _focusNode.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
-  void _onFocusChange() {
-    setState(() {
-      _isFocused = _focusNode.hasFocus;
-    });
+  void _handleHover(bool isHovered) {
+    setState(() => _isHovered = isHovered);
+    if (isHovered) {
+      _animationController.forward();
+    } else {
+      _animationController.reverse();
+    }
   }
 
   void _handleTap() {
-    // Haptic feedback for better UX
     HapticFeedback.lightImpact();
 
     final provider = context.read<SourceProvider>();
     provider.selectedQuery = widget.source.query.entries.first.value;
     provider.updateState();
 
-    // Navigation logic with enhanced routing
     switch (widget.source.type) {
       case '1':
       case '5':
@@ -84,28 +107,28 @@ class _SourceCardState extends State<SourceCard> {
   Color _getTypeColor(String type) {
     switch (type) {
       case '1':
-        return const Color(0xFF6366F1); // Indigo for Video
+        return const Color(0xFF6366F1);
       case '3':
-        return const Color(0xFF10B981); // Emerald for Wallpaper
+        return const Color(0xFF10B981);
       case '4':
-        return const Color(0xFFF59E0B); // Amber for Manga
+        return const Color(0xFFF59E0B);
       case '5':
-        return const Color(0xFFEC4899); // Pink for Anime
+        return const Color(0xFFEC4899);
       case '2':
-        return const Color(0xFF8B5CF6); // Violet for TikTok
+        return const Color(0xFF8B5CF6);
       default:
-        return Colors.grey;
+        return AppColors.primaryColor;
     }
   }
 
   IconData _getTypeIcon(String type) {
     switch (type) {
       case '1':
-        return Icons.play_circle_outline;
+        return Icons.play_circle_outline_rounded;
       case '3':
-        return Icons.wallpaper_outlined;
+        return Icons.image_outlined;
       case '4':
-        return Icons.book_outlined;
+        return Icons.menu_book_outlined;
       case '5':
         return Icons.movie_outlined;
       case '2':
@@ -136,172 +159,201 @@ class _SourceCardState extends State<SourceCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final isInteractive = _isHovered || _isFocused || _isPressed;
+    final typeColor = _getTypeColor(widget.source.type);
 
     return Container(
-      margin: EdgeInsets.only(
-        left: 10,
-        right: 10,
-        top: widget.index == 0 ? 16 : 0,
+      margin: EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 8,
       ),
       child: Focus(
         focusNode: _focusNode,
         child: MouseRegion(
-          onEnter: (_) => setState(() => _isHovered = true),
-          onExit: (_) => setState(() => _isHovered = false),
+          onEnter: (_) => _handleHover(true),
+          onExit: (_) => _handleHover(false),
           child: GestureDetector(
             onTapDown: (_) => setState(() => _isPressed = true),
             onTapUp: (_) => setState(() => _isPressed = false),
             onTapCancel: () => setState(() => _isPressed = false),
             onTap: _handleTap,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                gradient: isInteractive
-                    ? LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          AppColors.primaryColor.withOpacity(0.05),
-                          AppColors.primaryColor.withOpacity(0.02),
-                        ],
-                      )
-                    : null,
-                color: isInteractive
-                    ? null
-                    : (isDark ? Colors.grey[900] : Colors.white),
-                border: Border.all(
-                  color: isInteractive
-                      ? AppColors.primaryColor.withOpacity(0.3)
-                      : (isDark ? Colors.grey[700]! : Colors.grey[200]!),
-                  width: isInteractive ? 2 : 1,
-                ),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: Material(
-                  color: Colors.transparent,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Row(
-                      children: [
-                        // Icon Container with Glassmorphism
-                        _buildIconContainer(
-                            AppColors.primaryColor, isDark, isInteractive),
-
-                        const SizedBox(width: 20),
-
-                        // Content Section
-                        Expanded(
-                          child: _buildContentSection(theme,
-                              AppColors.primaryColor, isDark, isInteractive),
+            child: AnimatedBuilder(
+              animation: _animationController,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: _isPressed ? 0.98 : _scaleAnimation.value,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.grey[900] : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: _isHovered
+                            ? typeColor.withOpacity(0.4)
+                            : (isDark ? Colors.grey[800]! : Colors.grey[200]!),
+                        width: _isHovered ? 1.5 : 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+                          blurRadius: 8 + (_elevationAnimation.value * 12),
+                          offset:
+                              Offset(0, 4 + (_elevationAnimation.value * 8)),
+                          spreadRadius: -2,
                         ),
+                        if (_isHovered)
+                          BoxShadow(
+                            color: typeColor.withOpacity(0.15),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                            spreadRadius: -4,
+                          ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: _handleTap,
+                          borderRadius: BorderRadius.circular(20),
+                          splashColor: typeColor.withOpacity(0.1),
+                          highlightColor: typeColor.withOpacity(0.05),
+                          child: Padding(
+                            padding: const EdgeInsets.all(18),
+                            child: Row(
+                              children: [
+                                // Enhanced Icon Container
+                                _buildIconContainer(typeColor),
 
-                        const SizedBox(width: 16),
+                                const SizedBox(width: 18),
 
-                        // Chevron Icon
-                        _buildChevronIcon(
-                            theme, AppColors.primaryColor, isInteractive),
+                                // Enhanced Content
+                                Expanded(
+                                  child: _buildContent(typeColor, theme),
+                                ),
+
+                                const SizedBox(width: 12),
+
+                                // Enhanced Arrow
+                                _buildArrow(typeColor),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      )
+          .animate(delay: (widget.index * 80).ms)
+          .fadeIn(duration: 500.ms, curve: Curves.easeOutQuart)
+          .slideX(begin: 0.15, duration: 500.ms, curve: Curves.easeOutCubic),
+    );
+  }
+
+  Widget _buildIconContainer(Color typeColor) {
+    return Container(
+      width: 52,
+      height: 52,
+      decoration: BoxDecoration(
+        color: typeColor.withOpacity(_isHovered ? 0.15 : 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: typeColor.withOpacity(_isHovered ? 0.3 : 0.15),
+          width: 1,
+        ),
+      ),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        transform: Matrix4.identity()..scale(_isHovered ? 1.05 : 1.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(15),
+          child: Stack(
+            children: [
+              // Icon background with subtle gradient
+              if (_isHovered)
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        typeColor.withOpacity(0.1),
+                        typeColor.withOpacity(0.05),
                       ],
                     ),
                   ),
                 ),
+
+              // Main icon
+              Center(
+                child: ImageWidget(
+                  imagePath: widget.source.icon,
+                  height: 32,
+                  width: 32,
+                  fit: BoxFit.cover,
+                ),
               ),
-            )
-                .animate(delay: (widget.index * 100).ms)
-                .fadeIn(duration: 600.ms, curve: Curves.easeOutQuart)
-                .slideX(
-                    begin: 0.3, duration: 600.ms, curve: Curves.easeOutQuart)
-                .scale(
-                    begin: Offset(1.0, .95),
-                    duration: 600.ms,
-                    curve: Curves.easeOutBack),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildIconContainer(Color typeColor, bool isDark, bool isInteractive) {
-    return Container(
-      width: 72,
-      height: 72,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Background glow effect
-          // if (isInteractive)
-          //   Container(
-          //     width: 70,
-          //     height: 70,
-          //     decoration: BoxDecoration(
-          //       shape: BoxShape.circle,
-          //       gradient: RadialGradient(
-          //         colors: [
-          //           typeColor.withOpacity(0.2),
-          //           typeColor.withOpacity(0.0),
-          //         ],
-          //       ),
-          //     ),
-          //   )
-          //       .animate(target: isInteractive ? 1 : 0)
-          //       .scale(duration: 300.ms, curve: Curves.easeOut)
-          //       .fadeIn(duration: 300.ms),
-
-          // Main icon
-          Hero(
-            tag: 'source_icon_${widget.source.name}',
-            child: ImageWidget(
-              imagePath: widget.source.icon,
-              height: 55,
-              width: 55,
-              fit: BoxFit.contain,
-            ),
-          )
-              .animate(target: isInteractive ? 1 : 0)
-              .scale(
-                  end: Offset(1.0, 1.1),
-                  duration: 300.ms,
-                  curve: Curves.easeOut)
-              .rotate(end: 0.02, duration: 300.ms),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildContentSection(
-      ThemeData theme, Color typeColor, bool isDark, bool isInteractive) {
+  Widget _buildContent(Color typeColor, ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
       children: [
-        // Source Name
-        TextWidget(
-          text: widget.source.name,
-          fontWeight: FontWeight.w600,
-          fontSize: 16.sp,
-          color: isInteractive ? typeColor : null,
-        )
-            .animate(target: isInteractive ? 1 : 0)
-            .slideX(end: 0.02, duration: 300.ms, curve: Curves.easeOut),
-
-        const SizedBox(height: 12),
-
-        // Type and NSFW badges row
+        // Enhanced Source Name
         Row(
           children: [
-            // Type badge
+            Expanded(
+              child: TextWidget(
+                text: widget.source.name,
+                fontWeight: FontWeight.w700,
+                fontSize: 16.sp,
+                color:
+                    _isHovered ? typeColor : theme.textTheme.bodyLarge?.color,
+              ),
+            ),
+            // Verified indicator
+            if (widget.source.nsfw != '1')
+              Container(
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.verified,
+                  size: 12,
+                  color: Colors.green,
+                ),
+              ),
+          ],
+        ),
+
+        const SizedBox(height: 10),
+
+        // Enhanced badges row
+        Row(
+          children: [
+            // Type badge with refined styling
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 5,
+              ),
               decoration: BoxDecoration(
-                color: AppColors.primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
+                color: typeColor.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: AppColors.primaryColor.withOpacity(0.2),
-                  width: 1,
+                  color: typeColor.withOpacity(0.25),
+                  width: 0.5,
                 ),
               ),
               child: Row(
@@ -309,93 +361,116 @@ class _SourceCardState extends State<SourceCard> {
                 children: [
                   Icon(
                     _getTypeIcon(widget.source.type),
-                    size: 14,
+                    size: 13,
                     color: typeColor,
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 5),
                   TextWidget(
                     text: _getTypeLabel(widget.source.type),
                     fontSize: 12.sp,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.primaryColor,
+                    fontWeight: FontWeight.w600,
+                    color: typeColor,
+                    letterSpacing: 0.2,
                   ),
                 ],
               ),
-            ).animate(target: isInteractive ? 1 : 0).scale(
-                end: Offset(1.0, 1.05),
-                duration: 300.ms,
-                curve: Curves.easeOut),
+            ),
 
-            // NSFW badge
+            // NSFW badge with better styling
             if (widget.source.nsfw == '1') ...[
               const SizedBox(width: 8),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.primaryColor.withOpacity(0.1),
-                      AppColors.primaryColor.withOpacity(0.1),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.red.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: AppColors.primaryColor.withOpacity(0.3),
-                    width: 1,
+                    color: Colors.red.withOpacity(0.25),
+                    width: 0.5,
                   ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      Icons.shield_outlined,
-                      size: 12,
-                      color: AppColors.primaryColor,
+                      Icons.warning_rounded,
+                      size: 11,
+                      color: Colors.red[600],
                     ),
                     const SizedBox(width: 4),
                     TextWidget(
                       text: '18+',
                       fontSize: 11.sp,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryColor,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.red[600],
+                      letterSpacing: 0.3,
                     ),
                   ],
                 ),
-              )
-                  .animate(delay: 100.ms)
-                  .fadeIn(duration: 400.ms)
-                  .slideX(begin: -0.3, duration: 400.ms, curve: Curves.easeOut),
+              ),
             ],
+
+            const Spacer(),
+
+            // Popularity indicator
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 6,
+                vertical: 3,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.grey.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.trending_up_rounded,
+                    size: 10,
+                    color: Colors.grey[600],
+                  ),
+                  const SizedBox(width: 3),
+                  TextWidget(
+                    text: 'Popular',
+                    fontSize: 9.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[600],
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildChevronIcon(
-      ThemeData theme, Color typeColor, bool isInteractive) {
-    return Container(
-      width: 40,
-      height: 40,
+  Widget _buildArrow(Color typeColor) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      width: 36,
+      height: 36,
       decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: isInteractive ? typeColor.withOpacity(0.1) : Colors.transparent,
+        color: _isHovered ? typeColor.withOpacity(0.1) : Colors.transparent,
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color:
-              isInteractive ? typeColor.withOpacity(0.3) : Colors.transparent,
+          color: _isHovered ? typeColor.withOpacity(0.2) : Colors.transparent,
           width: 1,
         ),
       ),
-      child: Icon(
-        Icons.arrow_forward_ios_rounded,
-        size: 16,
-        color: isInteractive ? typeColor : Colors.grey[600],
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        transform: Matrix4.identity()..translate(_isHovered ? 2.0 : 0.0, 0.0),
+        child: Icon(
+          Icons.arrow_forward_ios_rounded,
+          color: _isHovered ? typeColor : Colors.grey[500],
+          size: 16,
+        ),
       ),
-    )
-        .animate(target: isInteractive ? 1 : 0)
-        .scale(end: Offset(1.0, 1.1), duration: 300.ms, curve: Curves.easeOut)
-        .slideX(end: 0.1, duration: 300.ms, curve: Curves.easeOut)
-        .rotate(end: 0.05, duration: 300.ms);
+    );
   }
 }

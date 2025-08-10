@@ -419,7 +419,7 @@ class _TabbedContentViewState extends State<TabbedContentView>
             );
           },
           child: Container(
-            padding: EdgeInsets.only(top: 8.sp, left: 12.sp, right: 12.sp),
+            // padding: EdgeInsets.only(top: 8.sp, left: 12.sp, right: 12.sp),
             child: Stack(
               children: [
                 if (widget.category == ContentTypes.VIDEO) ...[
