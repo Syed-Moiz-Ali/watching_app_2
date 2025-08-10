@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -8,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../../data/database/local_database.dart';
@@ -18,10 +15,6 @@ class DatabaseBackupManager {
   static DatabaseBackupManager get instance => _instance;
 
   DatabaseBackupManager._init();
-
-  static const String _backupExtension = '.db';
-  static const String _backupPrefix = 'favorites_backup_';
-  static const String _metadataFile = 'backup_metadata.json';
 
   /// FIXED: Robust file selection with multiple fallback strategies
   Future<String?> _selectBackupFileRobust() async {

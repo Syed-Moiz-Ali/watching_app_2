@@ -14,7 +14,7 @@ class AppInitializer {
   static Future<(String route, Map<String, dynamic>? args)>
       initializeApp() async {
     // Check for app update first
-    if (await _isUpdateAvailable()) {
+    if (!await _isUpdateAvailable()) {
       return (AppRoutes.update, {"updateUrl": _updateUrl});
     }
 

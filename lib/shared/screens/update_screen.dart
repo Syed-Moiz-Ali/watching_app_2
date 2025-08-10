@@ -375,18 +375,18 @@ class _UpdateScreenState extends State<UpdateScreen>
           // ),
 
           // Particles Effect
-          // AnimatedBuilder(
-          //   animation: _particleController,
-          //   builder: (context, child) {
-          //     return CustomPaint(
-          //       painter: ParticlesPainter(
-          //         particles: _particles,
-          //         progress: _particleController.value,
-          //       ),
-          //       size: Size(screenSize.width, screenSize.height),
-          //     );
-          //   },
-          // ),
+          AnimatedBuilder(
+            animation: _particleController,
+            builder: (context, child) {
+              return CustomPaint(
+                painter: ParticlesPainter(
+                  particles: _particles,
+                  progress: _particleController.value,
+                ),
+                size: Size(screenSize.width, screenSize.height),
+              );
+            },
+          ),
 
           // Main Content
           SafeArea(
