@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../data/models/content_item.dart';
 import '../../shared/widgets/misc/restart_widget.dart';
 import '../constants/colors.dart';
@@ -51,7 +49,7 @@ class SMA {
       TextDecoration? decoration = TextDecoration.none,
       double? letterSpacing = 0.0,
       List<Shadow>? shadows}) {
-    TextStyle baseStyle = GoogleFonts.urbanist(
+    TextStyle baseStyle = TextStyle(
       fontSize: fontSize,
       fontWeight: fontWeight,
       color: color,

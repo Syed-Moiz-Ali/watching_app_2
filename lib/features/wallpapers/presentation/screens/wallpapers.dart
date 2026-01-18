@@ -1,8 +1,9 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:watching_app_2/core/navigation/routes.dart';
 
-import '../../../../core/enums/enums.dart';
 import '../../../../core/navigation/app_navigator.dart';
 import '../../../../data/models/content_item.dart';
 import '../../../../data/models/content_source.dart';
@@ -10,8 +11,6 @@ import '../../../../data/scrapers/scraper_service.dart';
 import '../../../../shared/widgets/appbars/app_bar.dart';
 import '../../../../shared/widgets/buttons/floating_action_button.dart';
 import '../../../../shared/widgets/loading/loading_indicator.dart';
-import '../../../../shared/widgets/loading/pagination_indicator.dart';
-import '../../../../shared/widgets/misc/text_widget.dart';
 import '../widgets/wallpaper_grid_view.dart';
 
 class Wallpapers extends StatefulWidget {
@@ -194,11 +193,7 @@ class _WallpapersState extends State<Wallpapers> with TickerProviderStateMixin {
     }
   }
 
-  void _toggleViewMode() {
-    setState(() => isGrid = !isGrid);
-    _buttonController.forward().then((_) => _buttonController.reverse());
-    HapticFeedback.lightImpact();
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -284,169 +279,6 @@ class _WallpapersState extends State<Wallpapers> with TickerProviderStateMixin {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildHeaderInfo(ThemeData theme, bool isDark) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            theme.cardColor.withOpacity(0.8),
-            theme.cardColor.withOpacity(0.6),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : Colors.grey.withOpacity(0.2),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.1),
-            blurRadius: 15,
-            offset: const Offset(0, 4),
-            spreadRadius: -3,
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Enhanced icon container
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  theme.primaryColor.withOpacity(0.15),
-                  theme.primaryColor.withOpacity(0.08),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: theme.primaryColor.withOpacity(0.2),
-                width: 1,
-              ),
-            ),
-            child: Icon(
-              Icons.wallpaper_rounded,
-              color: theme.primaryColor,
-              size: 22,
-            ),
-          ),
-
-          const SizedBox(width: 16),
-
-          // Content info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    TextWidget(
-                      text: '${wallpapers.length} wallpapers',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: theme.textTheme.bodyLarge?.color,
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.hd_rounded,
-                            size: 12,
-                            color: Colors.green,
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            'HD',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.green,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                if (_currentQuery.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.search_rounded,
-                        size: 14,
-                        color: Colors.grey[600],
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Search: "$_currentQuery"',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ],
-            ),
-          ),
-
-          // Quality indicator
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  theme.primaryColor.withOpacity(0.15),
-                  theme.primaryColor.withOpacity(0.08),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: theme.primaryColor.withOpacity(0.2),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.verified_rounded,
-                  size: 14,
-                  color: theme.primaryColor,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  'Premium',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: theme.primaryColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -562,7 +394,7 @@ class _WallpapersState extends State<Wallpapers> with TickerProviderStateMixin {
                 ),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.error_outline_rounded,
                 color: Colors.red,
                 size: 52,

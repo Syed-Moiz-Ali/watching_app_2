@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 import 'dart:ui';
 import 'dart:math' as math;
@@ -60,10 +62,9 @@ class _AdvancedTikTokVideoPlayerState extends State<AdvancedTikTokVideoPlayer>
 
   // Advanced features
   bool _isSlowMotion = false;
-  bool _isAutoPlay = true;
+  final bool _isAutoPlay = true;
   bool _showStats = false;
-  List<double> _volumeLevels = [];
-  bool _isRecording = false;
+  final List<double> _volumeLevels = [];
 
   @override
   void initState() {
@@ -112,7 +113,7 @@ class _AdvancedTikTokVideoPlayerState extends State<AdvancedTikTokVideoPlayer>
 
   void _setupMockData() {
     _videoAuthor =
-        '@${widget.item.title?.split(' ').first.toLowerCase() ?? 'creator'}';
+        '@${widget.item.title.split(' ').first.toLowerCase() }';
     _videoDescription = 'Amazing content! #trending #viral #fyp';
     _likeCount = math.Random().nextInt(100000) + 1000;
     _commentCount = math.Random().nextInt(10000) + 100;
@@ -185,7 +186,6 @@ class _AdvancedTikTokVideoPlayerState extends State<AdvancedTikTokVideoPlayer>
   }
 
   void _handleDoubleTap(TapDownDetails details) {
-    final size = MediaQuery.of(context).size;
     _tapPositionX = details.localPosition.dx;
     _tapPositionY = details.localPosition.dy;
 
@@ -334,7 +334,7 @@ class _AdvancedTikTokVideoPlayerState extends State<AdvancedTikTokVideoPlayer>
           Positioned(
             left: _tapPositionX - 40,
             top: _tapPositionY - 40,
-            child: Icon(
+            child: const Icon(
               Icons.favorite,
               color: Colors.red,
               size: 80,
@@ -392,7 +392,7 @@ class _AdvancedTikTokVideoPlayerState extends State<AdvancedTikTokVideoPlayer>
                     ),
                   ],
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.play_arrow_rounded,
                   size: 50,
                   color: Colors.black,
@@ -444,7 +444,7 @@ class _AdvancedTikTokVideoPlayerState extends State<AdvancedTikTokVideoPlayer>
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.slow_motion_video, color: Colors.white, size: 16),
+                  const Icon(Icons.slow_motion_video, color: Colors.white, size: 16),
                   const SizedBox(width: 4),
                   TextWidget(
                     text: '${_playbackSpeed}x',
@@ -488,7 +488,7 @@ class _AdvancedTikTokVideoPlayerState extends State<AdvancedTikTokVideoPlayer>
       top: 0,
       left: 0,
       right: 0,
-      child: Container(
+      child: SizedBox(
         height: 3,
         child: Stack(
           children: [

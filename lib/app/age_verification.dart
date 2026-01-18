@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, avoid_print, deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
@@ -319,11 +321,11 @@ class _AgeVerificationScreenState extends State<AgeVerificationScreen> {
         actions: [
           TextButton(
             onPressed: () => SystemNavigator.pop(),
-            child: const TextWidget(text: 'Exit App'),
             style: TextButton.styleFrom(
               foregroundColor: Colors.red,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
+            child: const TextWidget(text: 'Exit App'),
           ),
         ],
       ).animate().scale(
@@ -376,7 +378,7 @@ class _AgeVerificationScreenState extends State<AgeVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body: SizedBox(
         width: double.infinity,
         height: double.infinity,
         child: SafeArea(

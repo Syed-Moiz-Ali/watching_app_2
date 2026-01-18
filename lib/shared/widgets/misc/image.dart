@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:math' as math;
@@ -338,8 +340,7 @@ class _ImageWidgetState extends State<ImageWidget>
         );
 
       case ImageFilterType.none:
-      default:
-        return imageWidget;
+              return imageWidget;
     }
   }
 

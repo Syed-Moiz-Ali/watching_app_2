@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/colors.dart';
 
 class DarkTheme {
@@ -8,12 +9,10 @@ class DarkTheme {
       primaryColor: AppColors.primaryColor,
       hintColor: AppColors.accentColor,
       scaffoldBackgroundColor: AppColors.backgroundColorDark,
-      textTheme: const TextTheme(
-        bodyLarge: TextStyle(color: AppColors.textColorDark),
-        bodyMedium: TextStyle(color: AppColors.textColorDark),
-      ),
-      dialogBackgroundColor: AppColors.backgroundColorDark,
-      dialogTheme: const DialogTheme(
+      fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+
+      textTheme: GoogleFonts.plusJakartaSansTextTheme(),
+      dialogTheme:  const DialogThemeData(
         backgroundColor: AppColors.backgroundColorDark,
       ),
       appBarTheme: const AppBarTheme(
@@ -28,7 +27,7 @@ class DarkTheme {
         buttonColor: AppColors.primaryColor,
         textTheme: ButtonTextTheme.primary,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         margin: const EdgeInsets.symmetric(vertical: 8.0),
         elevation: 0,
         shape: RoundedRectangleBorder(

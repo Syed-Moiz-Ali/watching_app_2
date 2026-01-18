@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
@@ -6,15 +8,12 @@ import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/core/enums/enums.dart';
 import 'package:watching_app_2/core/global/globals.dart';
 import 'package:watching_app_2/data/database/local_database.dart';
-import 'package:watching_app_2/presentation/provider/source_provider.dart';
 import 'package:watching_app_2/presentation/provider/theme_provider.dart';
 import 'package:watching_app_2/presentation/provider/webview_provider.dart';
 import 'package:watching_app_2/data/models/content_item.dart';
 import 'package:watching_app_2/core/navigation/routes.dart';
 import 'package:watching_app_2/shared/screens/favorites/favorite_button.dart';
-import 'package:watching_app_2/shared/widgets/misc/gap.dart';
 import 'package:watching_app_2/shared/widgets/misc/image.dart';
-import 'package:watching_app_2/shared/widgets/buttons/primary_button.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 import '../../../../core/navigation/app_navigator.dart';
 import '../../../../data/scrapers/scraper_service.dart';
@@ -117,7 +116,7 @@ class _ContentDetailState extends State<ContentDetail> {
                 child: Stack(
                   children: [
                     // Background Image with Parallax Effect
-                    Container(
+                    SizedBox(
                       height: 65.h,
                       width: double.infinity,
                       child: Hero(
@@ -320,30 +319,6 @@ class _ContentDetailState extends State<ContentDetail> {
         fontSize: 14.sp,
         color: color,
         fontWeight: FontWeight.w600,
-      ),
-    );
-  }
-
-  Widget _buildDescription() {
-    if (detailItem!.detailContent?.discription == null) {
-      return const SizedBox.shrink();
-    }
-
-    return Container(
-      padding: EdgeInsets.all(4.w),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).dividerColor.withOpacity(0.2),
-        ),
-      ),
-      child: TextWidget(
-        text: detailItem!.detailContent!.discription!,
-        fontSize: 14.sp,
-        fontWeight: FontWeight.w400,
-        color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8),
-        maxLine: 4,
       ),
     );
   }

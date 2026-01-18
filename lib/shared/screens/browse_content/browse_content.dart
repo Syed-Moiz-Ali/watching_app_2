@@ -1,21 +1,21 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, deprecated_member_use
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'dart:math';
-import 'dart:ui' as ui;
 
 import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/core/navigation/app_navigator.dart';
 import 'package:watching_app_2/core/navigation/routes.dart';
 import 'package:watching_app_2/presentation/provider/search_provider.dart';
 import 'package:watching_app_2/shared/screens/browse_content/animated_search_bar.dart';
-
 import '../../widgets/misc/text_widget.dart';
 
 class BrowseContent extends StatefulWidget {
+
   const BrowseContent({super.key});
 
   @override
@@ -24,20 +24,12 @@ class BrowseContent extends StatefulWidget {
 
 class _BrowseContentState extends State<BrowseContent>
     with TickerProviderStateMixin {
-  // Enhanced Animation Controllers
-  late AnimationController _backgroundController;
-  late AnimationController _searchBarController;
+  // Simplified animation controllers
   late AnimationController _particleController;
-  late AnimationController _glowController;
-  late AnimationController _breatheController;
   late AnimationController _floatController;
 
-  // Enhanced Animations
-  late Animation<double> _searchBarFade;
-  late Animation<double> _searchBarSlide;
+  // Simplified animations
   late Animation<double> _particleFlow;
-  late Animation<double> _glowPulse;
-  late Animation<double> _breatheScale;
   late Animation<double> _floatOffset;
 
   late List<EnhancedParticle> particles;
@@ -52,76 +44,24 @@ class _BrowseContentState extends State<BrowseContent>
     super.initState();
     _initializeAnimations();
     _initializeParticles();
-    _startAnimationSequence();
   }
 
   void _initializeAnimations() {
-    // Main background animation with extended duration for smoothness
-    _backgroundController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 25),
-    )..repeat();
-
-    // Search bar entrance animation
-    _searchBarController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    );
-
-    // Particle system controller
+    // Simplified particle system with slower, more ambient movement
     _particleController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 8),
+      duration: const Duration(seconds: 15),
     )..repeat();
-
-    // Glow pulse animation
-    _glowController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2000),
-    )..repeat(reverse: true);
-
-    // Breathing animation for ambient effects
-    _breatheController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 4000),
-    )..repeat(reverse: true);
 
     // Floating elements animation
     _floatController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 12),
+      duration: const Duration(seconds: 20),
     )..repeat();
-
-    // Create smooth animations with premium easing
-    _searchBarFade = CurvedAnimation(
-      parent: _searchBarController,
-      curve: Curves.easeOutQuart,
-    );
-
-    _searchBarSlide = Tween<double>(begin: 50.0, end: 0.0).animate(
-      CurvedAnimation(
-        parent: _searchBarController,
-        curve: Curves.easeOutBack,
-      ),
-    );
 
     _particleFlow = CurvedAnimation(
       parent: _particleController,
       curve: Curves.linear,
-    );
-
-    _glowPulse = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _glowController,
-        curve: Curves.easeInOut,
-      ),
-    );
-
-    _breatheScale = Tween<double>(begin: 0.98, end: 1.02).animate(
-      CurvedAnimation(
-        parent: _breatheController,
-        curve: Curves.easeInOut,
-      ),
     );
 
     _floatOffset = CurvedAnimation(
@@ -131,16 +71,8 @@ class _BrowseContentState extends State<BrowseContent>
   }
 
   void _initializeParticles() {
-    particles =
-        _generateEnhancedParticles(80); // Reduced count for better performance
-    floatingElements = _generateFloatingElements(12);
-  }
-
-  void _startAnimationSequence() {
-    // Staggered animation entrance
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) _searchBarController.forward();
-    });
+    particles = _generateEnhancedParticles(40); // Reduced for minimalism
+    floatingElements = _generateFloatingElements(6); // Reduced for cleaner look
   }
 
   List<EnhancedParticle> _generateEnhancedParticles(int count) {
@@ -148,22 +80,21 @@ class _BrowseContentState extends State<BrowseContent>
     final List<EnhancedParticle> particles = [];
 
     for (int i = 0; i < count; i++) {
-      // Enhanced color palette with better visual harmony
       final Color color = _generateHarmonizedColor(random);
 
       particles.add(
         EnhancedParticle(
           x: random.nextDouble(),
           y: random.nextDouble(),
-          radius: 1.0 + random.nextDouble() * 2.5,
-          speed: 0.1 + random.nextDouble() * 0.4,
-          directionX: -0.5 + random.nextDouble(),
-          directionY: -0.5 + random.nextDouble(),
-          opacity: 0.3 + random.nextDouble() * 0.4,
+          radius: 1.0 + random.nextDouble() * 1.5, // Smaller particles
+          speed: 0.05 + random.nextDouble() * 0.15, // Slower movement
+          directionX: -0.3 + random.nextDouble() * 0.6,
+          directionY: -0.3 + random.nextDouble() * 0.6,
+          opacity: 0.15 + random.nextDouble() * 0.25, // More subtle
           id: i,
           color: color,
           pulsePhase: random.nextDouble() * 2 * pi,
-          trailLength: 3 + random.nextInt(5),
+          trailLength: 2 + random.nextInt(3), // Shorter trails
           trail: [],
         ),
       );
@@ -181,12 +112,12 @@ class _BrowseContentState extends State<BrowseContent>
         FloatingElement(
           x: random.nextDouble(),
           y: random.nextDouble(),
-          size: 20.0 + random.nextDouble() * 40.0,
-          speed: 0.02 + random.nextDouble() * 0.05,
-          opacity: 0.1 + random.nextDouble() * 0.2,
-          rotationSpeed: 0.01 + random.nextDouble() * 0.02,
+          size: 30.0 + random.nextDouble() * 50.0, // Slightly larger
+          speed: 0.01 + random.nextDouble() * 0.02, // Slower drift
+          opacity: 0.05 + random.nextDouble() * 0.08, // Very subtle
+          rotationSpeed: 0.005 + random.nextDouble() * 0.01,
           color: AppColors.primaryColor
-              .withOpacity(0.05 + random.nextDouble() * 0.1),
+              .withOpacity(0.03 + random.nextDouble() * 0.05),
         ),
       );
     }
@@ -195,25 +126,20 @@ class _BrowseContentState extends State<BrowseContent>
   }
 
   Color _generateHarmonizedColor(Random random) {
-    // Create a harmonized color palette based on primary color
     final baseHue = HSLColor.fromColor(AppColors.primaryColor).hue;
-    final hueVariation = baseHue + (-30 + random.nextDouble() * 60);
+    final hueVariation = baseHue + (-20 + random.nextDouble() * 40);
 
     return HSLColor.fromAHSL(
-      0.4 + random.nextDouble() * 0.4, // Alpha
-      hueVariation % 360, // Hue with variation
-      0.6 + random.nextDouble() * 0.3, // Saturation
-      0.6 + random.nextDouble() * 0.3, // Lightness
+      0.25 + random.nextDouble() * 0.15, // Lower alpha for subtlety
+      hueVariation % 360,
+      0.5 + random.nextDouble() * 0.2,
+      0.65 + random.nextDouble() * 0.25,
     ).toColor();
   }
 
   @override
   void dispose() {
-    _backgroundController.dispose();
-    _searchBarController.dispose();
     _particleController.dispose();
-    _glowController.dispose();
-    _breatheController.dispose();
     _floatController.dispose();
     _scrollController.dispose();
     _searchFocusNode.dispose();
@@ -228,48 +154,43 @@ class _BrowseContentState extends State<BrowseContent>
 
     return Scaffold(
       backgroundColor:
-          isDark ? const Color(0xFF0A0A0A) : const Color(0xFFFBFBFB),
+          isDark ? const Color(0xFF0A0A0A) : const Color(0xFFFAFAFA),
       extendBody: true,
       body: Stack(
         children: [
-          // Enhanced layered background system
-          _buildEnhancedBackground(theme, isDark),
+          // Simplified background
+          _buildMinimalistBackground(theme, isDark),
 
-          // Main content with improved positioning
+          // Main content
           _buildMainContent(theme, isDark),
-
-          // Optional floating action elements
-          _buildFloatingElements(theme, isDark),
         ],
       ),
     );
   }
 
-  Widget _buildEnhancedBackground(ThemeData theme, bool isDark) {
+  Widget _buildMinimalistBackground(ThemeData theme, bool isDark) {
     return Stack(
       children: [
-        // Base gradient background
+        // Clean gradient background
         Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
               colors: isDark
                   ? [
                       const Color(0xFF0A0A0A),
-                      const Color(0xFF1A1A1A).withOpacity(0.8),
-                      AppColors.primaryColor.withOpacity(0.05),
+                      const Color(0xFF1A1A1A),
                     ]
                   : [
-                      const Color(0xFFFBFBFB),
-                      const Color(0xFFF5F5F5).withOpacity(0.9),
-                      AppColors.primaryColor.withOpacity(0.03),
+                      const Color(0xFFFAFAFA),
+                      const Color(0xFFF5F5F7),
                     ],
             ),
           ),
         ),
 
-        // Enhanced particle system
+        // Subtle particle system
         AnimatedBuilder(
           animation: _particleController,
           builder: (context, child) {
@@ -284,7 +205,7 @@ class _BrowseContentState extends State<BrowseContent>
           },
         ),
 
-        // Floating geometric elements
+        // Minimal floating elements
         AnimatedBuilder(
           animation: _floatController,
           builder: (context, child) {
@@ -299,130 +220,134 @@ class _BrowseContentState extends State<BrowseContent>
           },
         ),
 
-        // Ambient glow effects
-        AnimatedBuilder(
-          animation: _glowController,
-          builder: (context, child) {
-            return Container(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: Alignment.center,
-                  radius: 1.5,
-                  colors: [
-                    AppColors.primaryColor.withOpacity(0.02 * _glowPulse.value),
-                    Colors.transparent,
-                  ],
-                ),
+        // Subtle ambient glow
+        Positioned(
+          top: -100,
+          right: -100,
+          child: Container(
+            width: 300,
+            height: 300,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  AppColors.primaryColor.withOpacity(isDark ? 0.08 : 0.05),
+                  Colors.transparent,
+                ],
               ),
-            );
-          },
+            ),
+          ),
         ),
       ],
     );
   }
 
   Widget _buildMainContent(ThemeData theme, bool isDark) {
-    return AnimatedBuilder(
-      animation: _breatheController,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _breatheScale.value,
-          child: Center(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: AnimatedBuilder(
-                animation: _searchBarController,
-                builder: (context, child) {
-                  return Transform.translate(
-                    offset: Offset(0, _searchBarSlide.value),
-                    child: Opacity(
-                      opacity: _searchBarFade.value,
-                      child: _buildEnhancedSearchSection(theme, isDark),
-                    ),
-                  );
-                },
+    return SafeArea(
+      child: CustomScrollView(
+        controller: _scrollController,
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Spacer(),
+
+                  // Hero icon with minimal animation
+                  _buildHeroIcon(theme, isDark)
+                      .animate()
+                      .fadeIn(duration: 600.ms, curve: Curves.easeOut)
+                      .scale(
+                        begin: const Offset(0.8, 0.8),
+                        curve: Curves.easeOutBack,
+                      ),
+
+                  const SizedBox(height: 32),
+
+                  // Main title
+                  _buildTitle(theme, isDark)
+                      .animate()
+                      .fadeIn(delay: 200.ms, duration: 600.ms)
+                      .slideY(begin: 0.3, end: 0, curve: Curves.easeOutQuart),
+
+                  const SizedBox(height: 12),
+
+                  // Subtitle with helper text
+                  _buildSubtitle(theme, isDark)
+                      .animate()
+                      .fadeIn(delay: 400.ms, duration: 600.ms)
+                      .slideY(begin: 0.3, end: 0, curve: Curves.easeOutQuart),
+
+                  const SizedBox(height: 48),
+
+                  // Premium search bar
+                  _buildPremiumSearchBar(theme, isDark)
+                      .animate()
+                      .fadeIn(delay: 600.ms, duration: 600.ms)
+                      .slideY(begin: 0.3, end: 0, curve: Curves.easeOutQuart),
+
+                  const Spacer(),
+
+
+
+                ],
               ),
             ),
           ),
-        );
-      },
-    );
-  }
-
-  Widget _buildEnhancedSearchSection(ThemeData theme, bool isDark) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Enhanced welcome section
-          _buildWelcomeSection(theme, isDark),
-
-          const SizedBox(height: 10),
-
-          // Premium search bar
-          _buildPremiumSearchBar(theme, isDark),
-
-          // const SizedBox(height: 30),
-
-          // // Search suggestions or recent searches
-          // _buildSearchSuggestions(theme, isDark),
         ],
       ),
     );
   }
 
-  Widget _buildWelcomeSection(ThemeData theme, bool isDark) {
-    return Column(
-      children: [
-        // App logo or icon with glow effect
-        AnimatedBuilder(
-          animation: _glowController,
-          builder: (context, child) {
-            return Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    AppColors.primaryColor.withOpacity(0.2 * _glowPulse.value),
-                    AppColors.primaryColor.withOpacity(0.05 * _glowPulse.value),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-              child: Icon(
-                Icons.search_rounded,
-                size: 60,
-                color: AppColors.primaryColor.withOpacity(0.8),
-              ),
-            );
-          },
+  Widget _buildHeroIcon(ThemeData theme, bool isDark) {
+    return Container(
+      width: 96,
+      height: 96,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: isDark
+            ? AppColors.primaryColor.withOpacity(0.12)
+            : AppColors.primaryColor.withOpacity(0.08),
+        border: Border.all(
+          color: AppColors.primaryColor.withOpacity(0.2),
+          width: 1,
         ),
+      ),
+      child: Icon(
+        Icons.search_rounded,
+        size: 44,
+        color: AppColors.primaryColor.withOpacity(0.9),
+      ),
+    );
+  }
 
-        const SizedBox(height: 24),
+  Widget _buildTitle(ThemeData theme, bool isDark) {
+    return TextWidget(
+      text: 'Discover Content',
+      fontSize: 32,
+      fontWeight: FontWeight.w700,
+      color: isDark ? Colors.white : const Color(0xFF1A1A1A),
+      letterSpacing: -0.5,
+      textAlign: TextAlign.center,
+    );
+  }
 
-        // Welcome text
-        TextWidget(
-          text: 'Discover Amazing Content',
-          fontSize: 28,
-          fontWeight: FontWeight.w800,
-          color: theme.textTheme.bodyLarge?.color,
-          letterSpacing: -0.5,
-          textAlign: TextAlign.center,
-        ),
-
-        const SizedBox(height: 12),
-
-        TextWidget(
-          text: 'Search through millions of videos, images, and more',
-          fontSize: 16,
-          color: Colors.grey[600],
-          fontWeight: FontWeight.w500,
-          maxLine: 2,
-          textAlign: TextAlign.center,
-        ),
-      ],
+  Widget _buildSubtitle(ThemeData theme, bool isDark) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 420),
+      child: TextWidget(
+        text:
+            'Search through our vast collection of videos, movies, series, and more',
+        fontSize: 15,
+        color: isDark ? Colors.grey[400] : Colors.grey[600],
+        fontWeight: FontWeight.w400,
+        maxLine: 3,
+        textAlign: TextAlign.center,
+      ),
     );
   }
 
@@ -432,7 +357,7 @@ class _BrowseContentState extends State<BrowseContent>
       child: UltraPremiumSearchBar(
         primaryColor: AppColors.primaryColor,
         backgroundColor: Colors.transparent,
-        hintText: 'Search for anything...',
+        hintText: 'Search for movies, series, anime...',
         onSearch: (value, category) {
           if (value.isNotEmpty) {
             HapticFeedback.lightImpact();
@@ -463,79 +388,96 @@ class _BrowseContentState extends State<BrowseContent>
     );
   }
 
-  Widget _buildSearchSuggestions(ThemeData theme, bool isDark) {
-    final suggestions = [
-      {
-        'title': 'Popular Movies',
-        'icon': Icons.movie_rounded,
-        'color': Colors.red
-      },
-      {
-        'title': 'Trending Anime',
-        'icon': Icons.animation_rounded,
-        'color': Colors.blue
-      },
-      {
-        'title': 'New Releases',
-        'icon': Icons.fiber_new_rounded,
-        'color': Colors.green
-      },
-      {'title': 'Top Rated', 'icon': Icons.star_rounded, 'color': Colors.amber},
+  Widget _buildQuickActions(ThemeData theme, bool isDark) {
+    final categories = [
+      {'icon': Icons.local_movies_rounded, 'label': 'Movies'},
+      {'icon': Icons.tv_rounded, 'label': 'TV Series'},
+      {'icon': Icons.live_tv_rounded, 'label': 'Anime'},
+      {'icon': Icons.sports_esports_rounded, 'label': 'Gaming'},
     ];
 
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 600),
-      child: Wrap(
-        spacing: 12,
-        runSpacing: 12,
-        children: suggestions.map((suggestion) {
-          final color = suggestion['color'] as Color;
+    return Column(
+      children: [
+        TextWidget(
+          text: 'Popular Categories',
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: isDark ? Colors.grey[500] : Colors.grey[600],
+          letterSpacing: 0.5,
+        ),
+        const SizedBox(height: 20),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          alignment: WrapAlignment.center,
+          children: categories.asMap().entries.map((entry) {
+            final index = entry.key;
+            final category = entry.value;
 
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  color.withOpacity(0.1),
-                  color.withOpacity(0.05),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: color.withOpacity(0.2),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  suggestion['icon'] as IconData,
-                  size: 18,
-                  color: color,
-                ),
-                const SizedBox(width: 8),
-                TextWidget(
-                  text: suggestion['title'] as String,
-                  color: theme.textTheme.bodyLarge?.color,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
+            return _buildCategoryChip(
+              theme,
+              isDark,
+              category['icon'] as IconData,
+              category['label'] as String,
+            )
+                .animate()
+                .fadeIn(delay: Duration(milliseconds: 900 + (index * 100)))
+                .scale(
+                  begin: const Offset(0.8, 0.8),
+                  curve: Curves.easeOutBack,
+                );
+          }).toList(),
+        ),
+      ],
     );
   }
 
-  Widget _buildFloatingElements(ThemeData theme, bool isDark) {
-    // Optional floating UI elements for enhanced visual appeal
-    return const SizedBox.shrink(); // Implement if needed
+  Widget _buildCategoryChip(
+      ThemeData theme, bool isDark, IconData icon, String label) {
+    return InkWell(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        _searchController.text = label;
+        // widget.onSearch?.call(label, 'All');
+      },
+      borderRadius: BorderRadius.circular(24),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: isDark
+              ? Colors.white.withOpacity(0.06)
+              : Colors.black.withOpacity(0.04),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withOpacity(0.08)
+                : Colors.black.withOpacity(0.06),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: isDark ? Colors.grey[300] : Colors.grey[700],
+            ),
+            const SizedBox(width: 8),
+            TextWidget(
+              text: label,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: isDark ? Colors.grey[300] : Colors.grey[700],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
-// Enhanced Model Classes
+// Enhanced Model Classes (unchanged)
 
 class EnhancedParticle {
   double x;
@@ -588,7 +530,7 @@ class FloatingElement {
   });
 }
 
-// Enhanced Custom Painters
+// Enhanced Custom Painters (simplified for better performance)
 
 class EnhancedParticlePainter extends CustomPainter {
   final List<EnhancedParticle> particles;
@@ -610,23 +552,21 @@ class EnhancedParticlePainter extends CustomPainter {
   }
 
   void _updateParticle(EnhancedParticle particle, Size size) {
-    // Smooth movement with fluid motion
+    // Slower, more ambient movement
     particle.x =
-        (particle.x + particle.directionX * particle.speed * 0.003) % 1.0;
+        (particle.x + particle.directionX * particle.speed * 0.002) % 1.0;
     particle.y =
-        (particle.y + particle.directionY * particle.speed * 0.003) % 1.0;
+        (particle.y + particle.directionY * particle.speed * 0.002) % 1.0;
 
-    // Handle edge wrapping
     if (particle.x < 0) particle.x = 1.0;
     if (particle.y < 0) particle.y = 1.0;
 
-    // Add subtle direction variation for organic movement
+    // Minimal direction variation
     particle.directionX +=
-        sin(animation.value * 2 * pi + particle.id * 0.1) * 0.0005;
+        sin(animation.value * 2 * pi + particle.id * 0.1) * 0.0003;
     particle.directionY +=
-        cos(animation.value * 2 * pi + particle.id * 0.1) * 0.0005;
+        cos(animation.value * 2 * pi + particle.id * 0.1) * 0.0003;
 
-    // Normalize direction to maintain consistent speed
     final magnitude = sqrt(particle.directionX * particle.directionX +
         particle.directionY * particle.directionY);
     if (magnitude > 0) {
@@ -634,7 +574,7 @@ class EnhancedParticlePainter extends CustomPainter {
       particle.directionY /= magnitude;
     }
 
-    // Update trail
+    // Simplified trail
     final currentPos =
         Offset(particle.x * size.width, particle.y * size.height);
     particle.trail.insert(0, currentPos);
@@ -644,39 +584,29 @@ class EnhancedParticlePainter extends CustomPainter {
   }
 
   void _drawParticle(Canvas canvas, EnhancedParticle particle, Size size) {
-    // Draw trail with fading opacity
-    for (int i = 0; i < particle.trail.length; i++) {
+    // Draw subtle trail
+    for (int i = 1; i < particle.trail.length; i++) {
       final trailOpacity =
-          particle.opacity * (1.0 - (i / particle.trail.length));
+          particle.opacity * (1.0 - (i / particle.trail.length)) * 0.4;
       final trailPaint = Paint()
-        ..color = particle.color.withOpacity(trailOpacity * 0.5)
+        ..color = particle.color.withOpacity(trailOpacity)
         ..style = PaintingStyle.fill;
 
       canvas.drawCircle(
         particle.trail[i],
-        particle.radius * (1.0 - (i / particle.trail.length)) * 0.5,
+        particle.radius * (1.0 - (i / particle.trail.length)) * 0.6,
         trailPaint,
       );
     }
 
-    // Draw main particle with pulsing effect
+    // Draw main particle with subtle pulse
     final pulseFactor =
-        1.0 + sin(animation.value * 2 * pi + particle.pulsePhase) * 0.15;
+        1.0 + sin(animation.value * 2 * pi + particle.pulsePhase) * 0.1;
     final mainPaint = Paint()
       ..color = particle.color.withOpacity(particle.opacity)
       ..style = PaintingStyle.fill;
 
-    // Add subtle glow effect
-    final glowPaint = Paint()
-      ..color = particle.color.withOpacity(particle.opacity * 0.3)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.0);
-
     final position = Offset(particle.x * size.width, particle.y * size.height);
-
-    // Draw glow
-    canvas.drawCircle(position, particle.radius * pulseFactor * 1.5, glowPaint);
-
-    // Draw main particle
     canvas.drawCircle(position, particle.radius * pulseFactor, mainPaint);
   }
 
@@ -704,15 +634,14 @@ class FloatingElementsPainter extends CustomPainter {
   }
 
   void _updateElement(FloatingElement element, Size size) {
-    // Slow upward drift
-    element.y = (element.y - element.speed) % 1.0;
+    // Very slow upward drift
+    element.y = (element.y - element.speed * 0.5) % 1.0;
     if (element.y < 0) element.y = 1.0;
 
-    // Gentle horizontal sway
-    element.x += sin(animation.value * 2 * pi * 0.1) * 0.0001;
+    // Minimal horizontal sway
+    element.x += sin(animation.value * 2 * pi * 0.05) * 0.00005;
     element.x = element.x.clamp(0.0, 1.0);
 
-    // Update rotation
     element.rotation += element.rotationSpeed;
   }
 
@@ -727,22 +656,9 @@ class FloatingElementsPainter extends CustomPainter {
     canvas.translate(position.dx, position.dy);
     canvas.rotate(element.rotation);
 
-    // Draw hexagon shape
-    final path = Path();
-    for (int i = 0; i < 6; i++) {
-      final angle = (i * pi * 2) / 6;
-      final x = cos(angle) * element.size * 0.5;
-      final y = sin(angle) * element.size * 0.5;
+    // Draw simple circle instead of hexagon for minimalism
+    canvas.drawCircle(Offset.zero, element.size * 0.5, paint);
 
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-    path.close();
-
-    canvas.drawPath(path, paint);
     canvas.restore();
   }
 

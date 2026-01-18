@@ -1,4 +1,7 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../data/models/category_model.dart';
@@ -22,60 +25,37 @@ class CategoryCard extends StatefulWidget {
 }
 
 class _CategoryCardState extends State<CategoryCard>
-    with TickerProviderStateMixin {
-  // Animation controllers
+    with SingleTickerProviderStateMixin {
   late AnimationController _hoverController;
-  late AnimationController _pulseController;
-  late AnimationController _shimmerController;
-
-  // Animations
   late Animation<double> _scaleAnimation;
-  late Animation<double> _borderAnimation;
+  late Animation<double> _elevationAnimation;
 
-  // Hover state
   bool _isHovering = false;
 
   @override
   void initState() {
     super.initState();
 
-    // Main hover animation controller
     _hoverController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 200),
     );
 
-    // Subtle continuous pulse animation for premium indicator
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2000),
-    )..repeat(reverse: true);
-
-    // Shimmer effect animation
-    _shimmerController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat();
-
-    // Define animations
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.03).animate(
       CurvedAnimation(parent: _hoverController, curve: Curves.easeOutCubic),
     );
 
-    _borderAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _hoverController, curve: Curves.easeOutCubic),
+    _elevationAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _hoverController, curve: Curves.easeOut),
     );
   }
 
   @override
   void dispose() {
     _hoverController.dispose();
-    _pulseController.dispose();
-    _shimmerController.dispose();
     super.dispose();
   }
 
-  // Handle mouse enter/exit for web/desktop
   void _onHover(bool isHovering) {
     setState(() {
       _isHovering = isHovering;
@@ -90,17 +70,8 @@ class _CategoryCardState extends State<CategoryCard>
 
   @override
   Widget build(BuildContext context) {
-    final brightness = MediaQuery.platformBrightnessOf(context);
-    final isDarkMode = brightness == Brightness.dark;
-
-    // Premium colors
-    final primaryColor = isDarkMode
-        ? const Color(0xFF9D81FC) // Soft purple for dark mode
-        : const Color(0xFF6C5CE7); // Bold purple for light mode
-
-    final accentColor = isDarkMode
-        ? const Color(0xFFFD79A8) // Pink accent for dark mode
-        : const Color(0xFFFF7675); // Coral accent for light mode
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return MouseRegion(
       onEnter: (_) => _onHover(true),
@@ -108,226 +79,39 @@ class _CategoryCardState extends State<CategoryCard>
       child: GestureDetector(
         onTap: () => widget.onTap(widget.index),
         child: AnimatedBuilder(
-          animation: Listenable.merge([
-            _hoverController,
-            _pulseController,
-            _shimmerController,
-          ]),
+          animation: _hoverController,
           builder: (context, child) {
             return Transform.scale(
               scale: _scaleAnimation.value,
               child: Container(
-                height: 220.h,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDark
+                          ? Colors.black.withOpacity(0.3 + (0.2 * _elevationAnimation.value))
+                          : Colors.black.withOpacity(0.08 + (0.12 * _elevationAnimation.value)),
+                      blurRadius: 12 + (12 * _elevationAnimation.value),
+                      offset: Offset(0, 4 + (4 * _elevationAnimation.value)),
+                    ),
+                  ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(20),
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      // Background image with parallax effect
-                      TweenAnimationBuilder<double>(
-                        tween:
-                            Tween<double>(begin: 0, end: _isHovering ? 1.0 : 0),
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeOutCubic,
-                        builder: (context, value, child) {
-                          return Transform.scale(
-                            scale: 1.1 + (0.05 * value),
-                            child: Transform.translate(
-                              offset: Offset(5 * value, -5 * value),
-                              child: ImageWidget(
-                                imagePath: widget.category.image,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                      // Background image with parallax
+                      _buildParallaxImage(),
 
-                      AnimatedOpacity(
-                        duration: const Duration(milliseconds: 500),
-                        opacity: 0.5 + (0.3 * _hoverController.value),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Colors.black.withOpacity(0.2),
-                                primaryColor.withOpacity(0.3),
-                                Colors.black.withOpacity(0.7),
-                              ],
-                              stops: const [0.0, 0.4, 1.0],
-                              transform: GradientRotation(
-                                (0.5 * 3.14) +
-                                    (0.05 * _shimmerController.value),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                      // Clean gradient overlay
+                      _buildGradientOverlay(isDark),
 
-                      Padding(
-                        padding: EdgeInsets.all(3.w),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            // Bottom content section
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Category title with animated shadow
-                                TweenAnimationBuilder<double>(
-                                  tween: Tween<double>(
-                                      begin: 0, end: _isHovering ? 1.0 : 0),
-                                  duration: const Duration(milliseconds: 400),
-                                  curve: Curves.easeOutCubic,
-                                  builder: (context, value, child) {
-                                    return Transform.translate(
-                                      offset: Offset(0, -3 * value),
-                                      child: TextWidget(
-                                        text: widget.category.title,
-                                        color: Colors.white,
-                                        fontSize: 18.sp,
-                                        fontWeight: FontWeight.w800,
-                                        letterSpacing: -0.3,
-                                        shadows: [
-                                          Shadow(
-                                            color:
-                                                Colors.black.withOpacity(0.5),
-                                            blurRadius: 8 + (8 * value),
-                                            offset: Offset(0, 2 + (2 * value)),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
+                      // Content
+                      _buildContent(theme, isDark),
 
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.visibility_rounded,
-                                      color: Colors.white.withOpacity(0.8),
-                                      size: 16.sp,
-                                    ),
-                                    // SizedBox(width: 6.w),
-                                    TextWidget(
-                                      text:
-                                          '${(widget.index + 1) * 1250}+ views',
-                                      color: Colors.white.withOpacity(0.8),
-                                      fontSize: 13.sp,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-
-                                    // SizedBox(width: 16.w),
-                                    // Pulse animation for "trending" indicator
-                                  ],
-                                ),
-
-                                Row(
-                                  children: [
-                                    TweenAnimationBuilder<double>(
-                                      tween: Tween<double>(begin: 0, end: 1),
-                                      duration:
-                                          const Duration(milliseconds: 1500),
-                                      curve: Curves.elasticOut,
-                                      builder: (context, value, child) {
-                                        return Transform.scale(
-                                          scale: value *
-                                              (0.9 +
-                                                  (0.1 *
-                                                      _pulseController.value)),
-                                          child: Icon(
-                                            Icons.trending_up_rounded,
-                                            color: accentColor.withOpacity(0.9),
-                                            size: 16.sp,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    SizedBox(width: 1.w),
-                                    TextWidget(
-                                      text: 'Trending',
-                                      color: accentColor.withOpacity(0.9),
-                                      fontSize: 13.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Animated border overlay
-                      AnimatedOpacity(
-                        duration: const Duration(milliseconds: 200),
-                        opacity: _borderAnimation.value * 0.8,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.3),
-                              width: 1.5,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Animated corner accents that appear on hover
-                      ...List.generate(4, (cornerIndex) {
-                        final positions = [
-                          Alignment.topLeft,
-                          Alignment.topRight,
-                          Alignment.bottomRight,
-                          Alignment.bottomLeft,
-                        ];
-
-                        return Positioned.fill(
-                          child: AnimatedBuilder(
-                            animation: _hoverController,
-                            builder: (context, child) {
-                              return AnimatedOpacity(
-                                duration: const Duration(milliseconds: 300),
-                                opacity: _hoverController.value,
-                                child: Align(
-                                  alignment: positions[cornerIndex],
-                                  child: FractionalTranslation(
-                                    translation: Offset(
-                                      cornerIndex == 0 || cornerIndex == 3
-                                          ? -0.5
-                                          : 0.5,
-                                      cornerIndex == 0 || cornerIndex == 1
-                                          ? -0.5
-                                          : 0.5,
-                                    ),
-                                    child: Container(
-                                      height: 3.w,
-                                      width: 3.w,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            primaryColor.withOpacity(0.8),
-                                            Colors.transparent,
-                                          ],
-                                          begin: positions[cornerIndex],
-                                          end: positions[(cornerIndex + 2) % 4],
-                                        ),
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      }),
+                      // Subtle border
+                      _buildBorder(isDark),
                     ],
                   ),
                 ),
@@ -337,5 +121,158 @@ class _CategoryCardState extends State<CategoryCard>
         ),
       ),
     );
+  }
+
+  Widget _buildParallaxImage() {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+      transform: Matrix4.identity()
+        ..scale(_isHovering ? 1.08 : 1.0)
+        ..translate(_isHovering ? -4.0 : 0.0, _isHovering ? -4.0 : 0.0),
+      child: ImageWidget(
+        imagePath: widget.category.image,
+        fit: BoxFit.cover,
+      ),
+    );
+  }
+
+  Widget _buildGradientOverlay(bool isDark) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: _isHovering
+              ? [
+                  Colors.transparent,
+                  Colors.black.withOpacity(0.3),
+                  Colors.black.withOpacity(0.85),
+                ]
+              : [
+                  Colors.transparent,
+                  Colors.black.withOpacity(0.2),
+                  Colors.black.withOpacity(0.75),
+                ],
+          stops: const [0.0, 0.5, 1.0],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContent(ThemeData theme, bool isDark) {
+    return Padding(
+      padding: EdgeInsets.all(3.5.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          // Category title
+          AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 200),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: _isHovering ? 19.sp : 18.sp,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.3,
+              height: 1.2,
+              shadows: [
+                Shadow(
+                  color: Colors.black.withOpacity(0.4),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Text(
+              widget.category.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+
+          SizedBox(height: 8),
+
+          // Metadata row
+          Row(
+            children: [
+              // Views count
+              Icon(
+                Icons.visibility_rounded,
+                color: Colors.white.withOpacity(0.7),
+                size: 14.sp,
+              ),
+              SizedBox(width: 1.w),
+              Flexible(
+                child: TextWidget(
+                  text: '${_formatNumber((widget.index + 1) * 1250)} views',
+                  color: Colors.white.withOpacity(0.7),
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: 4),
+
+          // Trending badge
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.5.h),
+            decoration: BoxDecoration(
+              color: theme.primaryColor.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                color: theme.primaryColor.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.trending_up_rounded,
+                  color: theme.primaryColor,
+                  size: 13.sp,
+                ),
+                SizedBox(width: 1.w),
+                TextWidget(
+                  text: 'Trending',
+                  color: theme.primaryColor,
+                  fontSize: 11.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBorder(bool isDark) {
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 200),
+      opacity: _isHovering ? 1.0 : 0.0,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: Colors.white.withOpacity(isDark ? 0.15 : 0.2),
+            width: 1.5,
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatNumber(int number) {
+    if (number >= 1000000) {
+      return '${(number / 1000000).toStringAsFixed(1)}M';
+    } else if (number >= 1000) {
+      return '${(number / 1000).toStringAsFixed(1)}K';
+    }
+    return number.toString();
   }
 }

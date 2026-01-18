@@ -70,6 +70,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         theme: AppTheme.lightTheme,
         darkTheme: DarkTheme.darkTheme,
         themeMode: context.watch<ThemeProvider>().themeMode,
+
         initialRoute: AppRoutes.splash,
         onGenerateRoute: AppRoutes.generateRoute,
         builder: (context, child) {

@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -5,7 +7,6 @@ import 'package:sizer/sizer.dart';
 import '../../../presentation/provider/search_provider.dart';
 import '../../widgets/appbars/app_bar.dart';
 import '../../widgets/loading/loading_indicator.dart';
-import '../../widgets/loading/pagination_indicator.dart';
 import 'tabbed_content_view.dart';
 
 class SearchResultsList extends StatefulWidget {
@@ -30,9 +31,7 @@ class _SearchResultsListState extends State<SearchResultsList>
   late AnimationController _slideController;
   late AnimationController _statsController;
 
-  late Animation<double> _fadeAnimation;
   late Animation<double> _slideAnimation;
-  late Animation<double> _statsAnimation;
 
   final TextEditingController _searchController = TextEditingController();
 
@@ -65,10 +64,7 @@ class _SearchResultsListState extends State<SearchResultsList>
       vsync: this,
     );
 
-    _fadeAnimation = CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeOutQuart,
-    );
+
 
     _slideAnimation = Tween<double>(begin: 30, end: 0).animate(
       CurvedAnimation(
@@ -77,10 +73,7 @@ class _SearchResultsListState extends State<SearchResultsList>
       ),
     );
 
-    _statsAnimation = CurvedAnimation(
-      parent: _statsController,
-      curve: Curves.easeOutCubic,
-    );
+
   }
 
   void _initializeTabController() {
@@ -245,169 +238,7 @@ class _SearchResultsListState extends State<SearchResultsList>
     );
   }
 
-  Widget _buildEnhancedSearchStats(
-      SearchProvider provider, ThemeData theme, bool isDark) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            theme.cardColor.withOpacity(0.9),
-            theme.cardColor.withOpacity(0.7),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : Colors.grey.withOpacity(0.2),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.08),
-            blurRadius: 15,
-            offset: const Offset(0, 4),
-            spreadRadius: -2,
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Search icon container
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  theme.primaryColor.withOpacity(0.15),
-                  theme.primaryColor.withOpacity(0.08),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: theme.primaryColor.withOpacity(0.2),
-                width: 1,
-              ),
-            ),
-            child: Icon(
-              Icons.search_rounded,
-              color: theme.primaryColor,
-              size: 20,
-            ),
-          ),
 
-          const SizedBox(width: 16),
-
-          // Search info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      _getResultsCount(provider),
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w700,
-                        color: theme.textTheme.bodyLarge?.color,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.check_circle_rounded,
-                            size: 12,
-                            color: Colors.green,
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            'Found',
-                            style: TextStyle(
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.green,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.category_rounded,
-                      size: 14,
-                      color: Colors.grey[600],
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Category: ${widget.category}',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          // View mode indicator
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  theme.primaryColor.withOpacity(0.15),
-                  theme.primaryColor.withOpacity(0.08),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: theme.primaryColor.withOpacity(0.2),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  provider.isGrid ? Icons.grid_view : Icons.view_list,
-                  size: 14,
-                  color: theme.primaryColor,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  provider.isGrid ? 'Grid' : 'List',
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w700,
-                    color: theme.primaryColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildEnhancedCategoryContent(
       SearchProvider provider, ThemeData theme, bool isDark) {
@@ -447,7 +278,7 @@ class _SearchResultsListState extends State<SearchResultsList>
   }
 
   Widget _buildEnhancedLoadingState(ThemeData theme) {
-    return Center(child: CustomLoadingIndicator()
+    return const Center(child: CustomLoadingIndicator()
 
         // Container(
         //   padding: const EdgeInsets.all(32),
@@ -602,21 +433,5 @@ class _SearchResultsListState extends State<SearchResultsList>
     );
   }
 
-  String _getResultsCount(SearchProvider provider) {
-    final categoryResults = provider.allCategoryResults[widget.category];
-    if (categoryResults == null) return '0 results';
 
-    int totalResults = 0;
-    categoryResults.forEach((sourceId, results) {
-      totalResults += results.length;
-    });
-
-    if (totalResults >= 1000000) {
-      return '${(totalResults / 1000000).toStringAsFixed(1)}M results';
-    } else if (totalResults >= 1000) {
-      return '${(totalResults / 1000).toStringAsFixed(1)}K results';
-    }
-
-    return '$totalResults results';
-  }
 }

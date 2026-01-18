@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, only_throw_errors
+// ignore_for_file: library_private_types_in_public_api, only_throw_errors, deprecated_member_use
 
 import 'dart:developer';
 import 'dart:io';
@@ -53,8 +53,7 @@ class _UpdateScreenState extends State<UpdateScreen>
   double _cardRotationY = 0;
 
   // Colors - Luxurious color scheme
-  final Color _bgDarkColor = AppColors.disabledColor;
-  final Color _bgLightColor = const Color(0xFF1E1E1E);
+
   final Color _accentColor = AppColors.primaryColor; // Luxurious gold
   final Color _accentSecondaryColor =
       AppColors.primaryColor.withOpacity(.8); // Deeper gold

@@ -1,11 +1,14 @@
-// ignore_for_file: library Hawkins, library_private_types_in_public_api, use_build_context_synchronously, unused_element
+
+
+
+
+// ignore_for_file: use_build_context_synchronously, deprecated_member_use, avoid_print, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math' as math;
 import 'dart:ui';
-
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/core/navigation/app_navigator.dart';
@@ -268,64 +271,12 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
     );
   }
 
-  // Widget _buildAnimatedBackground() {
-  //   return AnimatedBuilder(
-  //     animation: _backgroundAnimController,
-  //     builder: (context, _) {
-  //       // Update particle positions
-  //       for (final particle in _particles) {
-  //         particle.x += particle.speedX;
-  //         particle.y += particle.speedY;
-
-  //         // Wrap around edges
-  //         if (particle.x < -0.1) particle.x = 1.1;
-  //         if (particle.x > 1.1) particle.x = -0.1;
-  //         if (particle.y < -0.1) particle.y = 1.1;
-  //         if (particle.y > 1.1) particle.y = -0.1;
-  //       }
-
-  //       return AnimatedContainer(
-  //         duration: const Duration(milliseconds: 500),
-  //         decoration: BoxDecoration(
-  //           gradient: LinearGradient(
-  //             begin: Alignment.topLeft,
-  //             end: Alignment.bottomRight,
-  //             colors: _backgroundGradient,
-  //           ),
-  //         ),
-  //         child: CustomPaint(
-  //           painter: _ParticlePainter(
-  //             particles: _particles,
-  //             color: AppColors.primaryColor,
-  //             animationValue: _backgroundAnimController.value,
-  //           ),
-  //           child: const SizedBox.expand(),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   PreferredSizeWidget _buildAppBar() {
     return const CustomAppBar(
       elevation: 0,
       title: "Settings",
       appBarStyle: AppBarStyle.standard,
-      // actions: [
-      //   SlideTransition(
-      //     position: Tween<Offset>(
-      //       begin: const Offset(1, 0),
-      //       end: Offset.zero,
-      //     ).animate(CurvedAnimation(
-      //       parent: _pageEnterController,
-      //       curve: const Interval(0.3, 0.7, curve: Curves.easeOutQuint),
-      //     )),
-      //     child: IconButton(
-      //       icon: const Icon(Icons.search),
-      //       onPressed: () {},
-      //     ),
-      //   ),
-      // ],
     );
   }
 
@@ -1048,75 +999,6 @@ class _Particle {
     required this.speedY,
     required this.opacity,
   });
-}
-
-class _ParticlePainter extends CustomPainter {
-  final List<_Particle> particles;
-  final Color color;
-  final double animationValue;
-
-  _ParticlePainter({
-    required this.particles,
-    required this.color,
-    required this.animationValue,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    for (final particle in particles) {
-      final paint = Paint()
-        ..color = color.withOpacity(
-          particle.opacity *
-              (0.5 + 0.5 * math.sin(animationValue * math.pi * 2)),
-        );
-
-      canvas.drawCircle(
-        Offset(
-          particle.x * size.width,
-          particle.y * size.height,
-        ),
-        particle.size,
-        paint,
-      );
-
-      // Draw connecting lines between nearby particles
-      for (final otherParticle in particles) {
-        final dx = (particle.x - otherParticle.x).abs() * size.width;
-        final dy = (particle.y - otherParticle.y).abs() * size.height;
-        final distance = math.sqrt(dx * dx + dy * dy);
-
-        if (distance < 100) {
-          final linePaint = Paint()
-            ..color = color.withOpacity(
-              0.05 *
-                  (1 - distance / 100) *
-                  (0.5 +
-                      0.5 *
-                          math.sin(
-                              (animationValue + particle.x) * math.pi * 2)),
-            )
-            ..strokeWidth = 1.0;
-
-          canvas.drawLine(
-            Offset(
-              particle.x * size.width,
-              particle.y * size.height,
-            ),
-            Offset(
-              otherParticle.x * size.width,
-              otherParticle.y * size.height,
-            ),
-            linePaint,
-          );
-        }
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(_ParticlePainter oldDelegate) {
-    return oldDelegate.animationValue != animationValue;
-  }
 }
 
 enum _SettingType {

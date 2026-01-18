@@ -30,31 +30,20 @@ class _SourceCardState extends State<SourceCard>
     with SingleTickerProviderStateMixin {
   bool _isHovered = false;
   bool _isPressed = false;
-  late FocusNode _focusNode;
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
-  late Animation<double> _elevationAnimation;
 
   @override
   void initState() {
     super.initState();
-    _focusNode = FocusNode();
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 200),
       vsync: this,
     );
 
     _scaleAnimation = Tween<double>(
       begin: 1.0,
-      end: 1.015,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _elevationAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
+      end: 1.02,
     ).animate(CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeOutCubic,
@@ -63,7 +52,6 @@ class _SourceCardState extends State<SourceCard>
 
   @override
   void dispose() {
-    _focusNode.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -124,17 +112,17 @@ class _SourceCardState extends State<SourceCard>
   IconData _getTypeIcon(String type) {
     switch (type) {
       case '1':
-        return Icons.play_circle_outline_rounded;
+        return Icons.play_circle_filled_rounded;
       case '3':
-        return Icons.image_outlined;
+        return Icons.image_rounded;
       case '4':
-        return Icons.menu_book_outlined;
+        return Icons.menu_book_rounded;
       case '5':
-        return Icons.movie_outlined;
+        return Icons.movie_rounded;
       case '2':
-        return Icons.music_video_outlined;
+        return Icons.music_video_rounded;
       default:
-        return Icons.category_outlined;
+        return Icons.category_rounded;
     }
   }
 
@@ -143,7 +131,7 @@ class _SourceCardState extends State<SourceCard>
       case '1':
         return 'Video';
       case '3':
-        return 'Wallpaper';
+        return 'Photos';
       case '4':
         return 'Manga';
       case '5':
@@ -161,154 +149,142 @@ class _SourceCardState extends State<SourceCard>
     final isDark = theme.brightness == Brightness.dark;
     final typeColor = _getTypeColor(widget.source.type);
 
-    return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 8,
-      ),
-      child: Focus(
-        focusNode: _focusNode,
-        child: MouseRegion(
-          onEnter: (_) => _handleHover(true),
-          onExit: (_) => _handleHover(false),
-          child: GestureDetector(
-            onTapDown: (_) => setState(() => _isPressed = true),
-            onTapUp: (_) => setState(() => _isPressed = false),
-            onTapCancel: () => setState(() => _isPressed = false),
-            onTap: _handleTap,
-            child: AnimatedBuilder(
-              animation: _animationController,
-              builder: (context, child) {
-                return Transform.scale(
-                  scale: _isPressed ? 0.98 : _scaleAnimation.value,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.grey[900] : Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: _isHovered
-                            ? typeColor.withOpacity(0.4)
-                            : (isDark ? Colors.grey[800]! : Colors.grey[200]!),
-                        width: _isHovered ? 1.5 : 1,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
-                          blurRadius: 8 + (_elevationAnimation.value * 12),
-                          offset:
-                              Offset(0, 4 + (_elevationAnimation.value * 8)),
-                          spreadRadius: -2,
-                        ),
-                        if (_isHovered)
-                          BoxShadow(
-                            color: typeColor.withOpacity(0.15),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
-                            spreadRadius: -4,
-                          ),
-                      ],
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.w),
+      child: MouseRegion(
+        onEnter: (_) => _handleHover(true),
+        onExit: (_) => _handleHover(false),
+        child: GestureDetector(
+          onTapDown: (_) => setState(() => _isPressed = true),
+          onTapUp: (_) => setState(() => _isPressed = false),
+          onTapCancel: () => setState(() => _isPressed = false),
+          onTap: _handleTap,
+          child: AnimatedBuilder(
+            animation: _animationController,
+            builder: (context, child) {
+              return Transform.scale(
+                scale: _isPressed ? 0.98 : _scaleAnimation.value,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? Colors.white.withOpacity(0.04)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: _isHovered
+                          ? typeColor.withOpacity(0.3)
+                          : (isDark
+                              ? Colors.white.withOpacity(0.08)
+                              : Colors.black.withOpacity(0.06)),
+                      width: _isHovered ? 1.5 : 1,
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: _handleTap,
-                          borderRadius: BorderRadius.circular(20),
-                          splashColor: typeColor.withOpacity(0.1),
-                          highlightColor: typeColor.withOpacity(0.05),
-                          child: Padding(
-                            padding: const EdgeInsets.all(18),
-                            child: Row(
-                              children: [
-                                // Enhanced Icon Container
-                                _buildIconContainer(typeColor),
-
-                                const SizedBox(width: 18),
-
-                                // Enhanced Content
-                                Expanded(
-                                  child: _buildContent(typeColor, theme),
-                                ),
-
-                                const SizedBox(width: 12),
-
-                                // Enhanced Arrow
-                                _buildArrow(typeColor),
-                              ],
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+                        blurRadius: _isHovered ? 12 : 8,
+                        offset: Offset(0, _isHovered ? 6 : 2),
+                      ),
+                      if (_isHovered)
+                        BoxShadow(
+                          color: typeColor.withOpacity(0.15),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(16),
+                    child: InkWell(
+                      onTap: _handleTap,
+                      borderRadius: BorderRadius.circular(16),
+                      splashColor: typeColor.withOpacity(0.08),
+                      highlightColor: typeColor.withOpacity(0.04),
+                      child: Padding(
+                        padding: EdgeInsets.all(4.w),
+                        child: Row(
+                          children: [
+                            _buildIconContainer(typeColor, isDark),
+                            SizedBox(width: 4.w),
+                            Expanded(
+                              child: _buildContent(typeColor, theme, isDark),
                             ),
-                          ),
+                            SizedBox(width: 3.w),
+                            _buildArrow(typeColor, isDark),
+                          ],
                         ),
                       ),
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         ),
-      )
-          .animate(delay: (widget.index * 80).ms)
-          .fadeIn(duration: 500.ms, curve: Curves.easeOutQuart)
-          .slideX(begin: 0.15, duration: 500.ms, curve: Curves.easeOutCubic),
-    );
+      ),
+    )
+        .animate(delay: Duration(milliseconds: widget.index * 60))
+        .fadeIn(duration: 400.ms, curve: Curves.easeOut)
+        .slideX(begin: -0.1, duration: 400.ms, curve: Curves.easeOutCubic);
   }
 
-  Widget _buildIconContainer(Color typeColor) {
+  Widget _buildIconContainer(Color typeColor, bool isDark) {
     return Container(
-      width: 52,
-      height: 52,
+      width: 60,
+      height: 60,
       decoration: BoxDecoration(
-        color: typeColor.withOpacity(_isHovered ? 0.15 : 0.08),
-        borderRadius: BorderRadius.circular(16),
+        color: typeColor.withOpacity(_isHovered ? 0.12 : 0.08),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: typeColor.withOpacity(_isHovered ? 0.3 : 0.15),
+          color: typeColor.withOpacity(_isHovered ? 0.25 : 0.15),
           width: 1,
         ),
       ),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        transform: Matrix4.identity()..scale(_isHovered ? 1.05 : 1.0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Stack(
-            children: [
-              // Icon background with subtle gradient
-              if (_isHovered)
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        typeColor.withOpacity(0.1),
-                        typeColor.withOpacity(0.05),
-                      ],
-                    ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(13),
+        child: Stack(
+          children: [
+            // Subtle gradient background on hover
+            if (_isHovered)
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      typeColor.withOpacity(0.08),
+                      typeColor.withOpacity(0.02),
+                    ],
                   ),
                 ),
-
-              // Main icon
-              Center(
-                child: ImageWidget(
-                  imagePath: widget.source.icon,
-                  height: 32,
-                  width: 32,
-                  fit: BoxFit.cover,
-                ),
               ),
-            ],
-          ),
+
+            // Icon or fallback
+            Center(
+              child: widget.source.icon.isNotEmpty
+                  ? ImageWidget(
+                      imagePath: widget.source.icon,
+                      height: 32,
+                      width: 32,
+                      fit: BoxFit.cover,
+                    )
+                  : Icon(
+                      _getTypeIcon(widget.source.type),
+                      color: typeColor,
+                      size: 28,
+                    ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildContent(Color typeColor, ThemeData theme) {
+  Widget _buildContent(Color typeColor, ThemeData theme, bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Enhanced Source Name
+        // Source name with verified badge
         Row(
           children: [
             Expanded(
@@ -316,20 +292,19 @@ class _SourceCardState extends State<SourceCard>
                 text: widget.source.name,
                 fontWeight: FontWeight.w700,
                 fontSize: 16.sp,
-                color:
-                    _isHovered ? typeColor : theme.textTheme.bodyLarge?.color,
+                color: isDark ? Colors.white : Colors.black87,
+                maxLine: 1,
               ),
             ),
-            // Verified indicator
             if (widget.source.nsfw != '1')
               Container(
-                padding: const EdgeInsets.all(2),
+                padding: const EdgeInsets.all(3),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withOpacity(0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.verified,
+                child: const Icon(
+                  Icons.verified_rounded,
                   size: 12,
                   color: Colors.green,
                 ),
@@ -337,139 +312,92 @@ class _SourceCardState extends State<SourceCard>
           ],
         ),
 
-        const SizedBox(height: 10),
+        SizedBox(height: 2.w),
 
-        // Enhanced badges row
-        Row(
+        // Badges row
+        Wrap(
+          spacing: 2.w,
+          runSpacing: 1.w,
           children: [
-            // Type badge with refined styling
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 5,
-              ),
-              decoration: BoxDecoration(
-                color: typeColor.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: typeColor.withOpacity(0.25),
-                  width: 0.5,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    _getTypeIcon(widget.source.type),
-                    size: 13,
-                    color: typeColor,
-                  ),
-                  const SizedBox(width: 5),
-                  TextWidget(
-                    text: _getTypeLabel(widget.source.type),
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w600,
-                    color: typeColor,
-                    letterSpacing: 0.2,
-                  ),
-                ],
-              ),
+            // Type badge
+            _buildBadge(
+              icon: _getTypeIcon(widget.source.type),
+              label: _getTypeLabel(widget.source.type),
+              color: typeColor,
             ),
 
-            // NSFW badge with better styling
-            if (widget.source.nsfw == '1') ...[
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: Colors.red.withOpacity(0.25),
-                    width: 0.5,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.warning_rounded,
-                      size: 11,
-                      color: Colors.red[600],
-                    ),
-                    const SizedBox(width: 4),
-                    TextWidget(
-                      text: '18+',
-                      fontSize: 11.sp,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.red[600],
-                      letterSpacing: 0.3,
-                    ),
-                  ],
-                ),
+            // NSFW badge
+            if (widget.source.nsfw == '1')
+              _buildBadge(
+                icon: Icons.warning_rounded,
+                label: '18+',
+                color: Colors.red,
+                isWarning: true,
               ),
-            ],
-
-            const Spacer(),
-
-            // Popularity indicator
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 6,
-                vertical: 3,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.trending_up_rounded,
-                    size: 10,
-                    color: Colors.grey[600],
-                  ),
-                  const SizedBox(width: 3),
-                  TextWidget(
-                    text: 'Popular',
-                    fontSize: 9.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey[600],
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildArrow(Color typeColor) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      width: 36,
-      height: 36,
+  Widget _buildBadge({
+    required IconData icon,
+    required String label,
+    required Color color,
+    bool isWarning = false,
+  }) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 2.5.w, vertical: 1.w),
       decoration: BoxDecoration(
-        color: _isHovered ? typeColor.withOpacity(0.1) : Colors.transparent,
-        borderRadius: BorderRadius.circular(18),
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: _isHovered ? typeColor.withOpacity(0.2) : Colors.transparent,
+          color: color.withOpacity(0.2),
           width: 1,
         ),
       ),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        transform: Matrix4.identity()..translate(_isHovered ? 2.0 : 0.0, 0.0),
-        child: Icon(
-          Icons.arrow_forward_ios_rounded,
-          color: _isHovered ? typeColor : Colors.grey[500],
-          size: 16,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 12,
+            color: color,
+          ),
+          SizedBox(width: 1.w),
+          TextWidget(
+            text: label,
+            fontSize: 11.sp,
+            fontWeight: FontWeight.w600,
+            color: color,
+            letterSpacing: 0.2,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildArrow(Color typeColor, bool isDark) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        color: _isHovered ? typeColor.withOpacity(0.1) : Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: _isHovered
+              ? typeColor.withOpacity(0.2)
+              : Colors.transparent,
+          width: 1,
         ),
+      ),
+      child: Icon(
+        Icons.arrow_forward_ios_rounded,
+        color: _isHovered
+            ? typeColor
+            : (isDark ? Colors.grey[500] : Colors.grey[400]),
+        size: 14,
       ),
     );
   }

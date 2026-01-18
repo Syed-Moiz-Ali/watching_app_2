@@ -1,4 +1,4 @@
-// ignore_for_file: dead_code
+// ignore_for_file: dead_code, deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
@@ -7,7 +7,6 @@ import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/data/models/content_item.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 import 'package:watching_app_2/shared/widgets/buttons/primary_button.dart';
-import '../../../data/database/local_database.dart';
 
 class MinimalistFiltersBottomSheet extends StatefulWidget {
   final String contentType;

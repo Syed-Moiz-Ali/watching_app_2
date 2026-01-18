@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/colors.dart';
 
 class AppTheme {
@@ -7,13 +8,11 @@ class AppTheme {
       brightness: Brightness.light,
       primaryColor: AppColors.primaryColor,
       hintColor: AppColors.accentColor,
+      fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+
+      textTheme: GoogleFonts.plusJakartaSansTextTheme(),
       scaffoldBackgroundColor: AppColors.backgroundColorLight,
-      textTheme: const TextTheme(
-        bodyLarge: TextStyle(color: AppColors.textColorLight),
-        bodyMedium: TextStyle(color: AppColors.textColorLight),
-      ),
-      dialogBackgroundColor: AppColors.backgroundColorLight,
-      dialogTheme: const DialogTheme(
+      dialogTheme: const DialogThemeData(
         backgroundColor: AppColors.backgroundColorLight,
       ),
       appBarTheme: const AppBarTheme(
@@ -21,16 +20,20 @@ class AppTheme {
         shadowColor: Colors.transparent,
         scrolledUnderElevation: 0,
         iconTheme: IconThemeData(color: AppColors.textColorLight),
-        toolbarTextStyle:
-            TextStyle(color: AppColors.textColorLight, fontSize: 20),
-        titleTextStyle:
-            TextStyle(color: AppColors.textColorLight, fontSize: 20),
+        toolbarTextStyle: TextStyle(
+          color: AppColors.textColorLight,
+          fontSize: 20,
+        ),
+        titleTextStyle: TextStyle(
+          color: AppColors.textColorLight,
+          fontSize: 20,
+        ),
       ),
       buttonTheme: ButtonThemeData(
         buttonColor: AppColors.primaryColor,
         textTheme: ButtonTextTheme.primary,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         margin: const EdgeInsets.symmetric(vertical: 8.0),
         elevation: 0,
         shape: RoundedRectangleBorder(

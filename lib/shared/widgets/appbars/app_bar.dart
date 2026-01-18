@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -430,7 +432,7 @@ class _CustomAppBarState extends State<CustomAppBar>
       case AppBarStyle.minimal:
         return _buildMinimalAppBar(context, isDarkTheme);
       case AppBarStyle.standard:
-      default:
+
         return _buildStandardAppBar(context, isDarkTheme);
     }
   }

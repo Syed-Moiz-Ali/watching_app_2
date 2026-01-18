@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -149,24 +151,7 @@ class _AnimatedEmptyStateState extends State<AnimatedEmptyState>
     super.dispose();
   }
 
-  String _getEmptyStateIcon() {
-    switch (widget.contentType.toLowerCase()) {
-      case 'video':
-      case 'videos':
-        return 'play_circle_outline';
-      case 'image':
-      case 'images':
-      case 'wallpaper':
-      case 'wallpapers':
-        return 'image_outlined';
-      case 'manga':
-        return 'menu_book_outlined';
-      case 'anime':
-        return 'movie_outlined';
-      default:
-        return 'favorite_outline';
-    }
-  }
+
 
   IconData _getContentIcon() {
     switch (widget.contentType.toLowerCase()) {

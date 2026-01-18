@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, deprecated_member_use
+
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -121,8 +123,9 @@ class DatabaseBackupManager {
       // Check if file has reasonable size (not empty, not too large)
       final stats = await file.stat();
       if (stats.size < 100) return false; // Too small to be a real database
-      if (stats.size > 100 * 1024 * 1024)
+      if (stats.size > 100 * 1024 * 1024) {
         return false; // Larger than 100MB is suspicious
+      }
 
       // Try to open as SQLite database
       try {
@@ -465,7 +468,7 @@ class DatabaseBackupManager {
             SnackBar(
               content: Row(
                 children: [
-                  Icon(Icons.check_circle, color: Colors.white),
+                  const Icon(Icons.check_circle, color: Colors.white),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
@@ -485,7 +488,7 @@ class DatabaseBackupManager {
             SnackBar(
               content: Row(
                 children: [
-                  Icon(Icons.error, color: Colors.white),
+                  const Icon(Icons.error, color: Colors.white),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
@@ -526,11 +529,11 @@ class DatabaseBackupManager {
             return AlertDialog(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20)),
-              title: Row(
+              title: const Row(
                 children: [
                   Icon(Icons.swap_horizontal_circle_rounded, color: Colors.red),
-                  const SizedBox(width: 12),
-                  const Text('Replace Database'),
+                  SizedBox(width: 12),
+                  Text('Replace Database'),
                 ],
               ),
               content: SingleChildScrollView(
@@ -556,7 +559,7 @@ class DatabaseBackupManager {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.delete_forever,
+                              const Icon(Icons.delete_forever,
                                   color: Colors.red, size: 20),
                               const SizedBox(width: 8),
                               Text(
@@ -570,12 +573,12 @@ class DatabaseBackupManager {
                             ],
                           ),
                           const SizedBox(height: 8),
-                          Icon(Icons.keyboard_double_arrow_down_rounded,
+                          const Icon(Icons.keyboard_double_arrow_down_rounded,
                               color: Colors.orange),
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              Icon(Icons.restore_rounded,
+                              const Icon(Icons.restore_rounded,
                                   color: Colors.green, size: 20),
                               const SizedBox(width: 8),
                               Expanded(
@@ -612,7 +615,7 @@ class DatabaseBackupManager {
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.warning_rounded,
+                          const Icon(Icons.warning_rounded,
                               color: Colors.red, size: 20),
                           const SizedBox(width: 8),
                           Expanded(
@@ -643,12 +646,12 @@ class DatabaseBackupManager {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 12),
                   ),
-                  child: Row(
+                  child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.close_rounded, size: 16),
-                      const SizedBox(width: 6),
-                      const Text('Cancel'),
+                      SizedBox(width: 6),
+                      Text('Cancel'),
                     ],
                   ),
                 ),
@@ -694,12 +697,12 @@ class DatabaseBackupManager {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: Row(
+                  child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.swap_horiz_rounded, size: 16),
-                      const SizedBox(width: 6),
-                      const Text(
+                      SizedBox(width: 6),
+                      Text(
                         'Replace Database',
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
@@ -717,15 +720,15 @@ class DatabaseBackupManager {
   }
 }
 
-String _formatBytes(int bytes) {
-  if (bytes < 1024) return '$bytes B';
-  if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-  return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-}
+// String _formatBytes(int bytes) {
+//   if (bytes < 1024) return '$bytes B';
+//   if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+//   return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+// }
 
-String _formatDate(DateTime date) {
-  return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
-}
+// String _formatDate(DateTime date) {
+//   return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+// }
 
 // Keep all your existing supporting classes...
 enum BackupLocation { downloads, documents, external }

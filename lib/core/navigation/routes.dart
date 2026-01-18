@@ -11,7 +11,6 @@ import '../../features/videos/presentation/screens/content_detail.dart';
 import '../../shared/screens/favorites/favorites.dart';
 import '../../shared/screens/navigation_screen.dart';
 import '../../shared/screens/search_results_list/search_results_list.dart';
-import '../../shared/screens/share_screen.dart';
 import '../../shared/screens/sources/sources.dart';
 import '../../shared/screens/video_player/video_player.dart';
 import '../../features/videos/presentation/screens/videos.dart';
@@ -73,7 +72,7 @@ class AppRoutes {
   static const String favorites = '/favorites';
   static const String searchResult = '/search-result';
   static const String settings = '/settings';
-  static const String share = '/share';
+  // static const String share = '/share';
   static const String sourceList = '/source-list';
   static const String videoList = '/video-list';
   static const String wallpapers = '/wallpapers';
@@ -167,8 +166,8 @@ class AppRoutes {
       case favorites:
         return _createRoute(const Favorites(), settings, transitionType);
 
-      case share:
-        return _createRoute(const DeepLinkHandler(), settings, transitionType);
+      // case share:
+      //   return _createRoute(const DeepLinkHandler(), settings, transitionType);
 
       case sourceList:
         return _createRoute(const Sources(), settings, transitionType);
@@ -379,8 +378,7 @@ class AppRoutes {
                     ..setEntry(1, 1, depth) // Scale y
                     ..setEntry(2, 2, depth) // Scale z
                     ..rotateX(0.1 * (1 - value))
-                    ..rotateY(0.1 * (1 - value))
-                    ..translate(0.0, 0.0, 200 * (1 - value)),
+                    ..rotateY(0.1 * (1 - value)),
                   alignment: Alignment.center,
                   child: Opacity(
                     opacity: value.clamp(0.0, 1.0),

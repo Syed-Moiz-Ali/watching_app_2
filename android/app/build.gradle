@@ -33,8 +33,9 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+         sourceCompatibility = JavaVersion.VERSION_17
+         targetCompatibility = JavaVersion.VERSION_17
+         coreLibraryDesugaringEnabled true
     }
 
     defaultConfig {
@@ -42,7 +43,7 @@ android {
         applicationId = "com.example.watching_app_2"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdk = 23
+        minSdkVersion = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
@@ -63,8 +64,22 @@ android {
             signingConfig = signingConfigs.release
         }
     }
+    kotlin {
+    jvmToolchain(17)
+}
 }
 
 flutter {
     source = "../.."
+}
+
+
+
+dependencies {
+
+
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+
+
+
 }

@@ -1,4 +1,4 @@
-// ignore_for_file: invalid_use_of_protected_member
+// ignore_for_file: invalid_use_of_protected_member, deprecated_member_use
 
 import 'dart:developer';
 
@@ -418,56 +418,53 @@ class _TabbedContentViewState extends State<TabbedContentView>
               ),
             );
           },
-          child: Container(
-            // padding: EdgeInsets.only(top: 8.sp, left: 12.sp, right: 12.sp),
-            child: Stack(
-              children: [
-                if (widget.category == ContentTypes.VIDEO) ...[
-                  VideoGridView(
-                    controller: scrollController,
-                    videos: results,
-                    isGrid: widget.isGrid,
-                    onItemTap: (itemIndex) {
-                      final scaleController = AnimationController(
-                          duration: const Duration(milliseconds: 200),
-                          vsync: this);
+          child: Stack(
+            children: [
+              if (widget.category == ContentTypes.VIDEO) ...[
+                VideoGridView(
+                  controller: scrollController,
+                  videos: results,
+                  isGrid: widget.isGrid,
+                  onItemTap: (itemIndex) {
+                    final scaleController = AnimationController(
+                        duration: const Duration(milliseconds: 200),
+                        vsync: this);
 
-                      scaleController.forward().then((_) {
-                        scaleController.reverse().then((_) {
-                          scaleController.dispose();
-                          NH.nameNavigateTo(AppRoutes.detail,
-                              arguments: {"item": results[itemIndex]});
-                        });
+                    scaleController.forward().then((_) {
+                      scaleController.reverse().then((_) {
+                        scaleController.dispose();
+                        NH.nameNavigateTo(AppRoutes.detail,
+                            arguments: {"item": results[itemIndex]});
                       });
-                    },
-                    currentPlayingIndex: _currentPlayingIndex,
-                    onHorizontalDragStart: (index) => setState(() {
-                      _currentPlayingIndex = index;
-                    }),
-                    onHorizontalDragEnd: (index) => setState(() {
-                      _currentPlayingIndex = index;
-                    }),
-                  ),
-                ] else if (widget.category == ContentTypes.IMAGE) ...[
-                  WallpaperGridView(
-                    wallpapers: results,
-                    onItemTap: (itemIndex) {
-                      NH.nameNavigateTo(AppRoutes.wallpaperDetail,
-                          arguments: {"item": results[itemIndex]});
-                    },
-                  ),
-                ],
-                if (_isLoading[sourceId] == true)
-                  Positioned(
-                    bottom: 20.sp,
-                    left: 0,
-                    right: 0,
-                    child: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  ),
+                    });
+                  },
+                  currentPlayingIndex: _currentPlayingIndex,
+                  onHorizontalDragStart: (index) => setState(() {
+                    _currentPlayingIndex = index;
+                  }),
+                  onHorizontalDragEnd: (index) => setState(() {
+                    _currentPlayingIndex = index;
+                  }),
+                ),
+              ] else if (widget.category == ContentTypes.IMAGE) ...[
+                WallpaperGridView(
+                  wallpapers: results,
+                  onItemTap: (itemIndex) {
+                    NH.nameNavigateTo(AppRoutes.wallpaperDetail,
+                        arguments: {"item": results[itemIndex]});
+                  },
+                ),
               ],
-            ),
+              if (_isLoading[sourceId] == true)
+                Positioned(
+                  bottom: 20.sp,
+                  left: 0,
+                  right: 0,
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+            ],
           ),
         );
       },

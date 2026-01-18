@@ -1,5 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
-import 'dart:developer';
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously, deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,7 +6,6 @@ import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/core/global/globals.dart';
 import 'dart:ui';
-import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:watching_app_2/core/services/download_service.dart';
 import 'package:watching_app_2/core/services/wallpaper_service.dart';
 import 'package:watching_app_2/data/database/local_database.dart';
@@ -49,7 +47,6 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
   late Animation<double> _actionsSlideAnimation;
   late Animation<Offset> _floatingAnimation;
   late Animation<double> _pulseAnimation;
-  late Animation<double> _blurAnimation;
 
   // State variables
   bool _interfaceVisible = true;
@@ -136,14 +133,7 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
       reverseCurve: Curves.easeInCubic,
     );
 
-    // Blur animation for background
-    _blurAnimation = Tween<double>(
-      begin: 0.0,
-      end: 10.0,
-    ).animate(CurvedAnimation(
-      parent: _interfaceController,
-      curve: Curves.easeOutCubic,
-    ));
+
 
     // Initially visible UI
     _interfaceController.value = 1.0;
@@ -235,7 +225,8 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
     );
   }
 
-  void _applyWallpaper(int location) {
+  void _applyWallpaper(  WallpaperLocation
+ location) {
     setState(() {
       _isWallpaperSetting = true;
     });
@@ -244,7 +235,7 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
 
     wallpaperService.applyWallpaper(
       widget.item,
-      location,
+  location,
       onProgress: (progress) {
         setState(() {
           _isWallpaperSetting = true;
@@ -365,7 +356,7 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
                     onTap: () {
                       HapticFeedback.mediumImpact();
                       Navigator.pop(context);
-                      _applyWallpaper(WallpaperManager.HOME_SCREEN);
+                      _applyWallpaper(  WallpaperLocation.home);
                     },
                   ),
                   _buildEnhancedOptionButton(
@@ -375,7 +366,7 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
                     onTap: () {
                       HapticFeedback.mediumImpact();
                       Navigator.pop(context);
-                      _applyWallpaper(WallpaperManager.LOCK_SCREEN);
+                      _applyWallpaper(WallpaperLocation.home);
                     },
                   ),
                   _buildEnhancedOptionButton(
@@ -385,7 +376,7 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
                     onTap: () {
                       HapticFeedback.mediumImpact();
                       Navigator.pop(context);
-                      _applyWallpaper(WallpaperManager.BOTH_SCREEN);
+                      _applyWallpaper(WallpaperLocation.both);
                     },
                   ),
                 ],
@@ -898,7 +889,7 @@ class _MinimalistWallpaperDetailState extends State<MinimalistWallpaperDetail>
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.hd_rounded,
                             color: Colors.green,
                             size: 12,

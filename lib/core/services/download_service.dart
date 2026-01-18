@@ -1,38 +1,37 @@
+// ignore_for_file: deprecated_member_use
+
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:watching_app_2/core/global/globals.dart';
+import 'package:flutter/services.dart';
+
 import '../../shared/widgets/misc/text_widget.dart';
 import '../utils/file_utils.dart';
 import '../../data/models/content_item.dart';
+import '../global/globals.dart';
 import 'permission_service.dart';
 
-/// Service for handling wallpaper downloads and saving to device storage.
 class DownloadService {
-  // Singleton pattern
   static final DownloadService _instance = DownloadService._internal();
   factory DownloadService() => _instance;
   DownloadService._internal();
 
-  // Dependencies
+  /// ✅ MUST MATCH MainActivity.kt
+  static const MethodChannel _channel =
+      MethodChannel('wallpaper_channel');
+
   final Dio _dio = Dio();
   final FileUtils _fileUtils = FileUtils();
   final PermissionService _permissionService = PermissionService();
 
-  // Constants
   static const _snackBarDuration = Duration(seconds: 2);
   static const _snackBarOpacity = 0.7;
   static const _snackBarBorderRadius = 20.0;
   static const _snackBarBottomMarginFactor = 0.1;
   static const _snackBarHorizontalMargin = 50.0;
 
-  /// Downloads a wallpaper and saves it to device storage and gallery.
-  ///
-  /// [item] The content item containing wallpaper details.
-  /// [onProgress] Optional callback for download progress updates.
-  /// [onSuccess] Optional callback for successful download with file path.
-  /// [onError] Optional callback for error handling.
   Future<void> downloadWallpaper(
     ContentItem item, {
     Function(double)? onProgress,
@@ -40,72 +39,65 @@ class DownloadService {
     Function(String)? onError,
   }) async {
     try {
-      // Request storage permissions
       await _permissionService.requestStoragePermissions();
 
-      // Get file path for download
       final filePath = await _getDownloadFilePath(item);
 
-      // Download the wallpaper
-      await _downloadFile(item, filePath, onProgress);
+      /// ✅ Avoid re-downloading if already exists
+      if (!await File(filePath).exists()) {
+        await _downloadFile(item, filePath, onProgress);
+      }
 
-      // Save to gallery
-      await _saveToGallery(filePath, item.source.name);
+      final bool saved = await _channel.invokeMethod(
+        'saveToGallery',
+        {
+          'path': filePath,
+          'name': item.source.name,
+        },
+      );
 
-      onSuccess?.call(filePath);
+      if (saved) {
+        onSuccess?.call(filePath);
+      } else {
+        onError?.call('Failed to save image');
+      }
+    } on PlatformException catch (e) {
+      onError?.call(e.message ?? 'Platform error');
+      if (kDebugMode) {
+        debugPrint('PlatformException: ${e.code} ${e.message}');
+      }
     } catch (e) {
       _handleError(e, onError);
     }
   }
 
-  /// Retrieves the file path for downloading the wallpaper.
-  ///
-  /// [item] The content item containing wallpaper details.
-  /// Returns the file path as a string.
   Future<String> _getDownloadFilePath(ContentItem item) async {
-    final downloadPath = await _fileUtils.getTemporaryDirectoryPath();
+    final tempPath = await _fileUtils.getTemporaryDirectoryPath();
     return _fileUtils.getWallpaperFilePath(
-      basePath: downloadPath,
+      basePath: tempPath,
       sourceName: item.source.name,
     );
   }
 
-  /// Downloads the wallpaper file from the provided URL.
-  ///
-  /// [item] The content item containing wallpaper details.
-  /// [filePath] The destination path for the downloaded file.
-  /// [onProgress] Optional callback for download progress updates.
   Future<void> _downloadFile(
     ContentItem item,
     String filePath,
     Function(double)? onProgress,
   ) async {
     await _dio.download(
-      SMA.formatImage(image: item.thumbnailUrl, baseUrl: item.source.url),
+      SMA.formatImage(
+        image: item.thumbnailUrl,
+        baseUrl: item.source.url,
+      ),
       filePath,
       onReceiveProgress: (received, total) {
-        if (total != -1 && onProgress != null) {
+        if (total > 0 && onProgress != null) {
           onProgress(received / total);
         }
       },
     );
   }
 
-  /// Saves the downloaded file to the device gallery.
-  ///
-  /// [filePath] The path of the downloaded file.
-  /// [sourceName] The name of the source for naming the file in the gallery.
-  Future<void> _saveToGallery(String filePath, String sourceName) async {
-    await ImageGallerySaver.saveFile(
-      filePath,
-      name: '${sourceName}_${DateTime.now().millisecondsSinceEpoch}',
-    );
-  }
-
-  /// Displays a snackbar with the download result.
-  ///
-  /// [context] The BuildContext for showing the snackbar.
-  /// [message] The message to display in the snackbar.
   void showDownloadResult(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -121,7 +113,8 @@ class DownloadService {
         ),
         margin: EdgeInsets.only(
           bottom:
-              MediaQuery.of(context).size.height * _snackBarBottomMarginFactor,
+              MediaQuery.of(context).size.height *
+                  _snackBarBottomMarginFactor,
           left: _snackBarHorizontalMargin,
           right: _snackBarHorizontalMargin,
         ),
@@ -129,15 +122,11 @@ class DownloadService {
     );
   }
 
-  /// Handles errors by invoking the error callback and logging in debug mode.
-  ///
-  /// [error] The error that occurred.
-  /// [onError] Optional callback to handle the error message.
   void _handleError(Object error, Function(String)? onError) {
     final errorMessage = error.toString();
     onError?.call(errorMessage);
     if (kDebugMode) {
-      print('DownloadService error: $errorMessage');
+      debugPrint('DownloadService error: $errorMessage');
     }
   }
 }

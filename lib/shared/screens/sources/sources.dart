@@ -1,5 +1,7 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, deprecated_member_use
+
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:sizer/sizer.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:watching_app_2/core/global/globals.dart';
@@ -13,12 +15,10 @@ import 'components/content_list.dart';
 
 // Constants for better maintainability
 class SourcesConstants {
-  static const Duration shimmerPeriod = Duration(milliseconds: 1500);
-  static const int shimmerItemCount = 8;
-  static const double borderRadius = 12.0;
-  static const double shadowOpacity = 0.05;
-  static const double shadowBlurRadius = 10.0;
-  static const Offset shadowOffset = Offset(0, 2);
+  static const Duration shimmerPeriod = Duration(milliseconds: 1400);
+  static const int shimmerItemCount = 6;
+  static const double borderRadius = 16.0;
+  static const double cardElevation = 2.0;
 }
 
 // Data class for content type configuration
@@ -38,11 +38,30 @@ class ContentTypeConfig {
 class ContentTypeConfigs {
   static const List<ContentTypeConfig> all = [
     ContentTypeConfig(
-        key: 'videos', title: 'Videos', icon: Icons.video_collection),
-    ContentTypeConfig(key: 'tiktok', title: 'TikTok', icon: Icons.music_note),
-    ContentTypeConfig(key: 'photos', title: 'Photos', icon: Icons.photo),
-    ContentTypeConfig(key: 'manga', title: 'Manga', icon: Icons.book),
-    ContentTypeConfig(key: 'anime', title: 'Anime', icon: Icons.book),
+      key: 'videos',
+      title: 'Videos',
+      icon: Icons.video_library_rounded,
+    ),
+    ContentTypeConfig(
+      key: 'tiktok',
+      title: 'TikTok',
+      icon: Icons.music_note_rounded,
+    ),
+    ContentTypeConfig(
+      key: 'photos',
+      title: 'Photos',
+      icon: Icons.photo_library_rounded,
+    ),
+    ContentTypeConfig(
+      key: 'manga',
+      title: 'Manga',
+      icon: Icons.menu_book_rounded,
+    ),
+    ContentTypeConfig(
+      key: 'anime',
+      title: 'Anime',
+      icon: Icons.video_collection_rounded,
+    ),
   ];
 
   static ContentTypeConfig getByIndex(int index) {
@@ -113,7 +132,6 @@ class _SourcesState extends State<Sources> with TickerProviderStateMixin {
 
       _allSources.addEntries(results);
     } catch (e) {
-      // Handle error appropriately - could show snackbar, etc.
       debugPrint('Error loading sources: $e');
     }
 
@@ -170,7 +188,7 @@ class _SourcesState extends State<Sources> with TickerProviderStateMixin {
     return CustomAppBar(
       appBarHeight: 15.h,
       elevation: 0,
-      title: 'Content Sources',
+      title: 'Sources',
       actions: [_buildSourcesCounter()],
       bottom: _buildTabBar(),
       appBarStyle: AppBarStyle.standard,
@@ -178,19 +196,47 @@ class _SourcesState extends State<Sources> with TickerProviderStateMixin {
   }
 
   Widget _buildSourcesCounter() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 2.w),
-      child: Row(
-        children: [
-          const Icon(Icons.cloud_done, size: 20),
-          SizedBox(width: 1.w),
-          TextWidget(
-            text: 'Active Sources: $_totalSourcesCount',
-            fontSize: 15.sp,
+      padding: EdgeInsets.only(right: 4.w),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 0.8.h),
+        decoration: BoxDecoration(
+          color: isDark
+              ? Colors.white.withOpacity(0.08)
+              : Colors.black.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withOpacity(0.1)
+                : Colors.black.withOpacity(0.06),
+            width: 1,
           ),
-        ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.cloud_done_rounded,
+              size: 16,
+              color: theme.primaryColor,
+            ),
+            SizedBox(width: 1.5.w),
+            TextWidget(
+              text: '$_totalSourcesCount',
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w600,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
+          ],
+        ),
       ),
-    );
+    )
+        .animate()
+        .fadeIn(delay: 300.ms, duration: 400.ms)
+        .scale(begin: const Offset(0.8, 0.8), curve: Curves.easeOutBack);
   }
 
   PreferredSize _buildTabBar() {
@@ -206,7 +252,7 @@ class _SourcesState extends State<Sources> with TickerProviderStateMixin {
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const EnhancedShimmerLoadingList();
+      return const ModernShimmerLoadingList();
     }
 
     return TabBarView(
@@ -217,89 +263,100 @@ class _SourcesState extends State<Sources> with TickerProviderStateMixin {
   }
 }
 
-class EnhancedShimmerLoadingList extends StatelessWidget {
-  const EnhancedShimmerLoadingList({super.key});
+// Modern minimalist shimmer loading
+class ModernShimmerLoadingList extends StatelessWidget {
+  const ModernShimmerLoadingList({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+      highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
       period: SourcesConstants.shimmerPeriod,
       child: ListView.builder(
-        padding: EdgeInsets.all(2.h),
+        padding: EdgeInsets.all(4.w),
         itemCount: SourcesConstants.shimmerItemCount,
-        itemBuilder: (context, index) => _buildShimmerItem(),
+        itemBuilder: (context, index) => _buildShimmerItem(context, isDark),
       ),
     );
   }
 
-  Widget _buildShimmerItem() {
+  Widget _buildShimmerItem(BuildContext context, bool isDark) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 2.h),
+      padding: EdgeInsets.only(bottom: 3.w),
       child: Container(
-        height: 15.h,
-        decoration: _buildShimmerItemDecoration(),
+        height: 100,
+        decoration: BoxDecoration(
+          color: isDark ? Colors.grey[850] : Colors.white,
+          borderRadius: BorderRadius.circular(SourcesConstants.borderRadius),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withOpacity(0.05)
+                : Colors.black.withOpacity(0.06),
+            width: 1,
+          ),
+        ),
         child: Row(
           children: [
-            _buildShimmerImage(),
+            // Image placeholder
+            Container(
+              width: 100,
+              decoration: BoxDecoration(
+                color: isDark ? Colors.grey[800] : Colors.grey[200],
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(SourcesConstants.borderRadius),
+                  bottomLeft: Radius.circular(SourcesConstants.borderRadius),
+                ),
+              ),
+            ),
+            SizedBox(width: 4.w),
+            // Content placeholder
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildShimmerLine(
+                    width: 50.w,
+                    height: 16,
+                    isDark: isDark,
+                  ),
+                  SizedBox(height: 8),
+                  _buildShimmerLine(
+                    width: 70.w,
+                    height: 12,
+                    isDark: isDark,
+                  ),
+                  SizedBox(height: 8),
+                  _buildShimmerLine(
+                    width: 35.w,
+                    height: 12,
+                    isDark: isDark,
+                  ),
+                ],
+              ),
+            ),
             SizedBox(width: 3.w),
-            Expanded(child: _buildShimmerContent()),
-            SizedBox(width: 2.w),
           ],
         ),
       ),
     );
   }
 
-  BoxDecoration _buildShimmerItemDecoration() {
-    return BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(SourcesConstants.borderRadius),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(SourcesConstants.shadowOpacity),
-          blurRadius: SourcesConstants.shadowBlurRadius,
-          offset: SourcesConstants.shadowOffset,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildShimmerImage() {
-    return Container(
-      width: 30.w,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(SourcesConstants.borderRadius),
-          bottomLeft: Radius.circular(SourcesConstants.borderRadius),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildShimmerContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _buildShimmerLine(width: 40.w, height: 2.h),
-        SizedBox(height: 1.h),
-        _buildShimmerLine(width: 60.w, height: 1.5.h),
-        SizedBox(height: 1.h),
-        _buildShimmerLine(width: 30.w, height: 1.5.h),
-      ],
-    );
-  }
-
-  Widget _buildShimmerLine({required double width, required double height}) {
+  Widget _buildShimmerLine({
+    required double width,
+    required double height,
+    required bool isDark,
+  }) {
     return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(4),
+        color: isDark ? Colors.grey[800] : Colors.grey[200],
+        borderRadius: BorderRadius.circular(6),
       ),
     );
   }

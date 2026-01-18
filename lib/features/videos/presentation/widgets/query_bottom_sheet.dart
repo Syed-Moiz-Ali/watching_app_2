@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -5,7 +7,6 @@ import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/constants/colors.dart';
 import 'package:watching_app_2/core/navigation/app_navigator.dart';
 import 'package:watching_app_2/presentation/provider/source_provider.dart';
-import 'package:watching_app_2/shared/widgets/buttons/primary_button.dart';
 import '../../../../data/models/content_source.dart';
 import '../../../../shared/widgets/misc/text_widget.dart';
 
@@ -493,7 +494,7 @@ class _QueryBottomsheetState extends State<QueryBottomsheet>
                                 ),
                               ],
                             ),
-                            child: Icon(
+                            child: const Icon(
                               Icons.check_rounded,
                               color: Colors.white,
                               size: 14,
@@ -546,7 +547,7 @@ class _QueryBottomsheetState extends State<QueryBottomsheet>
       child: AnimatedScale(
         scale: isSelected ? 1.0 : 0.0,
         duration: const Duration(milliseconds: 200),
-        child: Icon(
+        child: const Icon(
           Icons.check_rounded,
           size: 14,
           color: Colors.white,

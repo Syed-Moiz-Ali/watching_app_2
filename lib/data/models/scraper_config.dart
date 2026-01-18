@@ -1,5 +1,4 @@
 // Represents a selector for extracting elements from a webpage
-import 'dart:developer';
 
 class ElementSelector {
   final String? selector;

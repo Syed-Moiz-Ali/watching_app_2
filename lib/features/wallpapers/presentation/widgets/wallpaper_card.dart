@@ -1,5 +1,5 @@
-import 'dart:developer';
-import 'dart:ui' as ui;
+
+// ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -50,7 +50,6 @@ class _WallpaperCardState extends State<WallpaperCard>
   bool _isError = false;
   bool _isHovered = false;
   bool _showActions = false;
-  String? _dominantColor;
 
   late AnimationController _hoverController;
   late AnimationController _pressController;
@@ -137,7 +136,6 @@ class _WallpaperCardState extends State<WallpaperCard>
             (info, _) {
               if (mounted) {
                 setState(() => _isLoading = false);
-                _extractDominantColor(info.image);
               }
             },
             onError: (exception, stackTrace) {
@@ -162,11 +160,7 @@ class _WallpaperCardState extends State<WallpaperCard>
           );
   }
 
-  Future<void> _extractDominantColor(ui.Image image) async {
-    setState(() {
-      _dominantColor = '#FF6B6B';
-    });
-  }
+
 
   void _handleHover(bool isHovered) {
     setState(() => _isHovered = isHovered);
@@ -428,87 +422,6 @@ class _WallpaperCardState extends State<WallpaperCard>
         curve: Curves.easeOutCubic);
   }
 
-  Widget _buildMetadataRow() {
-    return Row(
-      children: [
-        _buildMetadataChip(
-          icon: Icons.photo_size_select_actual,
-          text: 'HD',
-          color: AppColors.primaryColor,
-        ),
-        const SizedBox(width: 8),
-        _buildMetadataChip(
-          icon: Icons.favorite_outline,
-          text: '2.1K',
-          color: Colors.red,
-        ),
-        const Spacer(),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.15),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.3),
-              width: 0.5,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.verified,
-                color: Colors.green,
-                size: 12,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                'Premium',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 9.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMetadataChip({
-    required IconData icon,
-    required String text,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: color.withOpacity(0.4),
-          width: 0.5,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: 12),
-          const SizedBox(width: 4),
-          Text(
-            text,
-            style: TextStyle(
-              color: color,
-              fontSize: 9.sp,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildEnhancedActionButtons() {
     return Positioned(
@@ -604,70 +517,7 @@ class _WallpaperCardState extends State<WallpaperCard>
         .fadeIn(duration: 200.ms);
   }
 
-  Widget _buildEnhancedQualityBadge() {
-    return Positioned(
-      top: 18,
-      right: 18,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AppColors.primaryColor,
-              AppColors.primaryColor.withOpacity(0.8),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primaryColor.withOpacity(0.4),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-              spreadRadius: 0,
-            ),
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-          border: Border.all(
-            color: Colors.white.withOpacity(0.2),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.diamond_outlined,
-              color: Colors.white,
-              size: 16,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              'HD',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ],
-        ),
-      ),
-    )
-        .animate(target: _isLoading ? 0 : 1)
-        .fadeIn(delay: 400.ms, duration: 400.ms, curve: Curves.easeOut)
-        .slideX(
-            begin: 1,
-            delay: 400.ms,
-            duration: 400.ms,
-            curve: Curves.easeOutBack);
-  }
+
 
   Widget _buildPremiumBadge() {
     if (!widget.isFavorite) return const SizedBox.shrink();

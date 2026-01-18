@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -5,12 +7,9 @@ import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/enums/enums.dart';
 import 'package:watching_app_2/data/models/content_item.dart';
 import 'package:watching_app_2/presentation/provider/webview_provider.dart';
-import 'package:watching_app_2/shared/widgets/appbars/app_bar.dart';
 import 'package:watching_app_2/shared/widgets/loading/loading_indicator.dart';
-import 'package:watching_app_2/shared/widgets/misc/padding.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../widgets/misc/gap.dart';
 import '../../widgets/misc/text_widget.dart';
 
 class VideoPlayer extends StatefulWidget {
@@ -24,8 +23,7 @@ class VideoPlayer extends StatefulWidget {
 
 class _VideoPlayerState extends State<VideoPlayer> {
   bool isFullscreen = false;
-  bool _showControls = true;
-  bool _isHovering = false;
+
 
   @override
   void dispose() {
@@ -34,22 +32,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
     super.dispose();
   }
 
-  void _toggleFullscreen() {
-    setState(() {
-      isFullscreen = !isFullscreen;
-    });
 
-    if (isFullscreen) {
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
-      ]);
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    } else {
-      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -214,97 +197,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
         );
   }
 
-  Widget _buildVideoOverlay(WebviewProvider provider) {
-    return Positioned.fill(
-      child: MouseRegion(
-        onEnter: (_) => setState(() => _isHovering = true),
-        onExit: (_) => setState(() => _isHovering = false),
-        child: GestureDetector(
-          onTap: () => setState(() => _showControls = !_showControls),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.black.withOpacity(0.3),
-                  Colors.transparent,
-                  Colors.transparent,
-                  Colors.black.withOpacity(0.4),
-                ],
-              ),
-            ),
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 300),
-              opacity: (_showControls || _isHovering) ? 1.0 : 0.0,
-              child: Stack(
-                children: [
-                  // Fullscreen button
-                  Positioned(
-                    top: 2.h,
-                    right: 3.w,
-                    child: _buildControlButton(
-                      icon: isFullscreen
-                          ? Icons.fullscreen_exit_rounded
-                          : Icons.fullscreen_rounded,
-                      onPressed: _toggleFullscreen,
-                    ).animate().fadeIn(delay: 100.ms),
-                  ),
 
-                  // Play/Pause overlay (center)
-                  Center(
-                    child: Container(
-                      padding: EdgeInsets.all(3.w),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.4),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
-                          width: 2,
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.play_arrow_rounded,
-                        color: Colors.white,
-                        size: 8.w,
-                      ),
-                    )
-                        .animate()
-                        .scale(begin: const Offset(0.8, 0.8))
-                        .fadeIn(duration: 400.ms),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
-  Widget _buildControlButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.6),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
-          width: 1,
-        ),
-      ),
-      child: IconButton(
-        icon: Icon(
-          icon,
-          color: Colors.white,
-          size: 20,
-        ),
-        onPressed: onPressed,
-      ),
-    );
-  }
 
   Widget _buildVideoInfo() {
     return Container(
@@ -473,7 +367,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
               ),
             ),
             SizedBox(height: 3.h),
-            TextWidget(
+            const TextWidget(
               text: 'Something went wrong',
               styleType: TextStyleType.heading2,
               color: Colors.white,

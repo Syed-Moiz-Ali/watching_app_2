@@ -1,8 +1,7 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:watching_app_2/core/enums/enums.dart';
 import 'package:watching_app_2/core/navigation/app_navigator.dart';
 import 'package:watching_app_2/core/navigation/routes.dart';
 import 'package:watching_app_2/shared/widgets/appbars/app_bar.dart';
@@ -13,7 +12,6 @@ import '../../../../data/models/content_item.dart';
 import '../../../../data/models/content_source.dart';
 import '../../../../data/scrapers/scraper_service.dart';
 import '../../../../shared/widgets/buttons/floating_action_button.dart';
-import '../../../../shared/widgets/loading/pagination_indicator.dart';
 import '../../../../shared/widgets/misc/text_widget.dart';
 import '../widgets/video_grid_view.dart';
 
@@ -308,86 +306,7 @@ class _VideosState extends State<Videos> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildHeaderInfo() {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.grey.withOpacity(0.1),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppColors.primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(
-              Icons.video_library_outlined,
-              color: AppColors.primaryColor,
-              size: 18,
-            ),
-          ),
 
-          const SizedBox(width: 12),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextWidget(
-                  text: '${videos.length} videos found',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).textTheme.bodyLarge?.color,
-                ),
-                if (_currentQuery.isNotEmpty) ...[
-                  const SizedBox(height: 2),
-                  TextWidget(
-                    text: 'Search: "$_currentQuery"',
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
-                ],
-              ],
-            ),
-          ),
-
-          // View mode indicator
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: AppColors.primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  isGrid ? Icons.grid_view : Icons.view_list,
-                  size: 14,
-                  color: AppColors.primaryColor,
-                ),
-                const SizedBox(width: 4),
-                TextWidget(
-                  text: isGrid ? 'Grid' : 'List',
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryColor,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildPaginationLoader() {
     return AnimatedBuilder(
@@ -543,7 +462,7 @@ class _VideosState extends State<Videos> with TickerProviderStateMixin {
                 color: Colors.red.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.error_outline_rounded,
                 color: Colors.red,
                 size: 48,

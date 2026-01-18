@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:watching_app_2/app/app_widget.dart';
 import 'package:watching_app_2/core/global/globals.dart';
@@ -20,6 +21,8 @@ import 'shared/widgets/misc/restart_widget.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+    GoogleFonts.config.allowRuntimeFetching = true;
+
   SMA.initializePref();
   ErrorWidget.builder = (FlutterErrorDetails details) {
     return CustomErrorScreen(errorDetails: details);

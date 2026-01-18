@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:sizer/sizer.dart';
 import 'package:watching_app_2/core/services/source_manager.dart';
 import 'package:watching_app_2/shared/screens/categories/components/category_card.dart';
@@ -20,31 +21,19 @@ class Categories extends StatefulWidget {
 }
 
 class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
-  late AnimationController _backgroundController;
-  late AnimationController _cardsController;
   late TabController _tabController;
   List<CategoryModel> _categories = [];
-  List<CategoryModel> _filteredCategories = []; // Filtered list
+  List<CategoryModel> _filteredCategories = [];
   List<CategoryModel> _stars = [];
-  List<CategoryModel> _filteredStars = []; // Filtered stars list
+  List<CategoryModel> _filteredStars = [];
 
-  final List<AnimationController> _hoverControllers = [];
-  final List<AnimationController> _starsHoverControllers = [];
   bool _isLoading = true;
-  late AnimationController _shimmerController;
+  bool _isSearching = false;
+  String _currentSearchQuery = '';
 
   @override
   void dispose() {
-    _backgroundController.dispose();
-    _cardsController.dispose();
-    _shimmerController.dispose();
     _tabController.dispose();
-    for (var controller in _hoverControllers) {
-      controller.dispose();
-    }
-    for (var controller in _starsHoverControllers) {
-      controller.dispose();
-    }
     super.dispose();
   }
 
@@ -54,297 +43,303 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
 
     // Initialize TabController
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_onTabChanged);
 
-    // Enhanced background animation
-    _backgroundController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 30),
-    );
-    _backgroundController.repeat(reverse: true);
-
-    // Enhanced cards animation
-    _cardsController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    );
-
-    // Shimmer loading effect controller
-    _shimmerController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1400),
-    );
-    _shimmerController.repeat();
-
-    // Fetch data with enhanced loading state
-    fetchCategories();
-    fetchStars();
-
-    // Delayed animation start with smoother timing
-    Future.delayed(const Duration(milliseconds: 300), () {
-      _cardsController.forward();
-    });
+    // Fetch data
+    _fetchData();
   }
 
-  fetchCategories() async {
+  void _onTabChanged() {
+    if (_tabController.indexIsChanging) {
+      setState(() {});
+      HapticFeedback.selectionClick();
+    }
+  }
+
+  Future<void> _fetchData() async {
     setState(() {
       _isLoading = true;
     });
 
-    // Simulate minimum loading time for smooth transitions
-    await Future.delayed(const Duration(milliseconds: 800));
+    // Simulate network delay for smooth loading state
+    await Future.delayed(const Duration(milliseconds: 600));
+
     final loadedCategories = await SourceManager().loadCategories();
-
-    if (mounted) {
-      setState(() {
-        _categories = loadedCategories;
-        _filteredCategories =
-            List.from(loadedCategories); // Initially show all categories
-
-        _isLoading = false;
-      });
-
-      // Initialize hover controllers for each category
-      for (int i = 0; i < _categories.length; i++) {
-        _hoverControllers.add(AnimationController(
-          vsync: this,
-          duration: const Duration(milliseconds: 180),
-        ));
-      }
-    }
-  }
-
-  fetchStars() async {
     final loadedStars = await SourceManager().loadStars();
 
     if (mounted) {
       setState(() {
+        _categories = loadedCategories;
+        _filteredCategories = List.from(loadedCategories);
         _stars = loadedStars;
-        _filteredStars = List.from(loadedStars); // Initially show all stars
+        _filteredStars = List.from(loadedStars);
+        _isLoading = false;
       });
-
-      // Initialize hover controllers for each star
-      for (int i = 0; i < _stars.length; i++) {
-        _starsHoverControllers.add(AnimationController(
-          vsync: this,
-          duration: const Duration(milliseconds: 180),
-        ));
-      }
     }
   }
 
   void _filterCategories(String query) {
     setState(() {
+      _currentSearchQuery = query;
+      _isSearching = query.isNotEmpty;
+
       if (query.isEmpty) {
         _filteredCategories = List.from(_categories);
         _filteredStars = List.from(_stars);
       } else {
         if (_tabController.index == 0) {
           _filteredCategories = _categories
-              .where((category) => category.title
-                  .toLowerCase()
-                  .contains(query.toLowerCase())) // Case-insensitive search
+              .where((category) =>
+                  category.title.toLowerCase().contains(query.toLowerCase()))
               .toList();
         } else {
           _filteredStars = _stars
-              .where((star) => star.title
-                  .toLowerCase()
-                  .contains(query.toLowerCase())) // Case-insensitive search
+              .where((star) =>
+                  star.title.toLowerCase().contains(query.toLowerCase()))
               .toList();
         }
       }
     });
   }
 
-  // Shimmer loading effect
+  // Modern minimal shimmer loading
   Widget _buildShimmerLoading() {
-    return AnimatedBuilder(
-      animation: _shimmerController,
-      builder: (context, child) {
-        return CustomPadding(
-          horizontalFactor: .04,
-          topFactor: .02,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title shimmer
-              Container(
-                width: 200,
-                height: 30,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      Colors.grey[800]!,
-                      Colors.grey[600]!,
-                      Colors.grey[800]!,
-                    ],
-                    stops: [
-                      0.0,
-                      _shimmerController.value,
-                      1.0,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Grid shimmer
-              Expanded(
-                child: GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 0.85,
-                  ),
-                  itemCount: 6,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.grey[900]!,
-                            Colors.grey[800]!,
-                            Colors.grey[900]!,
-                          ],
-                          stops: [
-                            0.0,
-                            _shimmerController.value,
-                            1.0,
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+    return CustomPadding(
+      horizontalFactor: .04,
+      topFactor: .02,
+      child: GridView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 0.75,
+        ),
+        itemCount: 6,
+        itemBuilder: (context, index) {
+          return _buildShimmerCard(index);
+        },
+      ),
     );
   }
 
-  // Enhanced animated category card
-  Widget _buildAnimatedCategoryCard(
-      List<CategoryModel> filteredData, int index) {
-    // Staggered animation for each grid item
-    return AnimatedBuilder(
-      animation: _cardsController,
-      builder: (context, child) {
-        // Stagger the animation based on index with improved timing
-        final double delayedStart = 0.05 + (index * 0.06);
-        final Animation<double> delayedAnimation = CurvedAnimation(
-          parent: _cardsController,
-          curve: Interval(
-            delayedStart.clamp(0.0, 1.0),
-            (delayedStart + 0.3).clamp(0.0, 1.0),
-            curve: Curves.easeOutCubic,
-          ),
-        );
+  Widget _buildShimmerCard(int index) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
-        // Multi-layered entrance animation with enhanced physics
-        return Transform.translate(
-          offset: Offset(0.0, 40 * (1.0 - delayedAnimation.value)),
-          child: Opacity(
-            opacity: delayedAnimation.value,
-            child: Transform.scale(
-              scale: 0.92 + (0.08 * delayedAnimation.value),
-              child: child,
-            ),
-          ),
-        );
-      },
-      child: MouseRegion(
-        onEnter: (_) => _onHoverStart(index),
-        onExit: (_) => _onHoverEnd(index),
-        child: AnimatedBuilder(
-          animation: _hoverControllers[index],
-          builder: (context, child) {
-            var category = filteredData[index];
-            // Enhanced hover effect with subtle lift and glow
-            return Transform.scale(
-              scale: 1.0 + (0.05 * _hoverControllers[index].value),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: CategoryCard(
-                  category: category,
-                  index: index,
-                  onTap: (index) => _onCategoryTap(category),
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100],
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Image placeholder
+          Expanded(
+            flex: 3,
+            child: Container(
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white.withOpacity(0.08) : Colors.grey[200],
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
                 ),
               ),
-            );
-          },
+            ),
+          ),
+          // Text placeholders
+          Padding(
+            padding: EdgeInsets.all(3.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.white.withOpacity(0.08) : Colors.grey[200],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                SizedBox(height: 8),
+                Container(
+                  width: 60.w,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.white.withOpacity(0.06) : Colors.grey[150],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    )
+        .animate(
+          onPlay: (controller) => controller.repeat(),
+        )
+        .shimmer(
+          duration: 1500.ms,
+          color: isDark
+              ? Colors.white.withOpacity(0.05)
+              : Colors.grey[300]!.withOpacity(0.5),
+        )
+        .animate()
+        .fadeIn(delay: Duration(milliseconds: index * 100));
+  }
+
+  // Empty state when no results found
+  Widget _buildEmptyState() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 8.w),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Empty state icon
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: isDark
+                    ? Colors.white.withOpacity(0.05)
+                    : Colors.grey[100],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.search_off_rounded,
+                size: 48,
+                color: isDark ? Colors.grey[600] : Colors.grey[400],
+              ),
+            )
+                .animate()
+                .fadeIn(duration: 400.ms)
+                .scale(curve: Curves.easeOutBack),
+
+            SizedBox(height: 24),
+
+            // Title
+            Text(
+              'No Results Found',
+              style: TextStyle(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.w700,
+                color: isDark ? Colors.white : Colors.black87,
+                letterSpacing: -0.3,
+              ),
+            )
+                .animate()
+                .fadeIn(delay: 200.ms, duration: 400.ms)
+                .slideY(begin: 0.2, end: 0),
+
+            SizedBox(height: 12),
+
+            // Description
+            Text(
+              _isSearching
+                  ? 'We couldn\'t find any ${_tabController.index == 0 ? 'categories' : 'stars'} matching "$_currentSearchQuery"'
+                  : 'No ${_tabController.index == 0 ? 'categories' : 'stars'} available',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                height: 1.5,
+              ),
+            )
+                .animate()
+                .fadeIn(delay: 400.ms, duration: 400.ms)
+                .slideY(begin: 0.2, end: 0),
+
+            SizedBox(height: 32),
+
+            // Action button
+            if (_isSearching)
+              TextButton.icon(
+                onPressed: () {
+                  _filterCategories('');
+                },
+                icon: Icon(Icons.clear_rounded, size: 18),
+                label: Text('Clear Search'),
+                style: TextButton.styleFrom(
+                  foregroundColor: theme.primaryColor,
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              )
+                  .animate()
+                  .fadeIn(delay: 600.ms, duration: 400.ms)
+                  .scale(
+                    begin: const Offset(0.8, 0.8),
+                    curve: Curves.easeOutBack,
+                  ),
+          ],
         ),
       ),
     );
   }
 
-  void _onHoverStart(int index) {
-    _hoverControllers[index].forward();
-    HapticFeedback.selectionClick();
-  }
-
-  void _onHoverEnd(int index) {
-    _hoverControllers[index].reverse();
+  // Animated category grid
+  Widget _buildAnimatedCategoryCard(
+      List<CategoryModel> filteredData, int index) {
+    return CategoryCard(
+      category: filteredData[index],
+      index: index,
+      onTap: (index) => _onCategoryTap(filteredData[index]),
+    )
+        .animate()
+        .fadeIn(
+          delay: Duration(milliseconds: 100 + (index * 50)),
+          duration: 500.ms,
+          curve: Curves.easeOut,
+        )
+        .slideY(
+          begin: 0.2,
+          end: 0,
+          delay: Duration(milliseconds: 100 + (index * 50)),
+          curve: Curves.easeOutCubic,
+        )
+        .scale(
+          begin: const Offset(0.9, 0.9),
+          delay: Duration(milliseconds: 100 + (index * 50)),
+          curve: Curves.easeOutBack,
+        );
   }
 
   void _onCategoryTap(CategoryModel data) {
-    // Enhanced haptic feedback
     HapticFeedback.mediumImpact();
 
-    // Premium navigation transition
     Navigator.of(context).push(
       PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 600),
         pageBuilder: (context, animation, secondaryAnimation) {
-          return PremiumCategoryDetailScreen(
-            category: data,
-          );
+          return PremiumCategoryDetailScreen(category: data);
         },
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           final curvedAnimation = CurvedAnimation(
             parent: animation,
-            curve: Curves.easeOutQuint,
+            curve: Curves.easeOutCubic,
           );
 
-          return Stack(
-            children: [
-              // Fade in background
-              FadeTransition(
-                opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
-                  CurvedAnimation(
-                    parent: animation,
-                    curve: const Interval(0.0, 0.7, curve: Curves.easeOut),
-                  ),
-                ),
-                child: Container(
-                  color: Colors.black,
-                ),
+          return FadeTransition(
+            opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
+              CurvedAnimation(
+                parent: animation,
+                curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
               ),
-              // Enhanced slide up with subtle scale
-              SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0, 0.1),
-                  end: Offset.zero,
-                ).animate(curvedAnimation),
-                child: ScaleTransition(
-                  scale: Tween<double>(
-                    begin: 0.98,
-                    end: 1.0,
-                  ).animate(curvedAnimation),
-                  child: child,
-                ),
-              ),
-            ],
+            ),
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.05),
+                end: Offset.zero,
+              ).animate(curvedAnimation),
+              child: child,
+            ),
           );
         },
       ),
@@ -352,33 +347,31 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
   }
 
   Widget _buildCategoriesTab(List<CategoryModel> filteredData) {
-    return _isLoading
-        ? _buildShimmerLoading()
-        : CustomPadding(
-            horizontalFactor: .04,
-            topFactor: .02,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: GridView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 0.85,
-                    ),
-                    itemCount: filteredData.length,
-                    itemBuilder: (context, index) {
-                      return _buildAnimatedCategoryCard(filteredData, index);
-                    },
-                  ),
-                ),
-              ],
-            ),
-          );
+    if (_isLoading) {
+      return _buildShimmerLoading();
+    }
+
+    if (filteredData.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    return CustomPadding(
+      horizontalFactor: .04,
+      topFactor: .02,
+      child: GridView.builder(
+        physics: const BouncingScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 0.75,
+        ),
+        itemCount: filteredData.length,
+        itemBuilder: (context, index) {
+          return _buildAnimatedCategoryCard(filteredData, index);
+        },
+      ),
+    );
   }
 
   @override
@@ -399,6 +392,8 @@ class _CategoriesState extends State<Categories> with TickerProviderStateMixin {
           setState(() {
             _filteredCategories = _categories;
             _filteredStars = _stars;
+            _isSearching = false;
+            _currentSearchQuery = '';
           });
         },
       ),

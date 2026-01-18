@@ -1,65 +1,64 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
+import 'package:flutter/services.dart';
+
 import '../../shared/widgets/misc/text_widget.dart';
 import '../global/globals.dart';
 import '../utils/file_utils.dart';
 import '../../data/models/content_item.dart';
 import 'permission_service.dart';
 
-/// Service for handling wallpaper operations including downloading and applying wallpapers.
 class WallpaperService {
-  // Singleton pattern
   static final WallpaperService _instance = WallpaperService._internal();
   factory WallpaperService() => _instance;
   WallpaperService._internal();
 
-  // Dependencies
+  static const MethodChannel _channel =
+      MethodChannel('wallpaper_channel');
+
   final Dio _dio = Dio();
   final FileUtils _fileUtils = FileUtils();
   final PermissionService _permissionService = PermissionService();
 
-  // Constants
   static const _snackBarDuration = Duration(seconds: 2);
   static const _snackBarOpacity = 0.7;
   static const _snackBarBorderRadius = 20.0;
   static const _snackBarBottomMarginFactor = 0.1;
   static const _snackBarHorizontalMargin = 50.0;
 
-  /// Applies a wallpaper to the device from a given content item.
-  ///
-  /// [item] The content item containing wallpaper details.
-  /// [location] The screen to apply the wallpaper to (HOME_SCREEN, LOCK_SCREEN, or BOTH_SCREENS).
-  /// [onProgress] Optional callback for download progress updates.
-  /// [onSuccess] Optional callback for successful wallpaper application.
-  /// [onError] Optional callback for error handling.
-  /// Returns true if the wallpaper was set successfully, false otherwise.
+  /// location:
+  /// 1 = HOME
+  /// 2 = LOCK
+  /// 3 = BOTH
   Future<bool> applyWallpaper(
     ContentItem item,
-    int location, {
+  WallpaperLocation location, {
     Function(double)? onProgress,
     Function(String)? onSuccess,
     Function(String)? onError,
   }) async {
     try {
-      // Request storage permissions
       await _permissionService.requestStoragePermissions();
 
-      // Get file path for wallpaper
       final filePath = await _getWallpaperFilePath(item);
 
-      // Download wallpaper if it doesn't exist
       await _downloadWallpaperIfNeeded(
         item: item,
         filePath: filePath,
         onProgress: onProgress,
       );
 
-      // Apply the wallpaper
-      final success =
-          await WallpaperManager.setWallpaperFromFile(filePath, location);
+      final bool success = await _channel.invokeMethod(
+        'setWallpaper',
+        {
+          'path': filePath,
+          'location': location,
+        },
+      );
 
       if (success) {
         onSuccess?.call('Wallpaper set successfully');
@@ -74,10 +73,6 @@ class WallpaperService {
     }
   }
 
-  /// Retrieves the file path for storing the wallpaper.
-  ///
-  /// [item] The content item containing wallpaper details.
-  /// Returns the file path as a string.
   Future<String> _getWallpaperFilePath(ContentItem item) async {
     final appPath = await _fileUtils.getTemporaryDirectoryPath();
     return _fileUtils.getWallpaperFilePath(
@@ -86,12 +81,6 @@ class WallpaperService {
     );
   }
 
-  /// Downloads the wallpaper if it doesn't already exist.
-  ///
-  /// [item] The content item containing wallpaper details.
-  /// [filePath] The destination path for the wallpaper file.
-  /// [onProgress] Optional callback for download progress updates.
-  /// Returns the File object for the wallpaper.
   Future<File> _downloadWallpaperIfNeeded({
     required ContentItem item,
     required String filePath,
@@ -100,7 +89,10 @@ class WallpaperService {
     final file = File(filePath);
     if (!await file.exists()) {
       await _dio.download(
-        SMA.formatImage(image: item.thumbnailUrl, baseUrl: item.source.url),
+        SMA.formatImage(
+          image: item.thumbnailUrl,
+          baseUrl: item.source.url,
+        ),
         filePath,
         onReceiveProgress: (received, total) {
           if (total != -1 && onProgress != null) {
@@ -112,10 +104,6 @@ class WallpaperService {
     return file;
   }
 
-  /// Displays a snackbar with the result of the wallpaper operation.
-  ///
-  /// [context] The BuildContext for showing the snackbar.
-  /// [message] The message to display in the snackbar.
   void showWallpaperResult(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -139,15 +127,45 @@ class WallpaperService {
     );
   }
 
-  /// Handles errors by invoking the error callback and logging in debug mode.
-  ///
-  /// [error] The error that occurred.
-  /// [onError] Optional callback to handle the error message.
   void _handleError(Object error, Function(String)? onError) {
     final errorMessage = error.toString();
     onError?.call(errorMessage);
     if (kDebugMode) {
-      print('WallpaperService error: $errorMessage');
+      debugPrint('WallpaperService error: $errorMessage');
+    }
+  }
+}
+
+
+
+
+enum WallpaperLocation {
+  home,
+  lock,
+  both,
+}
+
+extension WallpaperLocationExt on WallpaperLocation {
+  /// Native Android mapping
+  int get value {
+    switch (this) {
+      case WallpaperLocation.home:
+        return 1;
+      case WallpaperLocation.lock:
+        return 2;
+      case WallpaperLocation.both:
+        return 3;
+    }
+  }
+
+  String get label {
+    switch (this) {
+      case WallpaperLocation.home:
+        return 'Home Screen';
+      case WallpaperLocation.lock:
+        return 'Lock Screen';
+      case WallpaperLocation.both:
+        return 'Home & Lock Screen';
     }
   }
 }

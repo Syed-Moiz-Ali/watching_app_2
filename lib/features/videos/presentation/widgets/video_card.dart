@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
-import 'package:watching_app_2/shared/widgets/misc/gap.dart';
 import 'package:watching_app_2/shared/widgets/misc/text_widget.dart';
 import '../../../../core/constants/colors.dart';
 import '../../../../core/global/globals.dart';

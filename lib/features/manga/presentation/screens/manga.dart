@@ -1,8 +1,9 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:watching_app_2/shared/widgets/loading/loading_indicator.dart';
 
-import '../../../../core/enums/enums.dart';
 import '../../../../core/navigation/app_navigator.dart';
 import '../../../../data/database/local_database.dart';
 import '../../../../data/models/content_item.dart';
@@ -10,8 +11,6 @@ import '../../../../data/models/content_source.dart';
 import '../../../../data/scrapers/scraper_service.dart';
 import '../../../../shared/widgets/appbars/app_bar.dart';
 import '../../../../shared/widgets/buttons/floating_action_button.dart';
-import '../../../../shared/widgets/loading/pagination_indicator.dart';
-import '../../../../shared/widgets/misc/text_widget.dart';
 import '../../../wallpapers/presentation/widgets/wallpaper_grid_view.dart';
 import 'manga_detail/manga_detail.dart';
 
@@ -286,240 +285,8 @@ class _MangaState extends State<Manga> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildMangaHeaderInfo(ThemeData theme, bool isDark) {
-    return AnimatedBuilder(
-      animation: _statsController,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, 20 * (1 - _statsController.value)),
-          child: Opacity(
-            opacity: _statsController.value,
-            child: Container(
-              margin: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    theme.cardColor.withOpacity(0.9),
-                    theme.cardColor.withOpacity(0.7),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: isDark
-                      ? Colors.white.withOpacity(0.1)
-                      : Colors.grey.withOpacity(0.2),
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(isDark ? 0.3 : 0.08),
-                    blurRadius: 18,
-                    offset: const Offset(0, 6),
-                    spreadRadius: -2,
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  // Enhanced manga icon container
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          const Color(0xFFF59E0B)
-                              .withOpacity(0.15), // Amber for manga
-                          const Color(0xFFF59E0B).withOpacity(0.08),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: const Color(0xFFF59E0B).withOpacity(0.25),
-                        width: 1,
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.menu_book_rounded,
-                      color: const Color(0xFFF59E0B),
-                      size: 24,
-                    ),
-                  ),
 
-                  const SizedBox(width: 16),
 
-                  // Manga info
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              '${mangas.length} manga series',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: theme.textTheme.bodyLarge?.color,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.blue.withOpacity(0.15),
-                                    Colors.blue.withOpacity(0.08),
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.auto_stories_rounded,
-                                    size: 12,
-                                    color: Colors.blue,
-                                  ),
-                                  const SizedBox(width: 3),
-                                  Text(
-                                    'Digital',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.blue,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        if (_currentQuery.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.search_rounded,
-                                size: 14,
-                                color: Colors.grey[600],
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Search: "$_currentQuery"',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-
-                        const SizedBox(height: 6),
-
-                        // Manga-specific stats
-                        Row(
-                          children: [
-                            _buildStatChip(
-                              Icons.collections_bookmark_outlined,
-                              'Series',
-                              Colors.purple,
-                            ),
-                            const SizedBox(width: 8),
-                            _buildStatChip(
-                              Icons.update_rounded,
-                              'Updated',
-                              Colors.green,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Reading mode indicator
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          const Color(0xFFF59E0B).withOpacity(0.15),
-                          const Color(0xFFF59E0B).withOpacity(0.08),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: const Color(0xFFF59E0B).withOpacity(0.2),
-                        width: 1,
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.chrome_reader_mode_rounded,
-                          size: 16,
-                          color: const Color(0xFFF59E0B),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Read',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFFF59E0B),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildStatChip(IconData icon, String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: color.withOpacity(0.2),
-          width: 0.5,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 12,
-            color: color,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: color,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildPaginationLoader(ThemeData theme) {
     return AnimatedBuilder(
@@ -554,7 +321,7 @@ class _MangaState extends State<Manga> with TickerProviderStateMixin {
                   ),
                 ],
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
@@ -563,16 +330,16 @@ class _MangaState extends State<Manga> with TickerProviderStateMixin {
                     child: CircularProgressIndicator(
                       strokeWidth: 2.5,
                       valueColor:
-                          AlwaysStoppedAnimation(const Color(0xFFF59E0B)),
+                          AlwaysStoppedAnimation(Color(0xFFF59E0B)),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   Text(
                     'Loading more manga...',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFFF59E0B),
+                      color: Color(0xFFF59E0B),
                     ),
                   ),
                 ],
@@ -634,7 +401,7 @@ class _MangaState extends State<Manga> with TickerProviderStateMixin {
                 ),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.error_outline_rounded,
                 color: Colors.red,
                 size: 52,
@@ -723,9 +490,9 @@ class _MangaState extends State<Manga> with TickerProviderStateMixin {
                 ),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.menu_book_outlined,
-                color: const Color(0xFFF59E0B),
+                color: Color(0xFFF59E0B),
                 size: 64,
               ),
             ),

@@ -1,9 +1,7 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, deprecated_member_use
 
 import 'dart:developer';
-import 'dart:ui';
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -487,8 +485,7 @@ class _PremiumFilterButtonState extends State<PremiumFilterButton>
   late Animation<double> _scaleAnimation;
   late Animation<double> _glowAnimation;
 
-  bool _isPressed = false;
-  bool _isHovered = false;
+
 
   @override
   void initState() {
@@ -542,21 +539,18 @@ class _PremiumFilterButtonState extends State<PremiumFilterButton>
 
   void _handleTapDown(TapDownDetails details) {
     if (!widget.isEnabled) return;
-    setState(() => _isPressed = true);
     _pressController.forward();
     HapticFeedback.lightImpact();
   }
 
   void _handleTapUp(TapUpDetails details) {
     if (!widget.isEnabled) return;
-    setState(() => _isPressed = false);
     _pressController.reverse();
     widget.onPressed();
   }
 
   void _handleTapCancel() {
     if (!widget.isEnabled) return;
-    setState(() => _isPressed = false);
     _pressController.reverse();
   }
 
